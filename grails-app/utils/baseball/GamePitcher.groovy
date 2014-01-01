@@ -14,6 +14,7 @@ class GamePitcher
     int whip = 0
     int balks = 0
     int runs = 0
+    int pitches = 0
 
     def getBattersFaced() {
         battersRetired + walks + hits + hitByPitch

@@ -64,8 +64,17 @@ class BallGame {
         }
         awayTeam["starterIndex"] = awayStarterIndex
         homeTeam["starterIndex"] = homeStarterIndex
-        awayBullpen << awayRotation[0]
-        homeBullpen << homeRotation[0]
+
+        println "Away Bullpen:"
+        for (int i=5; i <= awayRotation.size()-1; i++) {
+            awayBullpen << awayRotation[i]
+            println "${awayRotation[i].simPitcher.pitcher.name}"
+        }
+        println "Home Bullpen:"
+        for (int i=5; i <= homeRotation.size()-1; i++) {
+            homeBullpen << homeRotation[i]
+            println "${homeRotation[i].simPitcher.pitcher.name}"
+        }
 
         awayLineup.each {
             it.reset()
@@ -662,6 +671,13 @@ class BallGame {
 
         def stealAttemptResult = tryStolenBase()
         if (stealAttemptResult == AtBatResult.NO_STEAL) {
+            // Increment pitch count
+            if (gamePitcher.battersFaced % 2 == 0) {
+                gamePitcher.pitches += 3
+            } else {
+                gamePitcher.pitches += 4
+            }
+
             // Batter Info
             SimBatter simBatter = gameBatter.simBatter
             SimPitcher simPitcher = gamePitcher.simPitcher

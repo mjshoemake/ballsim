@@ -16,11 +16,11 @@ class SimPitcher {
     double whip = 0
     int balks = 0
     int runs = 0
-    int ipGame1 = 0
-    int ipGame2 = 0
-    int ipGame3 = 0
-    int ipGame4 = 0
-    int ipGame5 = 0
+    int pitchesGame1 = 0
+    int pitchesGame2 = 0
+    int pitchesGame3 = 0
+    int pitchesGame4 = 0
+    int pitchesGame5 = 0
 
     static hasOne = [pitcher: Pitcher]
 
@@ -39,11 +39,11 @@ class SimPitcher {
         whip(nullable: false)
         balks(nullable: false)
         runs(nullable: false)
-        ipGame1(nullable: false)
-        ipGame2(nullable: false)
-        ipGame3(nullable: false)
-        ipGame4(nullable: false)
-        ipGame5(nullable: false)
+        pitchesGame1(nullable: false)
+        pitchesGame2(nullable: false)
+        pitchesGame3(nullable: false)
+        pitchesGame4(nullable: false)
+        pitchesGame5(nullable: false)
     }
 
     def getBattersFaced() {
