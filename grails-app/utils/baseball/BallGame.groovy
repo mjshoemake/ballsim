@@ -44,6 +44,8 @@ class BallGame {
     def start() {
         awayLineup = awayTeam["lineup"]
         homeLineup = homeTeam["lineup"]
+        awayBullpen = awayTeam["bullpen"]
+        homeBullpen = homeTeam["bullpen"]
         awayTeamName = awayTeam["teamName"]
         homeTeamName = homeTeam["teamName"]
         def awayRotation = awayTeam["rotation"]
