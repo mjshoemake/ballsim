@@ -55,7 +55,7 @@ class AtBatTests {
 
 
         for (int i=0; i <= batter.atBats - 1; i++) {
-            ballGame.pitchToBatter(gameBatter, gamePitcher)
+            ballGame.pitchToBatter(gameBatter, gamePitcher, SimStyle.COMBINED)
             println "Sim Batter - Avg: ${gameBatter.battingAvg}  HR: ${gameBatter.homers}  Doubles: ${gameBatter.doubles}  Triples: ${gameBatter.triples}"
         }
 

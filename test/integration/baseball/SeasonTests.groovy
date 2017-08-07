@@ -25,7 +25,7 @@ class SeasonTests {
         def fileTeamLoader = new FileTeamLoader()
 
         // Load teams
-        division << bravesTeamLoader.loadBraves2003()
+        //division << bravesTeamLoader.loadBraves2003()
         division << fileTeamLoader.loadTeamFromFile("Phillies", 2003)
         division << fileTeamLoader.loadTeamFromFile("Mets", 2003)
         division << fileTeamLoader.loadTeamFromFile("Expos", 2003)
