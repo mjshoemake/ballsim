@@ -10,6 +10,7 @@ grails.project.source.level = 1.6
 //grails.project.fork = [
 //   run: [maxMemory:1024, minMemory:64, debug:false, maxPerm:256]
 //]
+grails.project.dependency.resolver = "maven"
 
 grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
@@ -42,22 +43,27 @@ grails.project.dependency.resolution = {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes e.g.
 
         // runtime 'mysql:mysql-connector-java:5.1.22'
+        build "log4j:log4j:1.2.17"
     }
 
     plugins {
-        runtime ":hibernate:$grailsVersion"
-        runtime ":jquery:1.8.3"
-        runtime ":resources:1.1.6"
+        //runtime ":hibernate:$grailsVersion"]
+        //runtime ":jquery:1.8.3"
+        //runtime ":resources:1.1.6"
 
         // Uncomment these (or add new ones) to enable additional resources capabilities
         //runtime ":zipped-resources:1.0"
         //runtime ":cached-resources:1.0"
         //runtime ":yui-minify-resources:0.1.5"
 
-        build ":tomcat:$grailsVersion"
+        //build ":tomcat:$grailsVersion"
+        build ":tomcat:8.0.33"
 
-        runtime ":database-migration:1.3.2"
+        //runtime ":database-migration:1.3.2"
+        //runtime ':database-migration:1.3.1'
 
-        compile ':cache:1.0.1'
+        //compile "org.grails.plugins:hibernate4:5.0.0.RC1"
+        compile "org.grails.plugins:hibernate:3.6.10.19"
+        //compile ':cache:1.0.1'
     }
 }

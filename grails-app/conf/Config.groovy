@@ -79,16 +79,16 @@ log4j = {
     appenders {
         appender new DailyRollingFileAppender(name: 'gamelog',
                                               layout: new EnhancedPatternLayout('[%d{MM-dd-yyyy HH:mm:ss-SSS}]%.11t %.11c %.5p [%C{1}.%M] - %m%n'),
-                                              file: "/Users/mshoemake/baseball/logs/game.log")
+                                              file: "/logs/ballsim/game.log")
         appender new DailyRollingFileAppender(name: 'boxscore',
                                               layout: new EnhancedPatternLayout('[%d{MM-dd-yyyy HH:mm:ss-SSS}]%.11t %.11c %.5p [%C{1}.%M] - %m%n'),
-                                              file: "/Users/mshoemake/baseball/logs/boxscore.log")
+                                              file: "/logs/ballsim/boxscore.log")
         appender new DailyRollingFileAppender(name: 'highlights',
                                               layout: new EnhancedPatternLayout('[%d{MM-dd-yyyy HH:mm:ss-SSS}]%.11t %.11c %.5p [%C{1}.%M] - %m%n'),
-                                              file: "/Users/mshoemake/baseball/logs/highlights.log")
+                                              file: "/logs/ballsim/highlights.log")
         appender new DailyRollingFileAppender(name: 'seasonStats',
                                               layout: new EnhancedPatternLayout('[%d{MM-dd-yyyy HH:mm:ss-SSS}]%.11t %.11c %.5p [%C{1}.%M] - %m%n'),
-                                              file: "/Users/mshoemake/baseball/logs/seasonStats.log")
+                                              file: "/logs/ballsim/seasonStats.log")
 
         console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
     }

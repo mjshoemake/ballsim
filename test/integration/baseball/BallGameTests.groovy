@@ -10,13 +10,15 @@ class BallGameTests {
     void setUp() {
         ballGame = new BallGame()
 
-        def bravesTeamLoader = new BravesTeamLoader()
+        //def bravesTeamLoader = new BravesTeamLoader()
         def fileTeamLoader = new FileTeamLoader()
-        def braves2003 = bravesTeamLoader.loadBraves2003()
+        //def braves2003 = bravesTeamLoader.loadBraves2003
+        def mets2003 = fileTeamLoader.loadTeamFromFile("Mets", 2003)
         def phillies2003 = fileTeamLoader.loadTeamFromFile("Phillies", 2003)
 
         ballGame.with {
-            awayTeam = braves2003
+            //awayTeam = braves2003
+            awayTeam = mets2003
             homeTeam = phillies2003
         }
     }

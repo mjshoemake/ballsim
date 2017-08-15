@@ -1,0 +1,14 @@
+# IDEA Ignores #
+################
+*.iml
+*.ipr
+*.iws
+.idea/
+out/
+local.properties
+target/
+
+# Compiled source #
+###################
+*.class
+
