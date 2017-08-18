@@ -7,13 +7,17 @@ class Season {
 
     def league
     def schedule
+    def scheduleIndex = 0
     def highlightsLog = Logger.getLogger('highlights')
     def seasonStatsLog = Logger.getLogger('seasonStats')
     def gameLogEnabled = true
     def highlightsLogEnabled = true
     def boxscoreLogEnabled = true
 
-    void playSeason() {
+    void startSeason(def league, def schedule) {
+        this.league = league;
+        this.schedule = schedule;
+
         def teamList = []
 
         def it = league.keySet().iterator()
@@ -23,7 +27,10 @@ class Season {
                 teamList << next
             }
         }
+    }
 
+    void playSeason(def league, schedule) {
+        startSeason(league, schedule)
         schedule.each() { game ->
             def ballGame = new BallGame()
             ballGame.gameLogEnabled = this.gameLogEnabled
