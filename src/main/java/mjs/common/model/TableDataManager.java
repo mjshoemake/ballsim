@@ -1,4 +1,4 @@
-package com.accenture.core.model;
+package mjs.common.model;
 
 import java.util.ArrayList;
 

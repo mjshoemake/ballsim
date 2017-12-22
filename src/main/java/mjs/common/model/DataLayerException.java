@@ -1,4 +1,4 @@
-package com.accenture.core.model;
+package mjs.common.model;
 
 
 
@@ -6,7 +6,7 @@ package com.accenture.core.model;
  * A DataLayerException is an CoreException used specifically for the
  * data access layer found in com.accenture.core.model.
  */
-public class DataLayerException extends com.accenture.core.utils.CoreException
+public class DataLayerException extends mjs.common.exceptions.CoreException
 {
    /**
     * Constructor.
@@ -24,7 +24,7 @@ public class DataLayerException extends com.accenture.core.utils.CoreException
     * @param s
     * @param e
     */
-   public DataLayerException(String s, java.lang.Exception e)
+   public DataLayerException(String s, Exception e)
    {
       super(s, e);
    }

@@ -1,4 +1,4 @@
-package com.accenture.core.utils;
+package mjs.common.utils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.Hashtable;
 import com.accenture.core.model.fielddef.FieldDefinition;
 import org.apache.log4j.Logger;
+import mjs.common.exceptions.CoreException;
+
 
 
 /**
@@ -171,7 +173,7 @@ public class FormatUtils
          df.setLenient(false);
          return df.parse(date);
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          throw new CoreException("Error parsing date '" + date + "'.  Invalid date.", e);
       }
@@ -203,7 +205,7 @@ public class FormatUtils
          df.parse(date);
          return true;
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          return false;
       }

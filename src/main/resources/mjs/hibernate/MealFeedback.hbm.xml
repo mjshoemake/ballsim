@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+          "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+  <class name="mjs.model.MealFeedback" table="meal_feedback">
+    <id name="meal_feedback_pk" column="meal_feedback_pk" type="int">
+      <generator class="increment"/>
+    </id>
+    <property name="user_pk" type="int" not-null="true"/>
+    <property name="fork_rating" type="int" not-null="true"/>
+    <property name="comments" type="string" not-null="false"/>
+  </class>
+</hibernate-mapping>

@@ -1,10 +1,12 @@
-package com.accenture.core.model.fielddef;
+package mjs.common.model.fielddef;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import com.accenture.core.model.fielddef.FieldDefinition;
+import com.accenture.core.model.fielddef.FieldDefinitionList;
 import com.accenture.core.utils.*;
 
 
@@ -61,7 +63,7 @@ public class FieldDefMappingLoader extends Loggable
          FieldDefinitionList defs = (FieldDefinitionList)CastorObjectConverter.convertXMLToObject(mapping, FieldDefinitionList.class, url);
          return populateHashtable(defs);
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          throw new CoreException("Error loading database table field type definitions.", e);
       }

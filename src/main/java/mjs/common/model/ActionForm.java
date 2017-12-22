@@ -1,4 +1,4 @@
-package com.accenture.core.model;
+package mjs.common.model;
 
 import com.accenture.core.utils.CoreException;
 import org.apache.log4j.Logger;
@@ -50,7 +50,7 @@ public abstract class ActionForm extends org.apache.struts.action.ActionForm
          if (category != null)
             log = Logger.getLogger(category);
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          log.error(new CoreException("Error creating action form.", e));
       }

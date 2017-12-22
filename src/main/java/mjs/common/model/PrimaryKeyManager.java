@@ -1,5 +1,5 @@
 
-package com.accenture.core.model;
+package mjs.common.model;
 
 import java.sql.ResultSet;
 import java.util.Vector;

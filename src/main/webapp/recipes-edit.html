@@ -1,0 +1,104 @@
+			<div id="recipes" class="row-liquid">
+				<div class="row">
+					<div class="col-md-12 scrollable" height="100%">
+						<p>
+						<!-- Page Title -->
+						<div class="page-header">New Recipe</div>
+						<p/>&nbsp;<p/>
+
+						<div class="panel panel-primary">
+							<!-- Default panel contents -->
+							<div class="panel-heading">Please update the information for this recipe below as needed and click "Save". To return to the previous page without making changes, click "Cancel".</div>
+
+							<table width="100%">
+								<tr>
+									<td width="40px">&nbsp;</td> 
+									<td width="160px">&nbsp;</td> 
+									<td>&nbsp;</td> 
+								</tr>
+								<tr>
+									<td>&nbsp;</td> 
+									<td>Recipe Name:</td>
+									<td><input name="name" type="textbox" size="60" ng-model="recipeToEdit.name" /></td>
+								</tr>
+                                <tr ng-if="recipeToEdit.favorite == 'Yes'">
+                                    <td>&nbsp;</td>
+                                    <td>Ingredients:</td>
+                                    <td><textarea name="ingredients" cols="50" rows="7" ng-model="recipeToEdit.ingredients"></textarea></td>
+                                </tr>
+                                <tr ng-if="recipeToEdit.favorite == 'Yes'">
+                                    <td>&nbsp;</td>
+                                    <td>Directions:</td>
+                                    <td><textarea name="directions" cols="50" rows="7" ng-model="recipeToEdit.directions"></textarea></td>
+                                </tr>
+                                <tr ng-if="recipeToEdit.favorite == 'Yes'">
+                                    <td>&nbsp;</td>
+                                    <td>Nutrition:</td>
+                                    <td><textarea name="directions" cols="50" rows="3" ng-model="recipeToEdit.nutrition"></textarea></td>
+                                </tr>
+                                <tr ng-if="recipeToEdit.favorite == 'Yes'">
+                                    <td>&nbsp;</td>
+                                    <td>Servings:</td>
+                                    <td><input name="servings" type="textbox" size="30" maxlength="30" ng-model="recipeToEdit.servings" /></td>
+                                </tr>
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td>Cookbook:</td>
+                                    <td>
+                                        <select name="cookbook_pk" ng-model="recipeToEdit.cookbook_pk">
+                                            <option ng-repeat="cookbook in cookbookList|orderBy:'name'" value="{{cookbook.cookbooks_pk}}">{{cookbook.name}}</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td>Meal:</td>
+                                    <td>
+                                        <select name="meals_pk" ng-model="recipeToEdit.meals_pk">
+                                            <option ng-repeat="meal in mealList|orderBy:'name'" value="{{meal.meals_pk}}">{{meal.name}}</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td>Food Category:</td>
+                                    <td>
+                                        <select name="meal_categories_pk" ng-model="recipeToEdit.meal_categories_pk">
+                                            <option ng-repeat="foodCategory in foodCategoryList|orderBy:'name'" value="{{foodCategory.meal_categories_pk}}">{{foodCategory.name}}</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr ng-if="recipeToEdit.favorite == 'Yes'">
+                                    <td>&nbsp;</td>
+                                    <td>Servings Size:</td>
+                                    <td><input name="serving_size" type="textbox" size="20" maxlength="20" ng-model="recipeToEdit.serving_size" /></td>
+                                </tr>
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td>Notes:</td>
+                                    <td><textarea name="notes" cols="50" rows="5" ng-model="recipeToEdit.notes"></textarea></td>
+                                </tr>
+								<tr>
+									<td>&nbsp;</td> 
+									<td>&nbsp;</td> 
+									<td>&nbsp;</td> 
+								</tr>
+								<tr>
+									<td>&nbsp;</td> 
+									<td colspan="2">
+									    <button type="button" class="btn btn-default" ng-click="update()">Save</button>
+									    &nbsp;&nbsp;
+									    <button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
+                                        &nbsp;&nbsp;
+                                        <button type="button" class="btn btn-default" ng-click="delete()">Delete</button>
+                                        &nbsp;&nbsp;
+                                        <button type="button" class="btn btn-default" ng-click="favorite()">Favorite</button>
+                                        &nbsp;&nbsp;
+									</td>
+								</tr>
+							</table>					
+						</div>					
+						<p/>	
+					</div>			
+				</div>            			
+			</div>            		

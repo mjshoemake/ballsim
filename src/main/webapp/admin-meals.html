@@ -1,0 +1,46 @@
+			<div id="meals" class="row-liquid">
+				<div class="row" ng-controller="MealListController">
+					<div class="col-md-2 scrollable">
+						<p/>
+						<ul class="nav nav-pills nav-stacked">
+                            <li><a ng-click="goto('/adminCookbooks')">Cookbooks</a></li>
+                            <li><a ng-click="goto('/adminFoodCategories')">Food Categories</a></li>
+                            <li><a class="active" ng-click="goto('/adminMeals')">Meals</a></li>
+                            <li><a ng-click="goto('/adminUsers')">Users</a></li>
+						</ul>
+					</div>
+					<div class="col-md-10 scrollable">
+						<p>
+						<!-- Page Title -->
+						<div class="page-header">Meals</div>
+						<p/>
+			
+						<!-- Jumbotron Example -->
+						<div class="jumbotron">
+							<p class="jumbotron">This page allows you to add, update, and delete meals.  Each recipe has an associated meal used to organize the recipes.</p>
+						</div>
+			
+						<p/>&nbsp;<p/>
+						<button type="button" class="btn btn-default" ng-click="goto('/adminNewMeal')">New Meal</button>
+						&nbsp;&nbsp;
+						<button type="button" class="btn btn-default" ng-click="removeSelected()">Delete</button>
+						<p/>	
+						<div class="panel panel-primary">
+							<!-- Default panel contents -->
+							<div class="panel-heading">Meal List</div>
+							<table width="100%">
+								<tr>
+									<th width="40px"><input id="selectAll" type="checkbox" ng-model="allSelected" ng-change="selectAll()"/></th> 
+									<th>Meal Name</th>
+								</tr>
+								
+								<tr ng-repeat="meal in mealList|orderBy:'name'" ng-class-even="'highlight'">
+									<td><input id="{{meal.meals_pk}}" name="listselect" type="checkbox" ng-model="meal.selected"/></td> 
+									<td><a ng-click="edit(meal.meals_pk)">{{meal.name}}</a></td> 
+								</tr>
+							</table>					
+						</div>					
+					</div>			
+				</div>
+				<script src="js/app-meals.js"></script>
+			</div>            		

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+          "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+  <class name="mjs.model.Recipe" table="recipes">
+    <id name="recipes_pk" column="recipes_pk" type="int">
+      <generator class="increment"/>
+    </id>
+    <property name="name" type="string" not-null="false"/>
+    <property name="servings" type="string" not-null="false"/>
+    <property name="cookbook_pk" type="int" not-null="false"/>
+    <property name="nutrition" type="string" not-null="false"/>
+    <property name="picture_filename" type="string" not-null="false"/>
+    <property name="meals_pk" type="int" not-null="false"/>
+    <property name="meal_categories_pk" type="int" not-null="false"/>
+    <property name="notes" type="string" not-null="false"/>
+    <property name="calories_per_serving" type="int" not-null="false"/>
+    <property name="ingredients" type="string" not-null="false"/>
+    <property name="directions" type="string" not-null="false"/>
+    <property name="serving_size" type="string" not-null="false"/>
+    <property name="favorite" type="string" not-null="false"/>
+  </class>
+</hibernate-mapping>

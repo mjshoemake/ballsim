@@ -1,5 +1,5 @@
 
-package com.accenture.core.model;
+package mjs.common.model;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
@@ -179,7 +179,7 @@ public class DatabaseDriver
       {
          throw dle;
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          throw new DataLayerException("Error populating bean list from result set. " + e.getMessage(), e);
       }
@@ -257,7 +257,7 @@ public class DatabaseDriver
       {
          throw dle;
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          throw new DataLayerException("Error populating bean list from result set.", e);
       }

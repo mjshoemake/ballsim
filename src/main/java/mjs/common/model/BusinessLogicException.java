@@ -1,4 +1,4 @@
-package com.accenture.core.model;
+package mjs.common.model;
 
 
 
@@ -24,7 +24,7 @@ public class BusinessLogicException extends com.accenture.core.utils.CoreExcepti
     * @param s
     * @param e
     */
-   public BusinessLogicException(String s, java.lang.Exception e)
+   public BusinessLogicException(String s, Exception e)
    {
       super(s, e);
    }

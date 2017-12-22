@@ -1,4 +1,4 @@
-package com.accenture.core.model;
+package mjs.common.model;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
@@ -8,10 +8,11 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Hashtable;
-import com.accenture.core.model.fielddef.FieldDefinition;
-import com.accenture.core.utils.BeanUtils;
-import com.accenture.core.utils.DateUtils;
-import com.accenture.core.utils.FormatUtils;
+import mjs.common.model.fielddef.FieldDefinition;
+import mjs.common.model.DataLayerException;
+import mjs.common.utils.BeanUtils;
+import mjs.common.utils.DateUtils;
+import mjs.common.utils.FormatUtils;
 import org.apache.log4j.Logger;
 
 
@@ -219,7 +220,7 @@ public abstract class AbstractDataManager
       {
          throw ex;
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          throw new DataLayerException("Error populating PreparedStatement attributes.", e);
       }
@@ -425,7 +426,7 @@ public abstract class AbstractDataManager
       {
          throw e;
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          throw new DataLayerException("Error populating PreparedStatement attributes.", e);
       }
@@ -460,7 +461,7 @@ public abstract class AbstractDataManager
       {
          throw ex;
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          throw new DataLayerException("Error populating PreparedStatement attributes.", e);
       }
@@ -645,7 +646,7 @@ public abstract class AbstractDataManager
          sql.append(whereClause);
          return sql.toString();
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          throw new DataLayerException("Unable to generate SQL to load data from the database.", e);
       }
@@ -824,7 +825,7 @@ public abstract class AbstractDataManager
       {
          throw e;
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          throw new DataLayerException("Error loading mapping file.", e);
       }
@@ -967,7 +968,7 @@ public abstract class AbstractDataManager
       {
          throw e;
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          throw new DataLayerException("Error converting attribute to string.", e);
       }

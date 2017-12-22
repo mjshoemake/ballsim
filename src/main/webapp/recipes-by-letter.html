@@ -1,0 +1,74 @@
+			<div id="recipesByLetter" class="row-liquid">
+				<div class="row" ng-controller="RecipeByLetterController">
+					<div class="col-md-12">
+						<p>
+						<!-- Page Title -->
+						<div class="page-header">Recipes</div>
+						<p/>
+			
+						<!-- Jumbotron Example -->
+						<div class="jumbotron">
+							<p class="jumbotron">This page allows you to see the list of recipes grouped by first letter. To edit a recipe, click the recipe name below.</p>
+						</div>
+			
+						<p/>&nbsp;<p/>
+
+						<button type="button" class="btn btn-default" ng-click="goto('/recipesAll')">All Recipes</button>
+						&nbsp;&nbsp;
+						<button type="button" class="btn btn-default" ng-click="goto('/recipesDetailed')">Show Details</button>
+						&nbsp;&nbsp;
+						<button type="button" class="btn btn-default" ng-click="goto('/recipesNew')">New Recipe</button>
+						&nbsp;&nbsp;
+						<button type="button" class="btn btn-default" ng-click="goto('/recipesNewTest')">New Recipe To Try</button>
+
+						<p/>&nbsp;<p/>
+						<div class="letterlinks">	
+							<a ng-click="goto('/recipesByLetter/A')">A</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/B')">B</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/C')">C</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/D')">D</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/E')">E</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/F')">F</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/G')">G</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/H')">H</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/I')">I</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/J')">J</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/K')">K</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/L')">L</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/M')">M</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/N')">N</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/O')">O</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/P')">P</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/Q')">Q</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/R')">R</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/S')">S</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/T')">T</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/U')">U</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/V')">V</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/W')">W</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/X')">X</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/Y')">Y</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a ng-click="goto('/recipesByLetter/Z')">Z</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						</div>
+						<p/>&nbsp;<p/>
+						<div class="letterheader">{{letter}}</div>
+						<p/>&nbsp;<p/>
+						<div class="col-md-4">
+                            <li ng-repeat="recipe in col1|orderBy:'name'">
+                                <a ng-click="edit(recipe.recipes_pk)">{{recipe.name}}</a>
+                            </li>
+						</div>
+						<div class="col-md-4">
+                            <li ng-repeat="recipe in col2|orderBy:'name'">
+                                <a ng-click="edit(recipe.recipes_pk)">{{recipe.name}}</a>
+                            </li>
+						</div>
+						<div class="col-md-4">
+                            <li ng-repeat="recipe in col3|orderBy:'name'">
+                                <a ng-click="edit(recipe.recipes_pk)">{{recipe.name}}</a>
+                            </li>
+						</div>
+					</div>
+				</div>            			
+				<script src="js/app-recipes.js"></script>
+			</div>            		

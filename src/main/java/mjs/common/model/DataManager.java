@@ -1,4 +1,4 @@
-package com.accenture.core.model;
+package mjs.common.model;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
@@ -103,7 +103,7 @@ public class DataManager extends AbstractDataManager
       {
          throw e;
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          throw new DataLayerException("Unable to load data using SQL statement. " + e.getMessage(), e);
       }
@@ -165,7 +165,7 @@ public class DataManager extends AbstractDataManager
       {
          throw e;
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          throw new DataLayerException("Unable to load data from the table "+table+".", e);
       }
@@ -220,7 +220,7 @@ public class DataManager extends AbstractDataManager
       {
          throw e;
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          throw new DataLayerException("Unable to load data using SQL.", e);
       }
@@ -289,7 +289,7 @@ public class DataManager extends AbstractDataManager
       {
          throw e;
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          throw new DataLayerException("Unable to load object from database table "+table+".", e);
       }
@@ -343,7 +343,7 @@ public class DataManager extends AbstractDataManager
       {
          throw e;
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          throw new DataLayerException("Unable to count rows from the table "+table+".", e);
       }
@@ -389,7 +389,7 @@ public class DataManager extends AbstractDataManager
          log.info("Delete SQL: "+deleteSQL);
          getDriver().executeStatement(deleteSQL, getConnection());
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          throw new DataLayerException("Error deleting rows from table "+table+".", e);
       }
@@ -489,7 +489,7 @@ public class DataManager extends AbstractDataManager
 
          return primaryKeyValue;
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          log.error("Bean properties:");
          String[] lines = LogUtils.dataToStrings(bean);
@@ -563,7 +563,7 @@ public class DataManager extends AbstractDataManager
          
          return primaryKeyValue;
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          log.error("Bean properties:");
          String[] lines = LogUtils.dataToStrings(bean);
@@ -666,7 +666,7 @@ public class DataManager extends AbstractDataManager
             statement.clearParameters();
          }
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          log.error("Error trying to insert Bean:");
          String[] lines = LogUtils.dataToStrings(bean);
@@ -742,7 +742,7 @@ public class DataManager extends AbstractDataManager
             }
          }
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          log.error("SQL: "+insertSQL);
          throw new DataLayerException("Unable to save bean to the database.", e);
@@ -794,7 +794,7 @@ public class DataManager extends AbstractDataManager
          // Execute the statement.
          statement.executeUpdate();
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          log.error("SQL: "+updateSQL);
          throw new DataLayerException("Unable to save bean to the database.", e);
@@ -861,7 +861,7 @@ public class DataManager extends AbstractDataManager
       {
          throw ex;   
       }
-      catch (java.lang.Exception e)
+      catch (Exception e)
       {
          throw new DataLayerException("Unable to save list to the database.", e);
       }

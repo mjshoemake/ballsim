@@ -1,74 +1,27 @@
 package baseball
 
-import baseball.domain.BallGame
-import baseball.domain.Batter
-import baseball.domain.Pitcher
-import baseball.domain.GamePitcher
-import baseball.domain.SimPitcher
-import baseball.domain.GameBatter
-import baseball.domain.SimBatter
-import baseball.domain.SimStyle
-
+import baseball.domain.*
+import baseball.processing.LeagueWriter
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-class AtBatTests {
+class LeagueWriterTest {
 
-    def ballGame = null
+    def leagueWriter = null
 
     @Before
     void setUp() {
-        ballGame = new BallGame()
+       leagueWriter = new LeagueWriter()
     }
 
     @After
     void tearDown() {
-        ballGame = null
+        leagueWriter = null
     }
 
     @Test
-    void testPitchToBatter() {
-        def batter = new Batter()
-        batter.with {
-            name = "Javy Lopez"
-            position = "C"
-            atBats = 457
-            hits = 150
-            walks = 33
-            strikeouts = 90
-            homers = 43
-            caughtStealing = 1
-            stolenBases = 0
-            doubles = 29
-            triples = 3
-            hitByPitch = 4
-        }
-        def pitcher = new Pitcher()
-        pitcher.with {
-            name = "Greg Maddux"
-            position = "SP"
-            battersRetired = 655
-            hits = 225
-            walks = 33
-            strikeouts = 124
-            homers = 24
-            hitByPitch = 4
-            whip = BigDecimal.valueOf(1.18)
-            balks = 0
-        }
-        def gameBatter = new GameBatter()
-        gameBatter.simBatter = new SimBatter(batter: batter)
-        def gamePitcher = new GamePitcher()
-        gamePitcher.simPitcher = new SimPitcher(pitcher: pitcher)
-
-
-        for (int i=0; i <= batter.atBats - 1; i++) {
-            ballGame.pitchToBatter(gameBatter, gamePitcher, SimStyle.COMBINED)
-            println "Sim Batter - Avg: ${gameBatter.battingAvg}  HR: ${gameBatter.homers}  Doubles: ${gameBatter.doubles}  Triples: ${gameBatter.triples}"
-        }
-
-        println "Sim Batter - Avg: ${gameBatter.battingAvg}  HR: ${gameBatter.homers}  Doubles: ${gameBatter.doubles}  Triples: ${gameBatter.triples}"
-        println "Sim Pitcher - Faced: ${gamePitcher.battersFaced}  Retired: ${gamePitcher.battersRetired}  ERA: ${gamePitcher.getERA()}  Opp. Avg: ${gamePitcher.getOppAvg()}"
+    void testGetLeague() {
+        String
     }
 }

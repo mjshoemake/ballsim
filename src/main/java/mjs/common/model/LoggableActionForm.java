@@ -1,4 +1,4 @@
-package com.accenture.core.model;
+package mjs.common.model;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;

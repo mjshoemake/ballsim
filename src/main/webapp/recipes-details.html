@@ -1,0 +1,92 @@
+			<div id="recipesByLetter" class="row-liquid">
+				<div class="row" ng-controller="RecipesController">
+					<div class="col-md-12 scrollable">
+						<p>
+						<!-- Page Title -->
+						<div class="page-header">Recipes</div>
+						<p/>
+			
+						<!-- Jumbotron Example -->
+						<div class="jumbotron">
+							<p class="jumbotron">This page allows you to see the list of recipes grouped by first letter. To edit a recipe, click the recipe name below.</p>
+						</div>
+			
+						<p/>&nbsp;<p/>
+
+						<button type="button" class="btn btn-default" onclick="goto('recipes-all.html')">All Recipes</button>
+						&nbsp;&nbsp;
+                        <button type="button" class="btn btn-default" ng-click="goto('/recipesAll')">All Recipes</button>
+						&nbsp;&nbsp;
+                        <button type="button" class="btn btn-default" ng-click="goto('/recipesNew')">New Recipe</button>
+                        &nbsp;&nbsp;
+                        <button type="button" class="btn btn-default" ng-click="goto('/recipesNewTest')">New Recipe To Try</button>
+						<p/>&nbsp;<p/>
+
+
+                        <table>
+                            <tr>
+                                <th align="left" style="width: 260px;">Name&nbsp;</th>
+                                <th align="left" style="width: 190px;">Cookbook&nbsp;</th>
+                                <th align="left" style="width: 75px;">Meal&nbsp;</th>
+                                <th align="left" style="width: 110px;">Food Category&nbsp;</th>
+                                <th align="left" style="width: 80px;">Favorite?&nbsp;</th>
+                                <th align="left" >Cal. p/ Serv. (Ex. '< 200')&nbsp;</th>
+                            </tr>
+                            <tr>
+                                <td><input name="name" type="textbox" size="30" maxlength="30" width="100%" ng-model="recipeFilter.name" /></td>
+                                <td><input name="cookbook" type="textbox" size="30" maxlength="30" width="100%" ng-model="recipeFilter.cookbook" /></td>
+                                <td><input name="meal" type="textbox" size="30" maxlength="30" width="100%" ng-model="recipeFilter.meal" /></td>
+                                <td><input name="category" type="textbox" size="30" maxlength="30" width="100%" ng-model="recipeFilter.category" /></td>
+                                <td><input name="favorite" type="textbox" size="30" maxlength="30" width="100%" ng-model="recipeFilter.favorite" /></td>
+                                <td><input name="calPerServing" type="textbox" size="30" maxlength="30" width="100%" ng-model="recipeFilter.calPerServing" /></td>
+                            </tr>
+                            <tr ng-repeat="next in recipes|orderBy:'name'">
+                                <td>1</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr class="highlight">
+                                <td>2</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+
+                        </table>
+
+
+
+
+						<p/>&nbsp;<p/>
+						<div class="col-md-4">
+                            <li ng-repeat="recipe in col1|orderBy:'name'">
+                                <a href="#">{{recipe.name}}</a>
+                            </li>
+						</div>
+						<div class="col-md-4">
+                            <li ng-repeat="recipe in col2|orderBy:'name'">
+                                <a href="#">{{recipe.name}}</a>
+                            </li>
+						</div>
+						<div class="col-md-4">
+                            <li ng-repeat="recipe in col3|orderBy:'name'">
+                                <a href="#">{{recipe.name}}</a>
+                            </li>
+						</div>
+					</div>
+				</div>            			
+				<script src="js/app-cookbooks.js"></script>
+			</div>            		

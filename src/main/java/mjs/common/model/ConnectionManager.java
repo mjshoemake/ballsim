@@ -1,4 +1,4 @@
-package com.accenture.core.model;
+package mjs.common.model;
 
 import java.sql.*;
 import java.util.*;
@@ -237,7 +237,7 @@ class DBConnectionPool
                   perfLog.error("Error trying to get connection.  Ignoring error.", e);
                   e.printStackTrace();
                }
-               catch (java.lang.Exception ex)
+               catch (Exception ex)
                {
                   perfLog.error("Error trying to get connection.  Ignoring error.", ex);
                   ex.printStackTrace();
@@ -251,7 +251,7 @@ class DBConnectionPool
                }
            }
         }
-        catch (java.lang.Exception ex)
+        catch (Exception ex)
         {
            perfLog.error("Error trying to get connection.  Ignoring error.", ex);
         }
