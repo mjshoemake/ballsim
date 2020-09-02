@@ -1,3 +1,4 @@
+/*
 package mjs.common.core;
 
 import org.springframework.web.servlet.DispatcherServlet;
@@ -19,3 +20,4 @@ public class SpringServlet extends DispatcherServlet {
         }
     }
 }
+*/

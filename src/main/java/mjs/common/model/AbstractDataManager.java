@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Hashtable;
 import mjs.common.model.fielddef.FieldDefinition;
-import mjs.common.model.DataLayerException;
+//import mjs.common.model.DataLayerException;
 import mjs.common.utils.BeanUtils;
 import mjs.common.utils.DateUtils;
 import mjs.common.utils.FormatUtils;
@@ -491,7 +491,7 @@ public abstract class AbstractDataManager
 
       try
       {
-         PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(type, mapping);
+         PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(type);
 
          if (pds == null || pds.length == 0)
             throw new DataLayerException("Error creating Insert SQL. Bean Discriptors are missing.");
@@ -573,7 +573,7 @@ public abstract class AbstractDataManager
 
       try
       {
-         PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(type, mapping);
+         PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(type);
 
          if (pds == null || pds.length == 0)
             throw new DataLayerException("Error creating Insert SQL. Bean Discriptors are missing.");
@@ -618,7 +618,7 @@ public abstract class AbstractDataManager
 
       try
       {
-         PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(type, mapping);
+         PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(type);
 
          if (pds == null || pds.length == 0)
          {

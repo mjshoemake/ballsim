@@ -1,12 +1,10 @@
 package mjs.common.model;
 
-
-
 /**
  * A DataLayerException is an CoreException used specifically for the
  * data access layer found in com.accenture.core.model.
  */
-public class BusinessLogicException extends com.accenture.core.utils.CoreException
+public class BusinessLogicException extends mjs.common.exceptions.CoreException
 {
    /**
     * Constructor.

@@ -1,8 +1,8 @@
-
+/*
 package baseball
 
 import baseball.domain.Batter
-import mjs.common.utils.BsonConverter
+
 import mjs.common.utils.LogUtils
 import org.bson.BsonValue
 import org.junit.After
@@ -30,3 +30,4 @@ class BsonConverterTest {
         LogUtils.println(result)
     }
 }
+*/

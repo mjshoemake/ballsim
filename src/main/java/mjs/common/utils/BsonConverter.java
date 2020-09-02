@@ -92,16 +92,16 @@ public class BsonConverter {
                     Object val = map.get(key);
 
                     if (val instanceof Integer ||
-                        val instanceof Long ||
-                        val instanceof Float ||
-                        val instanceof Double ||
-                        val instanceof Boolean ||
-                        val instanceof Date ||
-                        val instanceof String ||
-                        val instanceof BigDecimal ||
-                        val instanceof BigInteger ||
-                        val instanceof Collection ||
-                        val instanceof Map) {
+                            val instanceof Long ||
+                            val instanceof Float ||
+                            val instanceof Double ||
+                            val instanceof Boolean ||
+                            val instanceof Date ||
+                            val instanceof String ||
+                            val instanceof BigDecimal ||
+                            val instanceof BigInteger ||
+                            val instanceof Collection ||
+                            val instanceof Map) {
                         BsonValue value = processBean(val, level + 1);
                         result.put(key, value);
                     }
@@ -158,16 +158,16 @@ public class BsonConverter {
                             } else {
                                 String key = fieldName;
                                 if (val instanceof Integer ||
-                                    val instanceof Long ||
-                                    val instanceof Float ||
-                                    val instanceof Double ||
-                                    val instanceof Boolean ||
-                                    val instanceof Date ||
-                                    val instanceof String ||
-                                    val instanceof BigDecimal ||
-                                    val instanceof BigInteger ||
-                                    val instanceof Collection ||
-                                    val instanceof Map) {
+                                        val instanceof Long ||
+                                        val instanceof Float ||
+                                        val instanceof Double ||
+                                        val instanceof Boolean ||
+                                        val instanceof Date ||
+                                        val instanceof String ||
+                                        val instanceof BigDecimal ||
+                                        val instanceof BigInteger ||
+                                        val instanceof Collection ||
+                                        val instanceof Map) {
                                     BsonValue value = processBean(val, level + 1);
                                     result.put(key, value);
                                 } else if (val == null) {
@@ -191,7 +191,7 @@ public class BsonConverter {
             if (bean != null)
                 className = bean.getClass().getName();
             throw new CoreException("Error converting bean to Bson: "
-                                               + className + ".", e);
+                    + className + ".", e);
         }
     }
 
@@ -240,9 +240,9 @@ public class BsonConverter {
                                             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
                                             writeArgs[0] = new ObjectId(formatter.parse(objId.get("date").toString()),
-                                                                        Integer.parseInt(objId.get("machineIdentifier").toString()),
-                                                                        Short.parseShort(objId.get("processIdentifier").toString()),
-                                                                        Integer.parseInt(objId.get("counter").toString()));
+                                                    Integer.parseInt(objId.get("machineIdentifier").toString()),
+                                                    Short.parseShort(objId.get("processIdentifier").toString()),
+                                                    Integer.parseInt(objId.get("counter").toString()));
                                         }
                                         method.invoke(result, writeArgs);
                                     } catch (Exception e) {
@@ -265,7 +265,7 @@ public class BsonConverter {
                     Object val = map.get(key);
 
                     if (val instanceof Collection ||
-                        val instanceof Map) {
+                            val instanceof Map) {
                         Object value = reconstructBean(val, level + 1);
                         map.put(key, value);
                     }
@@ -280,7 +280,7 @@ public class BsonConverter {
                 for (int k = 0; k < list.length; k++) {
                     Object val = list[k];
                     if (val instanceof Collection ||
-                        val instanceof Map) {
+                            val instanceof Map) {
                         val = reconstructBean(val, level + 1);
                     }
                     result.add(val);
@@ -313,7 +313,7 @@ public class BsonConverter {
                             } else {
                                 String key = fieldName;
                                 if (val instanceof Collection ||
-                                    val instanceof Map) {
+                                        val instanceof Map) {
                                     Object value = reconstructBean(val, level + 1);
                                     Method writeMethod = pds[i].getWriteMethod();
                                     writeArgs[0] = value;
@@ -339,7 +339,7 @@ public class BsonConverter {
     /**
      * This method reads a specified number of lines from the bottom of a
      * log file.
-     * 
+     *
      * @param fileName String - The name and path of the log file to read.
      * @param bytesFromEndToStart int - The number of bytes from the end of the file
      *                                  to start reading from.
@@ -347,21 +347,21 @@ public class BsonConverter {
      * @return ArrayList<String> - The bottom of the log file.
      * @throws Exception
      */
-    public static ArrayList<String> readLogFile(String fileName, 
-                                                int bytesFromEndToStart, 
-                                                int linesToReturn) throws Exception {     
+    public static ArrayList<String> readLogFile(String fileName,
+                                                int bytesFromEndToStart,
+                                                int linesToReturn) throws Exception {
         ArrayList<String> list = new ArrayList<String>();
 
         // Open the file.
         File f = new File(fileName);
         long fileLength = f.length();
         RandomAccessFile file = new RandomAccessFile(f, "r");
-        
+
         // Go to the end of the file minus a specified number of bytes.
         if (fileLength - bytesFromEndToStart > 0)
             file.seek(fileLength - bytesFromEndToStart);
         // Clear the first line.  It's probably a partial.
-        String line = file.readLine(); 
+        String line = file.readLine();
         // Read the file from this point.
         while( line != null )
         {
@@ -372,6 +372,6 @@ public class BsonConverter {
             line = file.readLine();
         }
 
-        return list;            
+        return list;
     }
 }

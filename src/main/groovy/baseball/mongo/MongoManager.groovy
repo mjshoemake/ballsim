@@ -1,21 +1,18 @@
 package baseball.mongo
 
-import com.mongodb.DB
-import com.mongodb.async.SingleResultCallback
-import com.mongodb.client.FindIterable
+
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoCursor
 import com.mongodb.MongoClient
 import com.mongodb.MongoClientURI
-import com.mongodb.WriteResult
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.result.DeleteResult
 import groovy.json.*
-import mjs.common.utils.BsonConverter
-import mjs.common.utils.LogUtils
 import org.bson.Document
 import org.bson.conversions.Bson
 import org.bson.types.ObjectId
+
+import mjs.common.utils.BsonConverter
 
 
 /**

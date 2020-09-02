@@ -1,5 +1,7 @@
 package mjs.model
 
+import mjs.common.model.ModelLoggable
+
 /**
  * This is the data object or suitcase for an HTTP response to the caller.
  */

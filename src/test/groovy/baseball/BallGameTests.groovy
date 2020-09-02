@@ -2,7 +2,8 @@ package baseball
 
 import baseball.processing.DatabankTeamLoader
 
-import com.accenture.core.utils.ConfigFileLoader
+import mjs.common.utils.ConfigFileLoader
+import mjs.common.model.DatabaseDriver
 import baseball.mongo.MongoManager
 import org.junit.*
 import baseball.domain.BallGame

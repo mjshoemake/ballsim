@@ -3,7 +3,7 @@ package mjs.common.utils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import com.accenture.core.utils.CoreException;
+import mjs.common.exceptions.CoreException;
 import org.apache.log4j.Logger;
 
 
@@ -374,8 +374,7 @@ public class Thread extends java.lang.Thread
       catch (java.lang.Exception e)
       {
          CoreException ex = new CoreException("Error occurred in thread.  method='" + executeMethod + "()', object=" + targetObject.getClass().getName() + ".", e);
-
-         LogUtils.log(log, ex);
+         log.error(ex.getMessage(), ex);
       }
    }
 }

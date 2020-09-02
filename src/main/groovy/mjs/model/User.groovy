@@ -1,12 +1,13 @@
  package mjs.model
 
-//import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+//import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.Id
 import javax.persistence.Table
-import javax.persistence.Transient;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import javax.persistence.Transient
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import mjs.common.model.ModelLoggable
 
 /**
  * This is the data object or suitcase for a User. This data object

@@ -12,9 +12,9 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 
 import com.accenture.core.model.fielddef.FieldDefinition;
-import com.accenture.core.utils.BeanUtils;
-import com.accenture.core.utils.LogUtils;
-import com.accenture.core.utils.StringUtils;
+import mjs.common.utils.BeanUtils;
+import mjs.common.utils.LogUtils;
+import mjs.common.utils.StringUtils;
 
 /**
  * The DataManager class is the class that retrieves from 
@@ -492,7 +492,7 @@ public class DataManager extends AbstractDataManager
       catch (Exception e)
       {
          log.error("Bean properties:");
-         String[] lines = LogUtils.dataToStrings(bean);
+         String[] lines = LogUtils.dataToStringsSilentMode(bean);
          for (int C=0; C <= lines.length-1; C++)
             log.error("   "+lines[C]);
 
@@ -566,7 +566,7 @@ public class DataManager extends AbstractDataManager
       catch (Exception e)
       {
          log.error("Bean properties:");
-         String[] lines = LogUtils.dataToStrings(bean);
+         String[] lines = LogUtils.dataToStringsSilentMode(bean);
          for (int C=0; C <= lines.length-1; C++)
             log.error("   "+lines[C]);
             
@@ -669,7 +669,7 @@ public class DataManager extends AbstractDataManager
       catch (Exception e)
       {
          log.error("Error trying to insert Bean:");
-         String[] lines = LogUtils.dataToStrings(bean);
+         String[] lines = LogUtils.dataToStringsSilentMode(bean);
          for (int D=0; D <= lines.length-1; D++)
             log.error("   "+lines[D]);
          
@@ -813,7 +813,13 @@ public class DataManager extends AbstractDataManager
     */
    public void saveBeanList(String table, PaginatedList list, String mappingFile, String deleteWhereClause) throws DataLayerException
    {
-      PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(list.getDataType());
+      PropertyDescriptor[] pds = null;
+
+      try {
+         pds = BeanUtils.getPropertyDescriptors(list.getDataType());
+      } catch (Exception e) {
+         throw new DataLayerException("Unable to save list to the database. Failed to extract list of properties.", e);
+      }
 
       if (list == null)
          throw new DataLayerException("Unable to save list to the database.  List is null.");

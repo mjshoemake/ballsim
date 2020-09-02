@@ -16,8 +16,8 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 import javax.crypto.spec.DESedeKeySpec;
 
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
+import java.util.Base64;
+
 
 @SuppressWarnings("all")
 public class JCEStringEncrypter implements Encryptor {
@@ -94,8 +94,7 @@ public class JCEStringEncrypter implements Encryptor {
             byte[] cleartext = unencryptedString.getBytes(UNICODE_FORMAT);
             byte[] ciphertext = cipher.doFinal(cleartext);
 
-            BASE64Encoder base64encoder = new BASE64Encoder();
-            return base64encoder.encode(ciphertext);
+            return bytes2String(Base64.getEncoder().encode(ciphertext));
         } catch (Exception e) {
             throw new EncryptionException(e);
         }
@@ -108,8 +107,7 @@ public class JCEStringEncrypter implements Encryptor {
         try {
             SecretKey key = keyFactory.generateSecret(keySpec);
             cipher.init(Cipher.DECRYPT_MODE, key);
-            BASE64Decoder base64decoder = new BASE64Decoder();
-            byte[] cleartext = base64decoder.decodeBuffer(encryptedString);
+            byte[] cleartext = Base64.getDecoder().decode(encryptedString);
             byte[] ciphertext = cipher.doFinal(cleartext);
 
             return bytes2String(ciphertext);

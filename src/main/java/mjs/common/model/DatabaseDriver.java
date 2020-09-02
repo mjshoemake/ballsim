@@ -10,16 +10,16 @@ import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.*;
 
-import com.accenture.core.model.PaginatedList;
-import com.accenture.core.model.fielddef.FieldDefMappingLoader;
-import com.accenture.core.model.fielddef.FieldDefinition;
-import com.accenture.core.model.fielddef.FieldDefinitionList;
-import com.accenture.core.utils.BeanUtils;
-import com.accenture.core.utils.CoreException;
-import com.accenture.core.utils.FormatUtils;
-import com.accenture.core.utils.LogUtils;
+import mjs.common.model.PaginatedList;
+import mjs.common.model.fielddef.FieldDefMappingLoader;
+import mjs.common.model.fielddef.FieldDefinition;
+import mjs.common.model.fielddef.FieldDefinitionList;
+import mjs.common.utils.BeanUtils;
+import mjs.common.exceptions.CoreException;
+import mjs.common.utils.FormatUtils;
+import mjs.common.utils.LogUtils;
 import org.apache.log4j.Logger;
-import org.springframework.context.annotation.Bean;
+//import org.springframework.context.annotation.Bean;
 
 
 /**
@@ -134,13 +134,15 @@ public class DatabaseDriver
     * PercList.
     *
     * @param rs                      ResultSet
-    * @param mapping                 Hashtable
+//    * @param mapping                 Hashtable
     * @param data                    PaginatedList
     * @return                        boolean True if successful,
     * otherwise false.
     * @exception DataLayerException
     */
-   public boolean populateBeanList(ResultSet rs, Hashtable mapping, PaginatedList data) throws DataLayerException
+   public boolean populateBeanList(ResultSet rs,
+                                   Hashtable mapping,
+                                   PaginatedList data) throws DataLayerException
    {
       try
       {
@@ -148,7 +150,7 @@ public class DatabaseDriver
          long startTime = new Date().getTime();
 
          Class type = data.getDataType();
-         PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(type, mapping);
+         PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(type);
 
          rs.next();
          while (! rs.isAfterLast())
@@ -202,14 +204,14 @@ public class DatabaseDriver
     * 10,500);//here 500 is the max records and 10 is the page size
     *
     * @param rs                      ResultSet
-    * @param mapping                 Hashtable
     * @param data                    PaginatedList
     * @return                        boolean True if successful,
     * otherwise false.
     * @exception DataLayerException
     */
    public boolean populateBeanListMaxRecords(ResultSet rs,
-         Hashtable mapping, PaginatedList data)
+                                             Hashtable mapping,
+                                             PaginatedList data)
           throws DataLayerException
    {
       try
@@ -221,7 +223,7 @@ public class DatabaseDriver
          if (maxRecords > 0)
          {
             Class type = data.getDataType();
-            PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(type, mapping);
+            PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(type);
 
             //max records is not 0 so go ahead have fun populating:)!
             while (rs.next())
@@ -370,7 +372,7 @@ public class DatabaseDriver
       try
       {
          long startTime = new Date().getTime();
-         PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(type, mapping);
+         PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(type);
          if (gotoNextRow)
          {
             if (rs.next())
@@ -641,7 +643,7 @@ public class DatabaseDriver
                 throw new DataLayerException("Error generating bean from result set.  Map creation: No fields found for child type mapping.");
 
             // Get property descriptors.
-            PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(childClass, mapping);
+            PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(childClass);
 
             if (pds == null || pds.length == 0)
                 throw new DataLayerException("Bean Descriptors are missing.");

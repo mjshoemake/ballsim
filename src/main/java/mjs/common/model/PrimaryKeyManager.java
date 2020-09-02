@@ -3,9 +3,9 @@ package mjs.common.model;
 
 import java.sql.ResultSet;
 import java.util.Vector;
-import com.accenture.core.model.DataManager;
-import com.accenture.core.utils.CoreException;
-import com.accenture.core.utils.Loggable;
+import mjs.common.model.DataManager;
+import mjs.common.exceptions.CoreException;
+import mjs.common.utils.Loggable;
 import org.apache.log4j.Logger;
 
 

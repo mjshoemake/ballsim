@@ -139,10 +139,30 @@ public class LogUtils {
      *            Object
      * @return String[]
      */
-    public static String[] dataToStrings(Object bean) throws CoreException { 
-        return dataToStrings(bean, true);       
+    public static String[] dataToStringsSilentMode(Object bean) {
+        try {
+            return dataToStrings(bean, true);
+        } catch (Exception e) {
+            // Log, but do not throw.
+            log.warn("Error converting bean to list of strings.", e);
+            String[] result = new String[1];
+            result[0] = "Error converting bean to list of strings.";
+            return result;
+        }
     }
-    
+
+    /**
+     * Convert a bean to an array of String objects that contain the properties of the bean. This is
+     * used to log out the details of the bean.
+     *
+     * @param bean
+     *            Object
+     * @return String[]
+     */
+    public static String[] dataToStrings(Object bean) throws CoreException {
+        return dataToStrings(bean, true);
+    }
+
     /**
      * Convert a bean to an array of String objects that contain the properties of the bean. This is
      * used to log out the details of the bean.

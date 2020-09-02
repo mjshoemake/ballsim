@@ -1,3 +1,4 @@
+/*
 package mjs.common.core;
 
 import mjs.common.exceptions.ModelException;
@@ -8,16 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
-/**
- * REST service used to retrieve, update, and delete user data
- * from the database.
- */
 @Controller
 public class BaseController extends SeerObject {
 
-    /**
-     * The log4j logger to use when writing log messages.
-     */
     protected static final Logger log = Logger.getLogger("Controller");
 
     private final String entityType;
@@ -138,3 +132,4 @@ public class BaseController extends SeerObject {
     }
 
 }
+*/

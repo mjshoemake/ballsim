@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="ballsim:war">
-    <output-path>$PROJECT_DIR$/target</output-path>
-    <root id="archive" name="ballsim-1.0.0.war">
-      <element id="artifact" artifact-name="ballsim:war exploded" />
-    </root>
-  </artifact>
-</component>

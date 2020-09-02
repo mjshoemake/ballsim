@@ -7,7 +7,9 @@ import java.util.List;
 
 import com.accenture.core.model.fielddef.FieldDefinition;
 import com.accenture.core.model.fielddef.FieldDefinitionList;
-import com.accenture.core.utils.*;
+import mjs.common.exceptions.CoreException;
+import mjs.common.utils.Loggable;
+import mjs.common.utils.FileUtils;
 
 
 /**
@@ -58,10 +60,11 @@ public class FieldDefMappingLoader extends Loggable
          if (stream == null)
             throw new CoreException("Error occured loading mapping file.  InputStream is null.");
 
-         String mapping = FileUtils.inputStreamToString(stream);
-         java.net.URL url = CastorObjectConverter.class.getResource("/mapping/FieldDefMapping.xml");
-         FieldDefinitionList defs = (FieldDefinitionList)CastorObjectConverter.convertXMLToObject(mapping, FieldDefinitionList.class, url);
-         return populateHashtable(defs);
+         //String mapping = FileUtils.inputStreamToString(stream);
+         //java.net.URL url = CastorObjectConverter.class.getResource("/mapping/FieldDefMapping.xml");
+         //FieldDefinitionList defs = (FieldDefinitionList)CastorObjectConverter.convertXMLToObject(mapping, FieldDefinitionList.class, url);
+         //return populateHashtable(defs);
+          return new Hashtable();
       }
       catch (Exception e)
       {

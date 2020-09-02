@@ -5,7 +5,7 @@ import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Hashtable;
-import com.accenture.core.model.fielddef.FieldDefinition;
+import mjs.common.model.fielddef.FieldDefinition;
 import org.apache.log4j.Logger;
 import mjs.common.exceptions.CoreException;
 

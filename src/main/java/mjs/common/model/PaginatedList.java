@@ -2,7 +2,7 @@ package mjs.common.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import com.accenture.core.utils.AbstractArrayList;
+//import mjs.common.utils.AbstractArrayList;
 import org.apache.log4j.Logger;
 
 
