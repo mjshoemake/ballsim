@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import org.apache.log4j.Logger;
 
-import com.accenture.core.model.fielddef.FieldDefinition;
+import mjs.common.model.fielddef.FieldDefinition;
 import mjs.common.utils.BeanUtils;
 import mjs.common.utils.LogUtils;
 import mjs.common.utils.StringUtils;

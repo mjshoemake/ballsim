@@ -14,6 +14,7 @@ class Batter extends BatterComparable
     String nameFirst
     String nameLast
     String nameNick
+    String name
     int birthYear
     String armBats
     String armThrows
@@ -29,6 +30,7 @@ class Batter extends BatterComparable
     int stolenBases = 0
     int caughtStealing = 0
     int sacrificeFlies = 0
+    boolean isPitcher = false
     BigDecimal calculatedRank = BigDecimal.valueOf(0.0)
 
     // Overall fielding #s

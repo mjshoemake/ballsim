@@ -31,7 +31,7 @@ public class BsonConverter {
     /**
      * The log4j logger.
      */
-    private static final Logger log = Logger.getLogger("Core");
+    //private static final Logger log = Logger.getLogger("Core");
 
     /**
      * Convert a bean to an array of String objects that contain the properties of the bean. This is

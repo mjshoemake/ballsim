@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import com.accenture.core.model.fielddef.FieldDefinition;
-import com.accenture.core.model.fielddef.FieldDefinitionList;
+import mjs.common.model.fielddef.FieldDefinition;
+import mjs.common.model.fielddef.FieldDefinitionList;
 import mjs.common.exceptions.CoreException;
 import mjs.common.utils.Loggable;
 import mjs.common.utils.FileUtils;

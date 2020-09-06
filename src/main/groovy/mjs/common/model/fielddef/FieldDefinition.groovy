@@ -1,14 +1,14 @@
 package mjs.common.model.fielddef
 
 class FieldDefinition {
-    String type = null
-    String name = null
-    String format = null
-    String sequence = null
-    String id = null
+    String type = ""
+    String sequence = ""
+    String name = ""
     int maxlen = 0
     boolean ispercent = false
+    String format = ""
     String mapkey = ""
+    String id = ""
     String childtype = ""
     String childtypeMapping = ""
 }

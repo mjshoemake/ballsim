@@ -1,7 +1,7 @@
 package baseball
 
-import com.accenture.core.model.fielddef.FieldDefinition
-import com.accenture.core.model.fielddef.FieldDefinitionList
+import mjs.common.model.fielddef.FieldDefinition
+import mjs.common.model.fielddef.FieldDefinitionList
 //import mjs.common.utils.CastorObjectConverter
 import org.junit.After
 import org.junit.Before
