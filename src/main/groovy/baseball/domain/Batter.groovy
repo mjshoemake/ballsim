@@ -1,8 +1,7 @@
 package baseball.domain
 
+import baseball.domain.PitcherStats
 import org.bson.types.ObjectId
-
-import java.lang.reflect.Field
 
 class Batter extends BatterComparable
 {
@@ -31,6 +30,7 @@ class Batter extends BatterComparable
     int caughtStealing = 0
     int sacrificeFlies = 0
     boolean isPitcher = false
+    PitcherStats pitcherStats = null
     BigDecimal calculatedRank = BigDecimal.valueOf(0.0)
 
     // Overall fielding #s
@@ -123,6 +123,54 @@ class Batter extends BatterComparable
         }
         calculatedRank = value
         value
+    }
+
+    void loadFromMap(def playerMap, def battingStats, def pitchingStats,team_id, String year) {
+        this.name = playerMap.name_first_last
+        this.armBats = playerMap.bats
+        this.armThrows = playerMap.throws
+        this.isPitcher = playerMap.primary_position == "P"
+        this.nameFirst = this.name  // TODO
+        this.nameLast = "" // TODO
+        this.playerID = playerMap.player_id
+        this.teamID = team_id
+        this.year = year
+        this.atBats = Integer.parseInt(battingStats.ab)
+        this.games = Integer.parseInt(battingStats.g)
+        this.walks = Integer.parseInt(battingStats.bb)
+        this.strikeouts = Integer.parseInt(battingStats.so)
+        this.hits = Integer.parseInt(battingStats.h)
+        this.doubles = Integer.parseInt(battingStats.d)
+        this.triples = Integer.parseInt(battingStats.t)
+        this.homers = Integer.parseInt(battingStats.hr)
+        this.hitByPitch = Integer.parseInt(battingStats.hbp)
+        this.stolenBases = Integer.parseInt(battingStats.sb)
+        this.caughtStealing = Integer.parseInt(battingStats.cs)
+        this.sacrificeFlies = Integer.parseInt(battingStats.sac)
+
+        if (pitchingStats != null && pitchingStats.size() > 0) {
+            this.pitcherStats = new PitcherStats()
+            this.pitcherStats.with {
+                pitchingGames = Integer.parseInt(pitchingStats.g)
+                pitchingGamesStarted = Integer.parseInt(pitchingStats.gs)
+                pitchingBattersRetired = Integer.parseInt(pitchingStats.ab) - Integer.parseInt(pitchingStats.h)
+                pitchingWalks = Integer.parseInt(pitchingStats.bb)
+                pitchingRuns = Integer.parseInt(pitchingStats.r)
+                pitchingStrikeouts = Integer.parseInt(pitchingStats.so)
+                pitchingHits = Integer.parseInt(pitchingStats.h)
+                pitchingHomers = Integer.parseInt(pitchingStats.hr)
+                pitchingWildPitch = Integer.parseInt(pitchingStats.wp)
+                pitchingHitBatter = Integer.parseInt(pitchingStats.hb)
+                pitchingBalks = Integer.parseInt(pitchingStats.bk)
+                pitchingWhip = pitchingStats.whip
+            }
+        }
+        double pitchingWhip
+    }
+
+    void printPlayer() {
+        println "Name: ${this.name} ID: ${this.playerID} Year: ${year} Pitcher: ${this.isPitcher} Bats: ${this.armBats} Throws: ${this.armThrows}"
+        println "   HR: ${this.homers} 3B: ${this.triples} 2B: ${this.doubles} Hits: ${this.hits} Walks: ${this.walks} Strikeouts: ${this.strikeouts} Steals: ${this.stolenBases} Atbats: ${this.atBats} CS: ${this.caughtStealing} HBP: ${this.hitByPitch} G: ${this.games}"
     }
 
 }

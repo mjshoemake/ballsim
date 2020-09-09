@@ -17,7 +17,7 @@ public class Loggable
     * populated by extracting the logger using the Logger category.
     * The default Logger category is "Model".
     */
-   protected Logger log = null;
+   //protected Logger log = null;
 
    /**
     * Constructor.
@@ -26,10 +26,10 @@ public class Loggable
     */
    public Loggable(String logCategory)
    {
-      if (logCategory != null)
-         log = Logger.getLogger(logCategory);
-      else
-         log = Logger.getLogger("Core");
+      //if (logCategory != null)
+      //   log = Logger.getLogger(logCategory);
+      //else
+      //   log = Logger.getLogger("Core");
    }
 
    /**
@@ -38,7 +38,7 @@ public class Loggable
     */
    public Loggable()
    {
-      log = Logger.getLogger("Core");
+      //log = Logger.getLogger("Core");
    }
 
 }

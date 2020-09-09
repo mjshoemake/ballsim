@@ -33,7 +33,7 @@ class GamePitcherComparable implements Comparable {
     }
 
     private int compareGamesStartedTo(Object arg) {
-        Pitcher reference = (Pitcher)arg.simPitcher.pitcher
+        PitcherStats reference = (PitcherStats)arg.simPitcher.pitcher
         BigDecimal myValue = this.simPitcher.pitcher.gamesStarted
         BigDecimal refValue = reference.gamesStarted
 
@@ -47,7 +47,7 @@ class GamePitcherComparable implements Comparable {
     }
 
     private int compareEraTo(Object arg) {
-        Pitcher reference = (Pitcher)arg.simPitcher.pitcher
+        PitcherStats reference = (PitcherStats)arg.simPitcher.pitcher
         BigDecimal myValue = this.simBatter.batter.era
         BigDecimal refValue = reference.era
 

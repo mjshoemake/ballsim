@@ -14,34 +14,8 @@ import java.math.RoundingMode
 
 
 //import org.apache.log4j.Logger
-class Pitcher extends Batter
-{
-    //def gameLog = Logger.getLogger('gamelog')
-
-
-    //String type = Pitcher.class.name
-    //boolean isPitcher = false
-
-    int atBats = 0
-    int walks = 0
-    int strikeouts = 0
-    int hits = 0
-    int doubles = 0
-    int triples = 0
-    int homers = 0
-    int hitByPitch = 0
-    int stolenBases = 0
-    int caughtStealing = 0
-    int sacrificeFlies = 0
-    BigDecimal calculatedRank = BigDecimal.valueOf(0.0)
-
-    // Overall fielding #s
-    int putouts = 0
-    int assists = 0
-    int errors = 0
-    int catcherSteals = 0
-    int catcherCaught = 0
-
+class PitcherStats {
+    int pitchingGames
     int pitchingGamesStarted
     int pitchingBattersRetired
     int pitchingOrderPos
@@ -56,20 +30,19 @@ class Pitcher extends Batter
     double pitchingWhip
     SimPitcher simPitcher
 
-    Pitcher() {
-    _id = new ObjectId()
-}
+    PitcherStats() {
+    }
 
     public def getBattersFaced() {
-        battersRetired + walks + hits + hitByPitch
+        pitchingBattersRetired + pitchingWalks + pitchingHits + pitchingHitBatter
     }
 
     def getOppBattingAvg() {
-        int oppAtBats = battersRetired + hits
+        int oppAtBats = pitchingBattersRetired + pitchingHits
         if (oppAtBats == 0) {
             BigDecimal.valueOf(0)
         }  else {
-            BigDecimal.valueOf(hits / oppAtBats)
+            BigDecimal.valueOf(pitchingHits / oppAtBats)
         }
     }
 
@@ -79,7 +52,7 @@ class Pitcher extends Batter
     }
 
     public def getAvgBattersRetiredPerGame() {
-        def avgOuts = BigDecimal.valueOf(battersRetired / games).intValue()
+        def avgOuts = BigDecimal.valueOf(pitchingBattersRetired / pitchingGames).intValue()
         avgOuts
     }
 
@@ -88,18 +61,22 @@ class Pitcher extends Batter
         rate
     }
 
-    public setWhip(String value) {
-        BigDecimal result = new BigDecimal(value)
-        whip = result.toDouble().doubleValue()
+    public setPitchingWhip(String value) {
+        try {
+            BigDecimal result = new BigDecimal(value)
+            pitchingWhip = result.toDouble().doubleValue()
+        } catch (Exception e) {
+            println "Failed to convert whip '$value' to a BigDecimal value."
+        }
     }
 
     def getEra() {
-        BigDecimal games = new BigDecimal(battersRetired)
+        BigDecimal games = new BigDecimal(pitchingBattersRetired)
         games = games.divide(27, 5, RoundingMode.HALF_UP)
         if (games.intValue() == 0) {
             return "0.00"
         }
-        BigDecimal result = new BigDecimal(runs)
+        BigDecimal result = new BigDecimal(pitchingRuns)
         result = result.divide(games, 3, RoundingMode.HALF_UP)
         String padded = result.toString() + "000"
         if (result.intValue() >= 10) {

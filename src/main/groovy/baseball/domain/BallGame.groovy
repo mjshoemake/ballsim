@@ -878,11 +878,11 @@ class BallGame {
 
             def adjustment = BigDecimal.ZERO
             // Pitcher Info
-            def pitcherHitRate = pitcher.getRate(pitcher.hits) + adjustment
-            def pitcherWalkRate = pitcher.getRate(pitcher.walks + pitcher.hitByPitch) + adjustment
-            def pitcherBalkRate = pitcher.getRate(pitcher.balks)
-            def pitcherStrikeoutRate = pitcher.getRate(pitcher.strikeouts)
-            def pitcherHomerRate = pitcher.getRate(pitcher.homers, pitcher.hits) + adjustment
+            def pitcherHitRate = pitcher.getRate(pitcher.pitchingHits) + adjustment
+            def pitcherWalkRate = pitcher.getRate(pitcher.pitchingWalks + pitcher.pitchingHitBatter) + adjustment
+            def pitcherBalkRate = pitcher.getRate(pitcher.pitchingBalks)
+            def pitcherStrikeoutRate = pitcher.getRate(pitcher.pitchingStrikeouts)
+            def pitcherHomerRate = pitcher.getRate(pitcher.pitchingHomers, pitcher.pitchingHits) + adjustment
 
             def actualHitRate, actualWalkRate, actualStrikeoutRate, actualHomerRate
             if (simStyle == SimStyle.PITCHER_FOCUSED) {
@@ -990,11 +990,11 @@ class BallGame {
 
             def adjustment = BigDecimal.ZERO
             // Pitcher Info
-            def pitcherHitRate = pitcher.getRate(pitcher.hits) + adjustment
-            def pitcherWalkRate = pitcher.getRate(pitcher.walks + pitcher.hitByPitch, pitcher.walks + pitcher.hitByPitch + pitcher.battersRetired) + adjustment
-            def pitcherBalkRate = pitcher.getRate(pitcher.balks)
-            def pitcherStrikeoutRate = pitcher.getRate(pitcher.strikeouts, pitcher.walks + pitcher.hitByPitch + pitcher.battersRetired)
-            def pitcherHomerRate = pitcher.getRate(pitcher.homers, pitcher.hits) + adjustment
+            def pitcherHitRate = pitcher.getRate(pitcher.pitchingHits) + adjustment
+            def pitcherWalkRate = pitcher.getRate(pitcher.pitchingWalks + pitcher.pitchingHitBatter, pitcher.pitchingWalks + pitcher.pitchingHitBatter + pitcher.pitchingBattersRetired) + adjustment
+            def pitcherBalkRate = pitcher.getRate(pitcher.pitchingBalks)
+            def pitcherStrikeoutRate = pitcher.getRate(pitcher.pitchingStrikeouts, pitcher.pitchingWalks + pitcher.pitchingHitBatter + pitcher.pitchingBattersRetired)
+            def pitcherHomerRate = pitcher.getRate(pitcher.pitchingHomers, pitcher.pitchingHits) + adjustment
 
             def actualHitRate, actualWalkRate, actualStrikeoutRate, actualHomerRate
             if (simStyle == SimStyle.PITCHER_FOCUSED) {

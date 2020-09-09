@@ -26,7 +26,7 @@ public class PerformanceEvent extends Loggable
     * The default Logger category is "Test". See the public methods
     * debug(), info(), etc.
     */
-   protected Logger logCore = Logger.getLogger("Core");
+   //protected Logger logCore = Logger.getLogger("Core");
 
    /**
     * The event type name used as the key to the event hashtable in

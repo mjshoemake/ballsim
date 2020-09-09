@@ -33,7 +33,7 @@ public class PerformanceMetrics extends Loggable
     * default Logger category is "Test".  See
     * the public methods debug(), info(), etc.
     */
-   protected static Logger logCore = Logger.getLogger("Core");
+   //protected static Logger logCore = Logger.getLogger("Core");
 
    /**
     * The log4j logger to use when writing log
@@ -42,7 +42,7 @@ public class PerformanceMetrics extends Loggable
     * default Logger category is "Test".  See
     * the public methods debug(), info(), etc.
     */
-   protected static Logger logPerf = Logger.getLogger("Performance");
+   //protected static Logger logPerf = Logger.getLogger("Performance");
 
    /**
     * A hashtable that contains a list of groups.  All event types are 
@@ -65,8 +65,8 @@ public class PerformanceMetrics extends Loggable
     */
    public void startEvent(String group, String eventType)
    {
-      if (logPerf.isInfoEnabled())
-      {
+      //if (logPerf.isInfoEnabled())
+      //{
          Hashtable eventList = null;
          PerformanceEvent event = null;
          
@@ -89,8 +89,8 @@ public class PerformanceMetrics extends Loggable
          }
          
          event.startEvent(previousEndDate);
-         logPerf.debug(StringUtils.leftJustify(group, 25)+"  "+StringUtils.leftJustify(eventType, 30)+"  Start");
-      }
+         //logPerf.debug(StringUtils.leftJustify(group, 25)+"  "+StringUtils.leftJustify(eventType, 30)+"  Start");
+      //}
    }
 
    /**
@@ -100,8 +100,8 @@ public class PerformanceMetrics extends Loggable
     */
    public void endEvent(String group, String eventType)
    {
-      if (logPerf.isInfoEnabled())
-      {
+      //if (logPerf.isInfoEnabled())
+      //{
          Hashtable eventList = null;
          PerformanceEvent event = null;
 
@@ -111,7 +111,7 @@ public class PerformanceMetrics extends Loggable
          else
          {
             CoreException e = new CoreException("PerformanceEvent was never started.  group="+group+"  eventType="+eventType);
-            logPerf.error("Can't end performance metric event.", e);
+            //logPerf.error("Can't end performance metric event.", e);
          }   
          
          // Get the event.  If the event doesn't exist, throw an exception.
@@ -120,13 +120,14 @@ public class PerformanceMetrics extends Loggable
          else
          {
             CoreException e = new CoreException("PerformanceEvent was never started.  group="+group+"  eventType="+eventType);
-            logPerf.error("Can't end performance metric event.", e);
+            //logPerf.error("Can't end performance metric event.", e);
          }   
 
          event.endEvent();
          previousEndDate = new Date();
-         logPerf.debug("  "+StringUtils.leftJustify(group, 25)+"  "+StringUtils.leftJustify(eventType, 30)+"  End  "+event.getElapsedTimeAsText());
-      }
+         //logPerf.debug("  "+StringUtils.leftJustify(group, 25)+"  "+StringUtils.leftJustify(eventType, 30)+"  End  "+event.getElapsedTimeAsText());
+         //System.out.println("  "+StringUtils.leftJustify(group, 25)+"  "+StringUtils.leftJustify(eventType, 30)+"  End  "+event.getElapsedTimeAsText());
+      //}
    }
    
    /**
@@ -137,35 +138,38 @@ public class PerformanceMetrics extends Loggable
     */
    public void writeMetricsToLog(String group) throws CoreException
    {
-      if (logPerf.isInfoEnabled())
-      {
+      //if (logPerf.isInfoEnabled())
+      //{
          Hashtable eventList = null;
          PerformanceEvent event = null;
          
          // Get the group.  If the group doesn't exist, throw an exception.
          if (groups.containsKey(group))
          {
-            logPerf.info("");
+            //logPerf.info("");
+            System.out.println("");
             eventList = (Hashtable)(groups.get(group));         
 
             // Process each event type.
             Enumeration e = eventList.keys();
             String[] lines = PerformanceEvent.getLogHeaderText(group); 
-            logPerf.info(lines[0]);
-            logPerf.info(lines[1]);
+            //logPerf.info(lines[0]);
+            //logPerf.info(lines[1]);
+            System.out.println(lines[0]);
+            System.out.println(lines[1]);
             while (e.hasMoreElements())
             {
                String next = (String)e.nextElement();
                event = (PerformanceEvent)(eventList.get(next));
-               logPerf.info(event.getLogText());
+               //logPerf.info(event.getLogText());
+               System.out.println(event.getLogText());
             }
          }
-      }
+      //}
    }
 
    /**
     * Write the metrics information to the trace log file for all groups.
-    * @throws CoreException
     */
    public void writeMetricsToLog() throws CoreException
    {

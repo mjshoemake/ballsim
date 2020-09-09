@@ -4,7 +4,7 @@ import baseball.domain.Batter
 import baseball.domain.GameBatter
 import baseball.domain.GamePitcher
 import baseball.domain.HittingStaff
-import baseball.domain.Pitcher
+import baseball.domain.PitcherStats
 import baseball.domain.PitchingStaff
 import baseball.domain.SimBatter
 import baseball.domain.SimPitcher
@@ -119,7 +119,7 @@ abstract class AbstractTeamLoader {
         def existing = findPitcher(pYear, pTeamName, pNameFirst, pNameLast)
         if (! existing) {
             // Not found.  Add.
-            def pitcher = new Pitcher()
+            def pitcher = new PitcherStats()
             def simStats = new SimPitcher(pitcher: pitcher)
 
             pitcher.with {

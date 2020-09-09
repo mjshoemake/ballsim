@@ -2964,3 +2964,10 @@ out/production/ballsim/test/resources/teams-2017.json
 out/test/ballsim/baseball/GetTeamsHttpTests$_testGetTeamForSeason_closure1$_closure2.class
 out/test/ballsim/baseball/GetTeamsHttpTests$_testGetTeamForSeason_closure1.class
 out/test/ballsim/baseball/GetTeamsHttpTests.class
+out/production/ballsim/baseball/domain/Batter$_loadFromMap_closure1.class
+out/production/ballsim/baseball/domain/PitcherStats.class
+out/production/ballsim/baseball/processing/HttpHistoricalDataManager$_get40ManRoster_closure4.class
+out/production/ballsim/baseball/processing/HttpHistoricalDataManager$_get40ManRoster_closure5.class
+out/production/ballsim/baseball/processing/HttpHistoricalDataManager$_getPlayerBattingStats_closure2.class
+out/production/ballsim/baseball/processing/HttpHistoricalDataManager$_getPlayerPitchingStats_closure3.class
+out/production/ballsim/baseball/processing/HttpHistoricalDataManager$_getTeamMapForSeason_closure1.class

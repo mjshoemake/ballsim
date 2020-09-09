@@ -20,21 +20,22 @@ class GetTeamsHttpTests {
 
     @Test
     void testGetTeamForSeason() {
-       HttpHistoricalDataManager dataMgr = new HttpHistoricalDataManager()
-       String year = "1995"
-       def teams = dataMgr.getTeamsForSeason(year)
-       def teamList = []
-       teams.each { next ->
-           Team team = new Team()
-           teamList << team.load(next).printTeam()
+        HttpHistoricalDataManager dataMgr = new HttpHistoricalDataManager()
+        String year = "1995"
+        def teams = dataMgr.getTeamsForSeason(year)
+        def teamList = []
 
-           // Get data for team.
-           def teamRoster = dataMgr.get40ManRoster(team.team_id, year)
-           teamRoster.each { person ->
-               if (team.name_abbrev == "ATL") {
-                   println("Name: ${person.name_first_last}, Position: ${person.primary_position} ")
-               }
-           }
-       }
+        teams.each { next ->
+            Team team = new Team()
+            teamList << team.load(next).printTeam()
+
+            // Get data for team.
+            def teamRoster = dataMgr.get40ManRoster(team.team_id, year)
+            teamRoster.each { person ->
+                if (team.name_abbrev == "ATL") {
+                    println("Name: ${person.name_first_last}, Position: ${person.primary_position} ")
+                }
+            }
+        }
     }
 }
