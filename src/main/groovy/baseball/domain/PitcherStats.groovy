@@ -15,6 +15,7 @@ import java.math.RoundingMode
 
 //import org.apache.log4j.Logger
 class PitcherStats {
+    String name = ""
     int pitchingGames
     int pitchingGamesStarted
     int pitchingBattersRetired

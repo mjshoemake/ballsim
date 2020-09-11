@@ -1,12 +1,9 @@
 package baseball.processing
 
 import baseball.domain.Batter
-import baseball.domain.PitcherStats
 import baseball.domain.Team
 import groovy.json.JsonSlurper
-import mjs.common.exceptions.ModelException
 import mjs.common.utils.HttpClient
-import mjs.common.utils.PerformanceEvent
 import mjs.common.utils.PerformanceMetrics
 
 class HttpHistoricalDataManager {
@@ -54,7 +51,7 @@ class HttpHistoricalDataManager {
         JsonSlurper jsonSlurper = new JsonSlurper()
         def result = jsonSlurper.parseText(json)
         def battingStats = result["sport_hitting_tm"]["queryResults"]["row"]
-        if (! (battingStats instanceof Map)) {
+        if (!(battingStats instanceof Map)) {
             // Not a Map, it's a list. Find the map in the list.
             battingStats.each() { next ->
                 if (next.team_id == team_id) {
@@ -70,7 +67,7 @@ class HttpHistoricalDataManager {
         JsonSlurper jsonSlurper = new JsonSlurper()
         def result = jsonSlurper.parseText(json)
         def pitchingStats = result["sport_pitching_tm"]["queryResults"]["row"]
-        if (! (pitchingStats instanceof Map)) {
+        if (!(pitchingStats instanceof Map)) {
             // Not a Map, it's a list. Find the map in the list.
             pitchingStats.each() { next ->
                 if (next.team_id == team_id) {

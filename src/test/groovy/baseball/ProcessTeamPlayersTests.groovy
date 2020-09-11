@@ -1,15 +1,14 @@
 package baseball
 
-import baseball.domain.SimTeam
-import baseball.processing.DatabankTeamLoader
-import baseball.processing.HttpHistoricalDataManager
-import mjs.common.utils.ConfigFileLoader
-import mjs.common.model.DatabaseDriver
-import baseball.mongo.MongoManager
-import org.junit.*
-import baseball.domain.BallGame
 
-class BallGameTests {
+import baseball.domain.SimTeam
+
+import baseball.processing.HttpHistoricalDataManager
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
+
+class ProcessTeamPlayersTests {
 
     def ballGame = null
 
@@ -48,22 +47,13 @@ class BallGameTests {
 */
 
     @Test
-    void testPlayGame2() {
+    void processTeamPlayers() {
         HttpHistoricalDataManager dataMgr = new HttpHistoricalDataManager()
         String year = "1995"
         def teams = dataMgr.getTeamMapForSeason(year)
-        def home = teams["Braves"]
-        def away = teams["Giants"]
-
-        def homeRoster = dataMgr.get40ManRoster(home.team_id, year)
-        def awayRoster = dataMgr.get40ManRoster(away.team_id, year)
-
-        ballGame = new BallGame()
-        ballGame.with {
-            awayTeam = new SimTeam(awayRoster)
-            homeTeam = new SimTeam(homeRoster)
-        }
-        ballGame.start()
+        def team = teams["Braves"]
+        def roster = dataMgr.get40ManRoster(team.team_id, year)
+        def simTeam = new SimTeam(roster)
     }
 
 }

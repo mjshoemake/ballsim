@@ -3,8 +3,7 @@ package baseball.domain
 import baseball.domain.PitcherStats
 import org.bson.types.ObjectId
 
-class Batter extends BatterComparable
-{
+class Batter {
     ObjectId _id
     String type = Batter.class.name
     String year
@@ -25,6 +24,7 @@ class Batter extends BatterComparable
     int doubles = 0
     int triples = 0
     int homers = 0
+    int rbi = 0
     int hitByPitch = 0
     int stolenBases = 0
     int caughtStealing = 0
@@ -127,6 +127,7 @@ class Batter extends BatterComparable
 
     void loadFromMap(def playerMap, def battingStats, def pitchingStats,team_id, String year) {
         this.name = playerMap.name_first_last
+        this.pitcherStats?.name = this.name
         this.armBats = playerMap.bats
         this.armThrows = playerMap.throws
         this.isPitcher = playerMap.primary_position == "P"
@@ -171,6 +172,16 @@ class Batter extends BatterComparable
     void printPlayer() {
         println "Name: ${this.name} ID: ${this.playerID} Year: ${year} Pitcher: ${this.isPitcher} Bats: ${this.armBats} Throws: ${this.armThrows}"
         println "   HR: ${this.homers} 3B: ${this.triples} 2B: ${this.doubles} Hits: ${this.hits} Walks: ${this.walks} Strikeouts: ${this.strikeouts} Steals: ${this.stolenBases} Atbats: ${this.atBats} CS: ${this.caughtStealing} HBP: ${this.hitByPitch} G: ${this.games}"
+        if (this.isPitcher) {
+            this.pitcherStats.with {
+                println "   GS: ${pitchingGamesStarted} G: ${pitchingGames} ERA: ${era} Strikeouts: ${pitchingStrikeouts} Walks: ${pitchingWalks}"
+            }
+        }
+    }
+
+    void setName(String value) {
+        this.name = value
+        this.pitcherStats.name = value
     }
 
 }

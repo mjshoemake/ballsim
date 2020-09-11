@@ -3,11 +3,10 @@ package baseball.domain
 import org.apache.log4j.Logger
 
 class BallGame {
-
     def gameLog = Logger.getLogger('gamelog')
     def highlightsLog = Logger.getLogger('highlights')
     def boxscoreLog = Logger.getLogger('boxscore')
-
+    def random = new Random()
     def gameLogEnabled = true
     def highlightsLogEnabled = true
     def boxscoreLogEnabled = true
@@ -30,22 +29,21 @@ class BallGame {
     def homeDoublePlays = 0
 
     def simType = SimType.ACCURATE
-    def homeTeam, awayTeam, starterIndex
-    def awayTeamName = "Away", homeTeamName = "Home"
-    def nextAwayBatter = 0, nextHomeBatter = 0
-    def awayLineup = [], homeLineup = []
-    GamePitcher awayStarter = null, homeStarter = null
-    def awayBullpen = [], homeBullpen = [], tempAwayBullpen = [], tempHomeBullpen = []
-    GamePitcher awayCurrentPitcher = null, homeCurrentPitcher = null
     GameBatter runnerFirst = null, runnerSecond = null, runnerThird = null
-    def random = new Random()
+    SimTeam awayTeam, homeTeam
+
+//    def homeTeam, awayTeam, starterIndex
+//    def nextAwayBatter = 0, nextHomeBatter = 0
+//    GamePitcher awayStarter = null, homeStarter = null
+//    def awayBullpen = [], homeBullpen = [], tempAwayBullpen = [], tempHomeBullpen = []
+//    GamePitcher awayCurrentPitcher = null, homeCurrentPitcher = null
     def homeTeamWon = false
 
     // Managing pitching staff
-    int pitchCount3 = 0
-    int pitchCount4 = 0
-    int awayPitcherCount = 1
-    int homePitcherCount = 1
+//    int pitchCount3 = 0
+//    int pitchCount4 = 0
+//    int awayPitcherCount = 1
+//    int homePitcherCount = 1
 
     def start() {
         awayLineup = awayTeam["lineup"].clone()
