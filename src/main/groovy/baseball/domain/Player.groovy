@@ -1,11 +1,11 @@
 package baseball.domain
 
-import baseball.domain.PitcherStats
+
 import org.bson.types.ObjectId
 
-class Batter {
+class Player {
     ObjectId _id
-    String type = Batter.class.name
+    String type = Player.class.name
     String year
     String teamID
     String playerID
@@ -34,6 +34,11 @@ class Batter {
     PitcherStats pitcherStats = null
     BigDecimal calculatedRank = BigDecimal.valueOf(0.0)
 
+    GameBatter gameBatter = new GameBatter()
+    GamePitcher gamePitcher = new GamePitcher()
+    SimBatter simBatter = new SimBatter()
+    SimPitcher simPitcher = new SimPitcher()
+
     // Overall fielding #s
     int putouts = 0
     int assists = 0
@@ -41,10 +46,9 @@ class Batter {
     int catcherSteals = 0
     int catcherCaught = 0
 
-    Map<String, FieldingPosition> position = new HashMap<String, FieldingPosition>()
-    SimBatter simBatter
+    //Map<String, FieldingPosition> position = new HashMap<String, FieldingPosition>()
 
-    Batter() {
+    Player() {
     }
 
     static String getBoxScoreHeader() {

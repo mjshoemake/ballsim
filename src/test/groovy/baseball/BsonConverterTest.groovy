@@ -1,7 +1,7 @@
 
 package baseball
 
-import baseball.domain.Batter
+import baseball.domain.Player
 import baseball.domain.FieldingPosition
 import mjs.common.utils.BsonConverter
 import mjs.common.utils.LogUtils
@@ -28,7 +28,7 @@ class BsonConverterTest {
     void testConversion() {
         HashMap positions = new HashMap<String, FieldingPosition>()
         positions[]
-        Batter batter = new Batter(teamID: "1", playerID: "5", nameFirst: "Bob", nameLast: "Horner", atBats: 57, hits: 19, homers: 5, caughtStealing: 0, doubles: 2, hitByPitch: 1, name: "Bob Horner", position: "3B", stolenBases: 0, strikeouts: 6, teamName: "Braves", year: 1982, triples: 2, walks: 3)
+        Player batter = new Player(teamID: "1", playerID: "5", nameFirst: "Bob", nameLast: "Horner", atBats: 57, hits: 19, homers: 5, caughtStealing: 0, doubles: 2, hitByPitch: 1, name: "Bob Horner", position: "3B", stolenBases: 0, strikeouts: 6, teamName: "Braves", year: 1982, triples: 2, walks: 3)
         BsonValue result = converter.objectToBson(batter)
         LogUtils.println(result)
     }

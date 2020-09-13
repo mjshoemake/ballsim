@@ -1,7 +1,7 @@
 package baseball
 
 import baseball.domain.BallGame
-import baseball.domain.Batter
+import baseball.domain.Player
 import baseball.domain.PitcherStats
 import baseball.domain.GamePitcher
 import baseball.domain.SimPitcher
@@ -32,7 +32,7 @@ class AtBatTests {
 
     @Test
     void testPitchToBatter() {
-        def batter = new Batter()
+        def batter = new Player()
         batter.with {
             name = "Javy Lopez"
             //position = "C"

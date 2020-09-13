@@ -22,7 +22,7 @@ class GameBatterComparable implements Comparable {
     }
 
     private int compareRankTo(Object arg) {
-        Batter reference = (Batter)arg.simBatter.batter
+        Player reference = (Player)arg.simBatter.batter
         BigDecimal myRank = this.simBatter.batter.rank
         BigDecimal refRank = reference.rank
 
@@ -36,7 +36,7 @@ class GameBatterComparable implements Comparable {
     }
 
     private int compareObpTo(Object arg) {
-        Batter reference = (Batter)arg.simBatter.batter
+        Player reference = (Player)arg.simBatter.batter
         BigDecimal myValue = this.simBatter.batter.onBasePercentage
         BigDecimal refValue = reference.onBasePercentage
 
@@ -50,7 +50,7 @@ class GameBatterComparable implements Comparable {
     }
 
     private int compareOpsTo(Object arg) {
-        Batter reference = (Batter)arg.simBatter.batter
+        Player reference = (Player)arg.simBatter.batter
         BigDecimal myValue = this.simBatter.batter.ops
         BigDecimal refValue = reference.ops
 
@@ -64,7 +64,7 @@ class GameBatterComparable implements Comparable {
     }
 
     private int compareSluggingTo(Object arg) {
-        Batter reference = (Batter)arg.simBatter.batter
+        Player reference = (Player)arg.simBatter.batter
         BigDecimal myValue = this.simBatter.batter.sluggingPercentage
         BigDecimal refValue = reference.sluggingPercentage
 
@@ -78,7 +78,7 @@ class GameBatterComparable implements Comparable {
     }
 
     private int compareHomersTo(Object arg) {
-        Batter reference = (Batter)arg.simBatter.batter
+        Player reference = (Player)arg.simBatter.batter
         int myValue = this.simBatter.batter.homers
         int refValue = reference.homers
 
@@ -92,7 +92,7 @@ class GameBatterComparable implements Comparable {
     }
 
     private int compareLeadOffTo(Object arg) {
-        Batter reference = (Batter)arg.simBatter.batter
+        Player reference = (Player)arg.simBatter.batter
         BigDecimal myValue = BigDecimal.valueOf(this.simBatter.batter.stolenBases / 50) + this.simBatter.batter.onBasePercentage
         int refValue = BigDecimal.valueOf(reference.stolenBases / 50) + reference.onBasePercentage
 

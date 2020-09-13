@@ -21,11 +21,15 @@ class GameBatter extends GameBatterComparable {
     int caughtStealing = 0
 
     GameBatter() {
-        super()
+    }
+
+    GameBatter(Player player) {
+        simBatter = new SimBatter()
+        simBatter.batter = player
     }
 
     def getPositions() {
-        Batter myBatter = simBatter.batter
+        Player myBatter = simBatter.batter
         List<String> result = []
         myBatter.position.each() {
             result << it.position

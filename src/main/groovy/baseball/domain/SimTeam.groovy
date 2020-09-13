@@ -2,48 +2,36 @@ package baseball.domain
 
 
 class SimTeam {
+    // Temporary
     def batters = []
     def pitchers = []
-    def lineup = []
-    def bench = []
     def remainder = []
     def contact = []
     def power = []
     def speed = []
     def speedAndContact = []
+
+    // Primary for game
+    def lineup = []
+    def bench = []
     def rotation = []
     def bullpen = []
-    def position1B
-    def position2B
-    def position3B
-    def positionSS
-    def positionC
-    def positionLF
-    def positionCF
-    def positionRF
     String teamName = "MyTeam"
     int nextBatter = 0
-    GamePitcher starter
-    GamePitcher currentPitcher
-    GamePitcher closer
+    Player starter
+    Player currentPitcher
+    Player closer
     int pitchCount = 0
     def teamRoster = null
     def positions = [:]
-
-    int getNextBatter() {
-        nextBatter++
-        if (nextBatter > 8) {
-            nextBatter = 0
-        }
-        nextBatter
-    }
+    int nextStartingPitcher = 0
 
     SimTeam(def teamRoster) {
         this.teamRoster = teamRoster
         separatePlayers()
     }
 
-    boolean assignPosition(Batter batter, String position) {
+    boolean assignPosition(Player batter, String position) {
         if (positions.containsKey(position)) {
             return false
         } else {
@@ -170,52 +158,64 @@ class SimTeam {
         println ""
         println "Batting Order:"
         int positionsFilled = 0
+        def primaryPosition
         // Speed And Contact
         while (speedAndContact.size() > 0) {
-            // TODO assign a fielding position and make sure that position is not taken.
-            println "   ${positionsFilled+1}: ${speedAndContact[0].name} Pos: ${speedAndContact[0].primaryPosition} SB: ${speedAndContact[0].stolenBases} Avg: ${speedAndContact[0].battingAvg} AB: ${speedAndContact[0].atBats}"
-            lineup << speedAndContact[0]
-            speedAndContact.remove(0)
-            positionsFilled++
-        }
-
-        // Speed Only
-        while (positionsFilled < 2 && speed.size() > 0) {
-            // TODO assign a fielding position and make sure that position is not taken.
-            println "   ${positionsFilled+1}: ${speed[0].name} Pos: ${speed[0].primaryPosition} SB: ${speed[0].stolenBases} Avg: ${speed[0].battingAvg} AB: ${speed[0].atBats}"
-            lineup << speed[0]
-            speed.remove(0)
-            positionsFilled++
+            primaryPosition = speedAndContact[0].primaryPosition
+            addIfPositionAvailable(primaryPosition, speedAndContact, "Speed-And-Contact")
         }
 
         // Contact (first third)
-        while (positionsFilled < 3 && contact.size() > 0) {
-            // TODO assign a fielding position and make sure that position is not taken.
-            println "   ${positionsFilled+1}: ${contact[0].name} Pos: ${contact[0].primaryPosition} SB: ${contact[0].stolenBases} Avg: ${contact[0].battingAvg} AB: ${contact[0].atBats}"
-            lineup << contact[0]
-            contact.remove(0)
-            positionsFilled++
+        while (lineup.size() < 3 && contact.size() > 0) {
+            primaryPosition = contact[0].primaryPosition
+            addIfPositionAvailable(primaryPosition, contact, "Contact")
         }
 
         // Power
-        while (positionsFilled < 6 && power.size() > 0) {
-            // TODO assign a fielding position and make sure that position is not taken.
-            println "   ${positionsFilled+1}: ${power[0].name} Pos: ${power[0].primaryPosition} SB: ${power[0].stolenBases} Avg: ${power[0].battingAvg} AB: ${power[0].atBats}"
-            lineup << power[0]
-            power.remove(0)
-            positionsFilled++
+        while (lineup.size() < 6 && power.size() > 0) {
+            primaryPosition = power[0].primaryPosition
+            addIfPositionAvailable(primaryPosition, power, "Power")
         }
 
         // Fill up rest of line up.
-        while (positionsFilled < 9 && contact.size() > 0) {
-            // TODO assign a fielding position and make sure that position is not taken.
-            println "   ${positionsFilled+1}: ${contact[0].name} Pos: ${contact[0].primaryPosition} SB: ${contact[0].stolenBases} Avg: ${contact[0].battingAvg} AB: ${contact[0].atBats}"
-            lineup << contact[0]
-            contact.remove(0)
-            positionsFilled++
+        while (lineup.size() < 9 && contact.size() > 0) {
+            primaryPosition = contact[0].primaryPosition
+            addIfPositionAvailable(primaryPosition, contact, "Contact")
         }
 
         println "Remaining: speedAndContact: ${speedAndContact.size()} speed: ${speed.size()} power: ${power.size()} contact: ${contact.size()}"
+    }
+
+    void addIfPositionAvailable(def primaryPosition, def sourceList, def category) {
+        // Assign a fielding position and make sure that position is not taken.
+        if (positions[primaryPosition]) {
+            // Already taken. Skip this person.
+            def batter = new GameBatter(sourceList[0])
+            bench << batter
+            sourceList.remove(0)
+        } else {
+            def batter = new GameBatter(sourceList[0])
+            positions[primaryPosition] = batter
+            println "   ${lineup.size()+1}: ${sourceList[0].name} Pos: ${sourceList[0].primaryPosition} SB: ${sourceList[0].stolenBases} HR: ${sourceList[0].homers} Avg: ${sourceList[0].battingAvg} AB: ${sourceList[0].atBats}   ${category}"
+            lineup << batter
+            sourceList.remove(0)
+        }
+    }
+
+    int getNextBatter() {
+        nextBatter++
+        if (nextBatter > 8) {
+            nextBatter = 0
+        }
+        nextBatter
+    }
+
+    int getNextStartingPitcher() {
+        nextStartingPitcher++
+        if (nextStartingPitcher > 4) {
+            nextStartingPitcher = 0
+        }
+        nextStartingPitcher
     }
 
 }

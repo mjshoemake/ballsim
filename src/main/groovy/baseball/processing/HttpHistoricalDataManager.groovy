@@ -1,6 +1,6 @@
 package baseball.processing
 
-import baseball.domain.Batter
+import baseball.domain.Player
 import baseball.domain.Team
 import groovy.json.JsonSlurper
 import mjs.common.utils.HttpClient
@@ -100,7 +100,7 @@ class HttpHistoricalDataManager {
             }
 
             perf.startEvent("LoadHistoricalData.get40ManRoster", "loadBatterProperties")
-            Batter batter = new Batter()
+            Player batter = new Player()
             batter.loadFromMap(person, battingStats, pitchingStats, team_id, year)
             result << batter
             perf.endEvent("LoadHistoricalData.get40ManRoster", "loadBatterProperties")

@@ -1,6 +1,6 @@
 package baseball.processing
 
-import baseball.domain.Batter
+import baseball.domain.Player
 import baseball.domain.PitcherStats
 import baseball.domain.GameBatter
 import baseball.domain.GamePitcher
@@ -61,7 +61,7 @@ class DatabankTeamLoader extends AbstractTeamLoader {
         String mappingFile = "/mapping/BatterMap.xml"
         try {
             dataManager.open()
-            tempBatters = dataManager.loadList(sql, Batter.class, mappingFile, 1000, 1000)
+            tempBatters = dataManager.loadList(sql, Player.class, mappingFile, 1000, 1000)
         } finally {
             dataManager.close()
         }

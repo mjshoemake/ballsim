@@ -24,7 +24,7 @@ class SimPitcher {
     int pitchesGame3 = 0
     int pitchesGame4 = 0
     int pitchesGame5 = 0
-    PitcherStats pitcher
+    Player pitcher
 
     def getBattersFaced() {
         battersRetired + walks + hits + hitByPitch

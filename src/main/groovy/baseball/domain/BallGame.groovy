@@ -46,56 +46,56 @@ class BallGame {
 //    int homePitcherCount = 1
 
     def start() {
-        awayLineup = awayTeam["lineup"].clone()
-        homeLineup = homeTeam["lineup"].clone()
-        awayTeamName = awayTeam["teamName"]
-        homeTeamName = homeTeam["teamName"]
-        def awayRotation = awayTeam["rotation"].clone()
-        def homeRotation = homeTeam["rotation"].clone()
-        def awayStarterIndex = awayTeam["starterIndex"]
-        def homeStarterIndex = homeTeam["starterIndex"]
-        awayStarter = awayRotation[awayStarterIndex]
-        homeStarter = homeRotation[homeStarterIndex]
+        //awayLineup = awayTeam["lineup"].clone()
+        //homeLineup = homeTeam["lineup"].clone()
+        //awayTeamName = awayTeam["teamName"]
+        //homeTeamName = homeTeam["teamName"]
+        //def awayRotation = awayTeam["rotation"].clone()
+        //def homeRotation = homeTeam["rotation"].clone()
+        //def awayStarterIndex = awayTeam["starterIndex"]
+        //def homeStarterIndex = homeTeam["starterIndex"]
+        //awayStarter = awayRotation[awayStarterIndex]
+        //homeStarter = homeRotation[homeStarterIndex]
 
         // Add starting pitcher to lineup
-        awayTeam["battingpitchers"].each {
-            def nextBatter = it.simBatter.batter
-            if (nextBatter.nameFirst == awayStarter.simPitcher.pitcher.nameFirst &&
-                nextBatter.nameLast == awayStarter.simPitcher.pitcher.nameLast)
-                awayLineup << it
-        }
-        homeTeam["battingpitchers"].each {
-            def nextBatter = it.simBatter.batter
-            if (nextBatter.nameFirst == homeStarter.simPitcher.pitcher.nameFirst &&
-                    nextBatter.nameLast == homeStarter.simPitcher.pitcher.nameLast)
-                homeLineup << it
-        }
+        //awayTeam["battingpitchers"].each {
+        //    def nextBatter = it.simBatter.batter
+        //    if (nextBatter.nameFirst == awayStarter.simPitcher.pitcher.nameFirst &&
+        //        nextBatter.nameLast == awayStarter.simPitcher.pitcher.nameLast)
+        //        awayLineup << it
+        //}
+        //homeTeam["battingpitchers"].each {
+        //    def nextBatter = it.simBatter.batter
+        //    if (nextBatter.nameFirst == homeStarter.simPitcher.pitcher.nameFirst &&
+        //            nextBatter.nameLast == homeStarter.simPitcher.pitcher.nameLast)
+        //        homeLineup << it
+        //}
 
-        awayCurrentPitcher = awayStarter
-        homeCurrentPitcher = homeStarter
-        awayStarterIndex++
-        if (awayStarterIndex > 4) {
-            awayStarterIndex = 0
-        }
-        homeStarterIndex++
-        if (homeStarterIndex > 4) {
-            homeStarterIndex = 0
-        }
-        awayTeam["starterIndex"] = awayStarterIndex
-        homeTeam["starterIndex"] = homeStarterIndex
+        //awayCurrentPitcher = awayStarter
+        //homeCurrentPitcher = homeStarter
+        //awayStarterIndex++
+        //if (awayStarterIndex > 4) {
+        //    awayStarterIndex = 0
+        //}
+        //homeStarterIndex++
+        //if (homeStarterIndex > 4) {
+        //    homeStarterIndex = 0
+        //}
+        //awayTeam["starterIndex"] = awayStarterIndex
+        //homeTeam["starterIndex"] = homeStarterIndex
 
-        println "Away Bullpen:"
-        for (int i=0; i <= awayRotation.size()-1; i++) {
-            awayBullpen << awayRotation[i]
-            tempAwayBullpen << awayRotation[i]
-            println "${awayRotation[i].simPitcher.pitcher.nameFirst} ${awayRotation[i].simPitcher.pitcher.nameLast}"
-        }
-        println "Home Bullpen:"
-        for (int i=0; i <= homeRotation.size()-1; i++) {
-            homeBullpen << homeRotation[i]
-            tempHomeBullpen << homeRotation[i]
-            println "${homeRotation[i].simPitcher.pitcher.nameFirst} ${homeRotation[i].simPitcher.pitcher.nameLast}"
-        }
+        //println "Away Bullpen:"
+        //for (int i=0; i <= awayRotation.size()-1; i++) {
+        //    awayBullpen << awayRotation[i]
+        //    tempAwayBullpen << awayRotation[i]
+        //    println "${awayRotation[i].simPitcher.pitcher.nameFirst} ${awayRotation[i].simPitcher.pitcher.nameLast}"
+        //}
+        //println "Home Bullpen:"
+        //for (int i=0; i <= homeRotation.size()-1; i++) {
+        //    homeBullpen << homeRotation[i]
+        //    tempHomeBullpen << homeRotation[i]
+        //    println "${homeRotation[i].simPitcher.pitcher.nameFirst} ${homeRotation[i].simPitcher.pitcher.nameLast}"
+        //}
 
         awayLineup.each {
             it.reset()

@@ -1,6 +1,6 @@
 package baseball
 
-import baseball.domain.Batter
+import baseball.domain.Player
 import baseball.mongo.MongoManager
 import baseball.processing.BravesTeamLoader
 import org.junit.After
@@ -29,7 +29,7 @@ class StatsTest {
         def braves2003 = bravesTeamLoader.loadBraves2003()
 
         braves2003.lineup.each() {
-            Batter batter = it.simBatter.batter
+            Player batter = it.simBatter.batter
             println "${batter.nameFirst} ${batter.nameLast} ${batter.battingAvg}  ${batter.fieldingPercentage}  ${batter.sluggingPercentage}  ${batter.onBasePercentage}  ${batter.ops}   ${batter.rank}"
         }
     }

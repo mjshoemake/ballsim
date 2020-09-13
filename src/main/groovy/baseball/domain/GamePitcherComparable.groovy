@@ -19,7 +19,7 @@ class GamePitcherComparable implements Comparable {
     }
 
     private int compareRankTo(Object arg) {
-        Batter reference = (Batter)arg.simBatter.batter
+        Player reference = (Player)arg.simBatter.batter
         BigDecimal myRank = this.simBatter.batter.rank
         BigDecimal refRank = reference.rank
 

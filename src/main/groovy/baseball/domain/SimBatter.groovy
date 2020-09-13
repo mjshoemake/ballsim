@@ -16,7 +16,7 @@ class SimBatter {
     int caughtStealing = 0
     int runs = 0
     int rbi = 0
-    Batter batter
+    Player batter
     boolean maxedOut = false
 
     void setAtBats(int value) {

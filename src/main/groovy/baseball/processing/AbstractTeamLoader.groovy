@@ -1,6 +1,6 @@
 package baseball.processing
 
-import baseball.domain.Batter
+import baseball.domain.Player
 import baseball.domain.GameBatter
 import baseball.domain.GamePitcher
 import baseball.domain.HittingStaff
@@ -52,7 +52,7 @@ abstract class AbstractTeamLoader {
         def existing = findBatter(pYear, pTeamID, pNameFirst, pNameLast)
         if (! existing) {
             // Not found.  Add.
-            def batter = new Batter()
+            def batter = new Player()
             def simStats = new SimBatter(batter: batter)
 
             batter.with {
@@ -282,7 +282,7 @@ abstract class AbstractTeamLoader {
             // C
             C[0].position = "C"
             selected << C[0]
-            Batter batter = C[0].simBatter.batter
+            Player batter = C[0].simBatter.batter
             log.debug("Assigned ${batter.nameFirst} ${batter.nameLast} -> C.")
 
             // 1B

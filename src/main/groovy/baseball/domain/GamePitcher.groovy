@@ -19,6 +19,14 @@ class GamePitcher extends GamePitcherComparable
     int runs = 0
     int pitches = 0
 
+    GamePitcher() {
+    }
+
+    GamePitcher(Player player) {
+        simPitcher = new SimPitcher()
+        simPitcher.pitcher = player
+    }
+
     def getBattersFaced() {
         battersRetired + walks + hits + hitByPitch
     }

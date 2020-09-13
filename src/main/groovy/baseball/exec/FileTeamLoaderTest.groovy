@@ -1,7 +1,7 @@
 
 package baseball.exec
 
-import baseball.domain.Batter
+import baseball.domain.Player
 import baseball.processing.FileTeamLoader
 import baseball.mongo.MongoManager
 import mjs.common.utils.LogUtils
@@ -17,7 +17,7 @@ class FileTeamLoaderTest {
         MongoManager mongoDB = new MongoManager()
         mongoDB.open("ballsim")
 
-        Batter batter = new Batter(atBats: 57, hits: 19, homers: 5, caughtStealing: 0, doubles: 2, hitByPitch: 1, name: "Bob Horner", position: "3B", stolenBases: 0, strikeouts: 6, teamName: "Braves", year: 1982, triples: 2, walks: 3)
+        Player batter = new Player(atBats: 57, hits: 19, homers: 5, caughtStealing: 0, doubles: 2, hitByPitch: 1, name: "Bob Horner", position: "3B", stolenBases: 0, strikeouts: 6, teamName: "Braves", year: 1982, triples: 2, walks: 3)
 
         // Delete all
         mongoDB.deleteMany("batter", [position:"3B"])
