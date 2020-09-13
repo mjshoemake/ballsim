@@ -6,6 +6,11 @@ class SimTeam {
     def pitchers = []
     def lineup = []
     def bench = []
+    def remainder = []
+    def contact = []
+    def power = []
+    def speed = []
+    def speedAndContact = []
     def rotation = []
     def bullpen = []
     def position1B
@@ -23,6 +28,7 @@ class SimTeam {
     GamePitcher closer
     int pitchCount = 0
     def teamRoster = null
+    def positions = [:]
 
     int getNextBatter() {
         nextBatter++
@@ -37,13 +43,22 @@ class SimTeam {
         separatePlayers()
     }
 
+    boolean assignPosition(Batter batter, String position) {
+        if (positions.containsKey(position)) {
+            return false
+        } else {
+            positions << [position: batter]
+            return true
+        }
+    }
+
     void separatePlayers() {
         teamRoster.each() { next ->
             if (next.isPitcher) {
                 // Pitcher
                 pitchers << next
-                if (next.pitcherStats.pitchingGamesStarted <= 10) {
-                    if (next.pitcherStats.pitchingGames > 10) {
+                if (next.pitcherStats.pitchingGamesStarted <= 7) {
+                    if (next.pitcherStats.pitchingGames > 7) {
                         bullpen << next
                     }
                 } else {
@@ -87,29 +102,120 @@ class SimTeam {
         }
 
         // Create lineup.
-        batters.sort { a,b -> a.stolenBases <=> b.stolenBases }
+        // POWER: Who hits the most home runs?
+        batters.sort { a,b -> a.homers <=> b.homers }
         int i=batters.size()-1
-        while (i>=0 && batters[i].battingAvg < new BigDecimal(".290") && batters[i].stolenBases > 20) {
+        // Found cleanup hitter.
+        println "#4 hitter: ${batters[i].name} HR: ${batters[i].homers} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+        power << batters[i]
+        batters.remove(i)
+        i--
 
-            println "Skipping: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg}"
-            i--
-        }
-        if (i>=0 && batters[i].battingAvg < new BigDecimal(".290") && batters[i].stolenBases > 30) {
-            // Found leadoff hitter.
-            println "Leadoff hitter: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
-        } else {
-            // Select based on batting avg.
-            batters.sort { a,b -> a.battingAvg <=> b.battingAvg }
-            i=batters.size()-1
-            while (i>=0 && batters[i].atBats < 200) {
-                println "Skipping: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+        // Found other power hitters.
+        println "#5 hitter: ${batters[i].name} HR: ${batters[i].homers} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+        power << batters[i]
+        batters.remove(i)
+        i--
+
+        println "#6 hitter: ${batters[i].name} HR: ${batters[i].homers} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+        power << batters[i]
+        batters.remove(i)
+        i--
+
+        // SPEED: Who steals the most bases?
+        batters.sort { a,b -> a.stolenBases <=> b.stolenBases }
+        i=batters.size()-1
+        while (i>=0 && speed.size() < 2) {
+            if (batters[i].battingAvg > new BigDecimal(".290") && batters[i].stolenBases > 25) {
+                // Speed And Contact
+                println "SpeedAndContact Found: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+                speedAndContact << batters[i]
+                batters.remove(i)
+                i--
+            } else if (batters[i].stolenBases > 25) {
+                // Speed
+                println "Speed Found: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+                speed << batters[i]
+                batters.remove(i)
+                i--
+            } else {
                 i--
             }
-            if (i>=0 && batters[i].atBats > 200) {
-                // Found leadoff hitter.
-                println "Leadoff hitter: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+        }
+
+        // CONTACT: Who has the best batting avg?
+        batters.sort { a,b -> a.battingAvg <=> b.battingAvg }
+        i=batters.size()-1
+        while (i>=0) {
+            if (batters[i].atBats > 200) {
+                // Contact
+                println "Contact Found: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+                contact << batters[i]
+                batters.remove(i)
+                i--
+            } else {
+                i--
             }
         }
+        i=batters.size()-1
+        while (i>=0) {
+            // Remainder
+            println "Remainder Found: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+            remainder << batters[i]
+            batters.remove(i)
+            i--
+        }
+
+        // Players organized. Set lineup and defensive positions.
+        println ""
+        println "Batting Order:"
+        int positionsFilled = 0
+        // Speed And Contact
+        while (speedAndContact.size() > 0) {
+            // TODO assign a fielding position and make sure that position is not taken.
+            println "   ${positionsFilled+1}: ${speedAndContact[0].name} Pos: ${speedAndContact[0].primaryPosition} SB: ${speedAndContact[0].stolenBases} Avg: ${speedAndContact[0].battingAvg} AB: ${speedAndContact[0].atBats}"
+            lineup << speedAndContact[0]
+            speedAndContact.remove(0)
+            positionsFilled++
+        }
+
+        // Speed Only
+        while (positionsFilled < 2 && speed.size() > 0) {
+            // TODO assign a fielding position and make sure that position is not taken.
+            println "   ${positionsFilled+1}: ${speed[0].name} Pos: ${speed[0].primaryPosition} SB: ${speed[0].stolenBases} Avg: ${speed[0].battingAvg} AB: ${speed[0].atBats}"
+            lineup << speed[0]
+            speed.remove(0)
+            positionsFilled++
+        }
+
+        // Contact (first third)
+        while (positionsFilled < 3 && contact.size() > 0) {
+            // TODO assign a fielding position and make sure that position is not taken.
+            println "   ${positionsFilled+1}: ${contact[0].name} Pos: ${contact[0].primaryPosition} SB: ${contact[0].stolenBases} Avg: ${contact[0].battingAvg} AB: ${contact[0].atBats}"
+            lineup << contact[0]
+            contact.remove(0)
+            positionsFilled++
+        }
+
+        // Power
+        while (positionsFilled < 6 && power.size() > 0) {
+            // TODO assign a fielding position and make sure that position is not taken.
+            println "   ${positionsFilled+1}: ${power[0].name} Pos: ${power[0].primaryPosition} SB: ${power[0].stolenBases} Avg: ${power[0].battingAvg} AB: ${power[0].atBats}"
+            lineup << power[0]
+            power.remove(0)
+            positionsFilled++
+        }
+
+        // Fill up rest of line up.
+        while (positionsFilled < 9 && contact.size() > 0) {
+            // TODO assign a fielding position and make sure that position is not taken.
+            println "   ${positionsFilled+1}: ${contact[0].name} Pos: ${contact[0].primaryPosition} SB: ${contact[0].stolenBases} Avg: ${contact[0].battingAvg} AB: ${contact[0].atBats}"
+            lineup << contact[0]
+            contact.remove(0)
+            positionsFilled++
+        }
+
+        println "Remaining: speedAndContact: ${speedAndContact.size()} speed: ${speed.size()} power: ${power.size()} contact: ${contact.size()}"
     }
 
 }

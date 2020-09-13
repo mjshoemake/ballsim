@@ -30,6 +30,7 @@ class Batter {
     int caughtStealing = 0
     int sacrificeFlies = 0
     boolean isPitcher = false
+    String primaryPosition
     PitcherStats pitcherStats = null
     BigDecimal calculatedRank = BigDecimal.valueOf(0.0)
 
@@ -135,6 +136,7 @@ class Batter {
         this.nameLast = "" // TODO
         this.playerID = playerMap.player_id
         this.teamID = team_id
+        this.primaryPosition = playerMap.primary_position
         this.year = year
         this.atBats = Integer.parseInt(battingStats.ab)
         this.games = Integer.parseInt(battingStats.g)
@@ -170,7 +172,7 @@ class Batter {
     }
 
     void printPlayer() {
-        println "Name: ${this.name} ID: ${this.playerID} Year: ${year} Pitcher: ${this.isPitcher} Bats: ${this.armBats} Throws: ${this.armThrows}"
+        println "Name: ${this.name} Pos: ${this.primaryPosition} ID: ${this.playerID} Year: ${year} Pitcher: ${this.isPitcher} Bats: ${this.armBats} Throws: ${this.armThrows}"
         println "   HR: ${this.homers} 3B: ${this.triples} 2B: ${this.doubles} Hits: ${this.hits} Walks: ${this.walks} Strikeouts: ${this.strikeouts} Steals: ${this.stolenBases} Atbats: ${this.atBats} CS: ${this.caughtStealing} HBP: ${this.hitByPitch} G: ${this.games}"
         if (this.isPitcher) {
             this.pitcherStats.with {
