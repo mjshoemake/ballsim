@@ -142,37 +142,73 @@ class Player {
         this.teamID = team_id
         this.primaryPosition = playerMap.primary_position
         this.year = year
-        this.atBats = Integer.parseInt(battingStats.ab)
-        this.games = Integer.parseInt(battingStats.g)
-        this.walks = Integer.parseInt(battingStats.bb)
-        this.strikeouts = Integer.parseInt(battingStats.so)
-        this.hits = Integer.parseInt(battingStats.h)
-        this.doubles = Integer.parseInt(battingStats.d)
-        this.triples = Integer.parseInt(battingStats.t)
-        this.homers = Integer.parseInt(battingStats.hr)
-        this.hitByPitch = Integer.parseInt(battingStats.hbp)
-        this.stolenBases = Integer.parseInt(battingStats.sb)
-        this.caughtStealing = Integer.parseInt(battingStats.cs)
-        this.sacrificeFlies = Integer.parseInt(battingStats.sac)
+        if (year == "2020") {
+            if (! battingStats) {
+                println "${this.name} - battingStats object is null."
+            } else {
+                this.atBats = (Integer.parseInt(battingStats.ab) * 2.7).round(0)
+                this.games = (Integer.parseInt(battingStats.g) * 2.7).round(0)
+                this.walks = (Integer.parseInt(battingStats.bb) * 2.7).round(0)
+                this.strikeouts = (Integer.parseInt(battingStats.so) * 2.7).round(0)
+                this.hits = (Integer.parseInt(battingStats.h) * 2.7).round(0)
+                this.doubles = (Integer.parseInt(battingStats.d) * 2.7).round(0)
+                this.triples = (Integer.parseInt(battingStats.t) * 2.7).round(0)
+                this.homers = (Integer.parseInt(battingStats.hr) * 2.7).round(0)
+                this.hitByPitch = (Integer.parseInt(battingStats.hbp) * 2.7).round(0)
+                this.stolenBases = (Integer.parseInt(battingStats.sb) * 2.7).round(0)
+                this.caughtStealing = (Integer.parseInt(battingStats.cs) * 2.7).round(0)
+                this.sacrificeFlies = (Integer.parseInt(battingStats.sac) * 2.7).round(0)
+            }
 
-        if (pitchingStats != null && pitchingStats.size() > 0) {
-            this.pitcherStats = new PitcherStats()
-            this.pitcherStats.with {
-                pitchingGames = Integer.parseInt(pitchingStats.g)
-                pitchingGamesStarted = Integer.parseInt(pitchingStats.gs)
-                pitchingBattersRetired = Integer.parseInt(pitchingStats.ab) - Integer.parseInt(pitchingStats.h)
-                pitchingWalks = Integer.parseInt(pitchingStats.bb)
-                pitchingRuns = Integer.parseInt(pitchingStats.r)
-                pitchingStrikeouts = Integer.parseInt(pitchingStats.so)
-                pitchingHits = Integer.parseInt(pitchingStats.h)
-                pitchingHomers = Integer.parseInt(pitchingStats.hr)
-                pitchingWildPitch = Integer.parseInt(pitchingStats.wp)
-                pitchingHitBatter = Integer.parseInt(pitchingStats.hb)
-                pitchingBalks = Integer.parseInt(pitchingStats.bk)
-                pitchingWhip = pitchingStats.whip
+            if (pitchingStats != null && pitchingStats.size() > 0) {
+                this.pitcherStats = new PitcherStats()
+                this.pitcherStats.with {
+                    pitchingGames = (Integer.parseInt(pitchingStats.g) * 2.7).round(0)
+                    pitchingGamesStarted = (Integer.parseInt(pitchingStats.gs) * 2.7).round(0)
+                    pitchingBattersRetired = ((Integer.parseInt(pitchingStats.ab) - Integer.parseInt(pitchingStats.h))  * 2.7).round(0)
+                    pitchingWalks = (Integer.parseInt(pitchingStats.bb) * 2.7).round(0)
+                    pitchingRuns = (Integer.parseInt(pitchingStats.r) * 2.7).round(0)
+                    pitchingStrikeouts = (Integer.parseInt(pitchingStats.so) * 2.7).round(0)
+                    pitchingHits = (Integer.parseInt(pitchingStats.h) * 2.7).round(0)
+                    pitchingHomers = (Integer.parseInt(pitchingStats.hr) * 2.7).round(0)
+                    pitchingWildPitch = (Integer.parseInt(pitchingStats.wp) * 2.7).round(0)
+                    pitchingHitBatter = (Integer.parseInt(pitchingStats.hb) * 2.7).round(0)
+                    pitchingBalks = (Integer.parseInt(pitchingStats.bk) * 2.7).round(0)
+                    pitchingWhip = pitchingStats.whip
+                }
+            }
+        } else {
+            this.atBats = Integer.parseInt(battingStats.ab)
+            this.games = Integer.parseInt(battingStats.g)
+            this.walks = Integer.parseInt(battingStats.bb)
+            this.strikeouts = Integer.parseInt(battingStats.so)
+            this.hits = Integer.parseInt(battingStats.h)
+            this.doubles = Integer.parseInt(battingStats.d)
+            this.triples = Integer.parseInt(battingStats.t)
+            this.homers = Integer.parseInt(battingStats.hr)
+            this.hitByPitch = Integer.parseInt(battingStats.hbp)
+            this.stolenBases = Integer.parseInt(battingStats.sb)
+            this.caughtStealing = Integer.parseInt(battingStats.cs)
+            this.sacrificeFlies = Integer.parseInt(battingStats.sac)
+
+            if (pitchingStats != null && pitchingStats.size() > 0) {
+                this.pitcherStats = new PitcherStats()
+                this.pitcherStats.with {
+                    pitchingGames = Integer.parseInt(pitchingStats.g)
+                    pitchingGamesStarted = Integer.parseInt(pitchingStats.gs)
+                    pitchingBattersRetired = Integer.parseInt(pitchingStats.ab) - Integer.parseInt(pitchingStats.h)
+                    pitchingWalks = Integer.parseInt(pitchingStats.bb)
+                    pitchingRuns = Integer.parseInt(pitchingStats.r)
+                    pitchingStrikeouts = Integer.parseInt(pitchingStats.so)
+                    pitchingHits = Integer.parseInt(pitchingStats.h)
+                    pitchingHomers = Integer.parseInt(pitchingStats.hr)
+                    pitchingWildPitch = Integer.parseInt(pitchingStats.wp)
+                    pitchingHitBatter = Integer.parseInt(pitchingStats.hb)
+                    pitchingBalks = Integer.parseInt(pitchingStats.bk)
+                    pitchingWhip = pitchingStats.whip
+                }
             }
         }
-        double pitchingWhip
     }
 
     void printPlayer() {

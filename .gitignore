@@ -2990,3 +2990,5 @@ out/production/ballsim/baseball/domain/BallGame$_printTeamHittingStats_closure7.
 out/production/ballsim/baseball/domain/Player$_loadFromMap_closure1.class
 out/production/ballsim/baseball/domain/Player$_printPlayer_closure2.class
 out/production/ballsim/baseball/domain/Player.class
+out/production/ballsim/baseball/domain/Player$_loadFromMap_closure2.class
+out/production/ballsim/baseball/domain/Player$_printPlayer_closure3.class

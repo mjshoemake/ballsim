@@ -49,7 +49,7 @@ class ProcessTeamPlayersTests {
     @Test
     void processTeamPlayers() {
         HttpHistoricalDataManager dataMgr = new HttpHistoricalDataManager()
-        String year = "1999"
+        String year = "2020"
         def teams = dataMgr.getTeamMapForSeason(year)
         def team = teams["Braves"]
         def roster = dataMgr.get40ManRoster(team.team_id, year)

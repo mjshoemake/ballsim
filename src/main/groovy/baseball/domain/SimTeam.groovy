@@ -189,10 +189,21 @@ class SimTeam {
     void addIfPositionAvailable(def primaryPosition, def sourceList, def category) {
         // Assign a fielding position and make sure that position is not taken.
         if (positions[primaryPosition]) {
-            // Already taken. Skip this person.
-            def batter = new GameBatter(sourceList[0])
-            bench << batter
-            sourceList.remove(0)
+            // Already taken. DH?
+            if (positions["DH"]) {
+                // Already taken. Skip this person.
+                def batter = new GameBatter(sourceList[0])
+                bench << batter
+                sourceList.remove(0)
+            } else {
+                // DH is available. Use that.
+                sourceList[0].primaryPosition = "DH"
+                def batter = new GameBatter(sourceList[0])
+                positions["DH"] = batter
+                println "   ${lineup.size()+1}: ${sourceList[0].name} Pos: ${sourceList[0].primaryPosition} SB: ${sourceList[0].stolenBases} HR: ${sourceList[0].homers} Avg: ${sourceList[0].battingAvg} AB: ${sourceList[0].atBats}   ${category}"
+                lineup << batter
+                sourceList.remove(0)
+            }
         } else {
             def batter = new GameBatter(sourceList[0])
             positions[primaryPosition] = batter
