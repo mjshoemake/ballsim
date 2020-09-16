@@ -50,18 +50,24 @@ class BallGameTests {
     @Test
     void testPlayGame2() {
         HttpHistoricalDataManager dataMgr = new HttpHistoricalDataManager()
-        String year = "1995"
-        def teams = dataMgr.getTeamMapForSeason(year)
-        def home = teams["Braves"]
-        def away = teams["Giants"]
+        def homeYear = "1995"
+        def awayYear = "2020"
+        def teams
+        if (homeYear == awayYear) {
 
-        def homeRoster = dataMgr.get40ManRoster(home.team_id, year)
-        def awayRoster = dataMgr.get40ManRoster(away.team_id, year)
+        }
+        teams = dataMgr.getTeamMapForSeason(homeYear)
+        def home = teams["Braves"]
+        teams = dataMgr.getTeamMapForSeason(awayYear)
+        def away = teams["Braves"]
+
+        def homeRoster = dataMgr.get40ManRoster(home.team_id, homeYear)
+        def awayRoster = dataMgr.get40ManRoster(away.team_id, awayYear)
 
         ballGame = new BallGame()
         ballGame.with {
-            awayTeam = new SimTeam(awayRoster)
-            homeTeam = new SimTeam(homeRoster)
+            awayTeam = new SimTeam(awayRoster, away.city, away.name_display_full, awayYear)
+            homeTeam = new SimTeam(homeRoster, home.city, home.name_display_full, homeYear)
         }
         ballGame.start()
     }

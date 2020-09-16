@@ -31,82 +31,29 @@ class BallGame {
     def simType = SimType.ACCURATE
     GameBatter runnerFirst = null, runnerSecond = null, runnerThird = null
     SimTeam awayTeam, homeTeam
-
-//    def homeTeam, awayTeam, starterIndex
-//    def nextAwayBatter = 0, nextHomeBatter = 0
-//    GamePitcher awayStarter = null, homeStarter = null
-//    def awayBullpen = [], homeBullpen = [], tempAwayBullpen = [], tempHomeBullpen = []
-//    GamePitcher awayCurrentPitcher = null, homeCurrentPitcher = null
     def homeTeamWon = false
 
-    // Managing pitching staff
-//    int pitchCount3 = 0
-//    int pitchCount4 = 0
-//    int awayPitcherCount = 1
-//    int homePitcherCount = 1
-
     def start() {
-        //awayLineup = awayTeam["lineup"].clone()
-        //homeLineup = homeTeam["lineup"].clone()
-        //awayTeamName = awayTeam["teamName"]
-        //homeTeamName = homeTeam["teamName"]
-        //def awayRotation = awayTeam["rotation"].clone()
-        //def homeRotation = homeTeam["rotation"].clone()
-        //def awayStarterIndex = awayTeam["starterIndex"]
-        //def homeStarterIndex = homeTeam["starterIndex"]
-        //awayStarter = awayRotation[awayStarterIndex]
-        //homeStarter = homeRotation[homeStarterIndex]
+        homeTeam.starter = homeTeam.rotation[homeTeam.nextStartingPitcher]
+        awayTeam.starter = awayTeam.rotation[awayTeam.nextStartingPitcher]
 
-        // Add starting pitcher to lineup
-        //awayTeam["battingpitchers"].each {
-        //    def nextBatter = it.simBatter.batter
-        //    if (nextBatter.nameFirst == awayStarter.simPitcher.pitcher.nameFirst &&
-        //        nextBatter.nameLast == awayStarter.simPitcher.pitcher.nameLast)
-        //        awayLineup << it
-        //}
-        //homeTeam["battingpitchers"].each {
-        //    def nextBatter = it.simBatter.batter
-        //    if (nextBatter.nameFirst == homeStarter.simPitcher.pitcher.nameFirst &&
-        //            nextBatter.nameLast == homeStarter.simPitcher.pitcher.nameLast)
-        //        homeLineup << it
-        //}
-
-        //awayCurrentPitcher = awayStarter
-        //homeCurrentPitcher = homeStarter
-        //awayStarterIndex++
-        //if (awayStarterIndex > 4) {
-        //    awayStarterIndex = 0
-        //}
-        //homeStarterIndex++
-        //if (homeStarterIndex > 4) {
-        //    homeStarterIndex = 0
-        //}
-        //awayTeam["starterIndex"] = awayStarterIndex
-        //homeTeam["starterIndex"] = homeStarterIndex
-
-        //println "Away Bullpen:"
-        //for (int i=0; i <= awayRotation.size()-1; i++) {
-        //    awayBullpen << awayRotation[i]
-        //    tempAwayBullpen << awayRotation[i]
-        //    println "${awayRotation[i].simPitcher.pitcher.nameFirst} ${awayRotation[i].simPitcher.pitcher.nameLast}"
-        //}
-        //println "Home Bullpen:"
-        //for (int i=0; i <= homeRotation.size()-1; i++) {
-        //    homeBullpen << homeRotation[i]
-        //    tempHomeBullpen << homeRotation[i]
-        //    println "${homeRotation[i].simPitcher.pitcher.nameFirst} ${homeRotation[i].simPitcher.pitcher.nameLast}"
-        //}
-
-        awayLineup.each {
+        awayTeam.lineup.each {
             it.reset()
         }
-        homeLineup.each {
+        homeTeam.lineup.each {
             it.reset()
         }
-        awayRotation.each {
+        awayTeam.rotation.each {
             it.reset()
         }
-        homeRotation.each {
+        homeTeam.rotation.each {
+            it.reset()
+        }
+
+        awayTeam.bullpen.each {
+            it.reset()
+        }
+        homeTeam.bullpen.each {
             it.reset()
         }
 
@@ -128,17 +75,17 @@ class BallGame {
     private def getNewPitcher() {
         if (side == HalfInning.TOP) {
             // New home pitcher.
-            if (tempHomeBullpen.size() > 0) {
-                homeCurrentPitcher = tempHomeBullpen[0]
-                tempHomeBullpen.remove(0)
-                return homeCurrentPitcher
+            if (homeTeam.bullpen.size() >= homeTeam.nextReliefPitcher+1) {
+                homeTeam.currentPitcher = homeTeam.bullpen[homeTeam.nextReliefPitcher]
+                homeTeam.nextReliefPitcher++
+                return homeTeam.currentPitcher
             }
         } else {
             // New away pitcher.
-            if (tempAwayBullpen.size() > 0) {
-                awayCurrentPitcher = tempAwayBullpen[0]
-                tempAwayBullpen.remove(0)
-                return awayCurrentPitcher
+            if (awayTeam.bullpen.size() >= awayTeam.nextReliefPitcher+1) {
+                awayTeam.currentPitcher = awayTeam.bullpen[awayTeam.nextReliefPitcher]
+                awayTeam.nextReliefPitcher++
+                return awayTeam.currentPitcher
             }
         }
     }
@@ -148,9 +95,9 @@ class BallGame {
         int pitcherCount
         def pitcher
         if (side == HalfInning.TOP) {
-            pitcher = homeCurrentPitcher
+            pitcher = homeTeam.currentPitcher
         } else {
-            pitcher = awayCurrentPitcher
+            pitcher = awayTeam.currentPitcher
         }
         outs = 0
         bases = Bases.EMPTY
@@ -171,43 +118,49 @@ class BallGame {
 
     private boolean isReadyToStart() throws Exception {
         boolean result = true
-        if (awayLineup.size() != 9) {
+        if (awayTeam.lineup.size() != 9) {
             throw new Exception("Unable to start game.  The away lineup does not contain 9 batters.")
         }
-        if (homeLineup.size() != 9) {
+        if (homeTeam.lineup.size() != 9) {
             throw new Exception("Unable to start game.  The home lineup does not contain 9 batters.")
         }
-        if (awayBullpen.size() == 0) {
+        if (awayTeam.bullpen.size() == 0) {
             throw new Exception("Unable to start game.  The away bullpen is empty.")
         }
-        if (homeBullpen.size() == 0) {
+        if (homeTeam.bullpen.size() == 0) {
             throw new Exception("Unable to start game.  The home bullpen is empty.")
         }
-        if (awayStarter == null) {
-            throw new Exception("Unable to start game.  The away starter has not been specified.")
+        if (awayTeam.rotation.size() == 0) {
+            throw new Exception("Unable to start game.  The away rotation is empty.")
         }
-        if (homeStarter == null) {
-            throw new Exception("Unable to start game.  The home starter has not been specified.")
+        if (homeTeam.rotation.size() == 0) {
+            throw new Exception("Unable to start game.  The home rotation is empty.")
         }
-        if (awayCurrentPitcher == null) {
-            awayCurrentPitcher = awayStarter
+        //if (awayStarter == null) {
+        //   throw new Exception("Unable to start game.  The away starter has not been specified.")
+        //}
+        //if (homeStarter == null) {
+        //    throw new Exception("Unable to start game.  The home starter has not been specified.")
+        //}
+        if (awayTeam.currentPitcher == null) {
+            awayTeam.currentPitcher = awayTeam.rotation[0]
         }
-        if (homeCurrentPitcher == null) {
-            homeCurrentPitcher = homeStarter
+        if (homeTeam.currentPitcher == null) {
+            homeTeam.currentPitcher = homeTeam.rotation[0]
         }
     }
 
     private def getNextBatter() {
         def batter
         if (side == HalfInning.TOP) {
-            batter = awayLineup[nextAwayBatter++]
-            if (nextAwayBatter > 8) {
-                nextAwayBatter = 0
+            batter = awayTeam.lineup[awayTeam.nextBatter++]
+            if (awayTeam.nextBatter > 8) {
+                awayTeam.nextBatter = 0
             }
         } else {
-            batter = homeLineup[nextHomeBatter++]
-            if (nextHomeBatter > 8) {
-                nextHomeBatter = 0
+            batter = homeTeam.lineup[homeTeam.nextBatter++]
+            if (homeTeam.nextBatter > 8) {
+                homeTeam.nextBatter = 0
             }
         }
         batter
@@ -218,10 +171,11 @@ class BallGame {
             if (inning == 9 && homeScore > awayScore) {
                 isGameOver = true
             } else {
+                def homeStarter = homeTeam.currentPitcher
                 side = HalfInning.BOTTOM
                 gameLog.debug "${format("Pitcher", 20)}  ${format("W", 3)}  ${format("L", 3)}  ${format("IP", 5)}  ${format("R", 3)}  ${format("ERA", 5)}  ${format("H", 3)}  ${format("HR", 3)}  ${format("BB", 3)}  ${format("SO", 3)}"
-                gameLog.debug "${format(homeStarter.nameFirst + " " + homeStarter.nameLast, 20)}  ${format(homeStarter.simPitcher.wins, 3)}  ${format(homeStarter.simPitcher.losses, 3)}  ${format(homeStarter.battersRetired/3, 5)}  ${format(homeStarter.runs, 3)}  ${homeStarter.simPitcher.era}  ${format(homeStarter.hits, 3)}  ${format(homeStarter.homers, 3)}  ${format(homeStarter.walks, 3)}  ${format(homeStarter.strikeouts, 3)}"
-                printTeamHittingStats(awayLineup)
+                gameLog.debug "${format(homeTeam.currentPitcher.simPitcher.pitcher.name, 20)}  ${format(homeTeam.currentPitcher.simPitcher.wins, 3)}  ${format(homeTeam.currentPitcher.simPitcher.losses, 3)}  ${format(homeTeam.currentPitcher.battersRetired/3, 5)}  ${format(homeTeam.currentPitcher.runs, 3)}  ${homeTeam.currentPitcher.simPitcher.era}  ${format(homeTeam.currentPitcher.hits, 3)}  ${format(homeTeam.currentPitcher.homers, 3)}  ${format(homeTeam.currentPitcher.walks, 3)}  ${format(homeTeam.currentPitcher.strikeouts, 3)}"
+                printTeamHittingStats(awayTeam.lineup)
             }
         } else {
             if (inning >= 9 && awayScore != homeScore) {
@@ -229,8 +183,8 @@ class BallGame {
             } else {
                 side = HalfInning.TOP
                 gameLog.debug "${format("Pitcher", 20)}  ${format("W", 3)}  ${format("L", 3)}  ${format("IP", 5)}  ${format("R", 3)}  ${format("ERA", 5)}  ${format("H", 3)}  ${format("HR", 3)}  ${format("BB", 3)}  ${format("SO", 3)}"
-                gameLog.debug "${format(awayStarter.nameFirst + " " + awayStarter.nameLast, 20)}  ${format(awayStarter.simPitcher.wins, 3)}  ${format(awayStarter.simPitcher.losses, 3)}  ${format(awayStarter.battersRetired/3, 5)}  ${format(awayStarter.runs, 3)}  ${awayStarter.simPitcher.era}  ${format(awayStarter.hits, 3)}  ${format(awayStarter.homers, 3)}  ${format(awayStarter.walks, 3)}  ${format(awayStarter.strikeouts, 3)}"
-                printTeamHittingStats(homeLineup)
+                gameLog.debug "${format(awayTeam.currentPitcher.simPitcher.pitcher.name, 20)}  ${format(awayTeam.currentPitcher.simPitcher.wins, 3)}  ${format(awayTeam.currentPitcher.simPitcher.losses, 3)}  ${format(awayTeam.currentPitcher.battersRetired/3, 5)}  ${format(awayTeam.currentPitcher.runs, 3)}  ${awayTeam.currentPitcher.simPitcher.era}  ${format(awayTeam.currentPitcher.hits, 3)}  ${format(awayTeam.currentPitcher.homers, 3)}  ${format(awayTeam.currentPitcher.walks, 3)}  ${format(awayTeam.currentPitcher.strikeouts, 3)}"
+                printTeamHittingStats(homeTeam.lineup)
                 inning++
                 awayInnings.add(0)
                 homeInnings.add(0)
@@ -239,19 +193,19 @@ class BallGame {
 
         if (isGameOver) {
             if (homeScore > awayScore) {
-                homeTeam["wins"] = homeTeam["wins"] + 1
-                awayTeam["losses"] = awayTeam["losses"] + 1
-                homeTeam["winDiff"] = homeTeam["wins"] - homeTeam["losses"]
-                awayTeam["winDiff"] = awayTeam["wins"] - awayTeam["losses"]
-                homeStarter.simPitcher.wins += 1
-                awayStarter.simPitcher.losses += 1
+                homeTeam.wins = homeTeam.wins + 1
+                awayTeam.losses = awayTeam.losses + 1
+                homeTeam.winDiff = homeTeam.wins - homeTeam.losses
+                awayTeam.winDiff = awayTeam.wins - awayTeam.losses
+                homeTeam.starter.simPitcher.wins += 1
+                awayTeam.starter.simPitcher.losses += 1
             } else {
-                awayTeam["wins"] = awayTeam["wins"] + 1
-                homeTeam["losses"] = homeTeam["losses"] + 1
-                homeTeam["winDiff"] = homeTeam["wins"] - homeTeam["losses"]
-                awayTeam["winDiff"] = awayTeam["wins"] - awayTeam["losses"]
-                awayStarter.simPitcher.wins += 1
-                homeStarter.simPitcher.losses += 1
+                awayTeam.wins = awayTeam.wins + 1
+                homeTeam.losses = homeTeam.losses + 1
+                homeTeam.winDiff = homeTeam.wins - homeTeam.losses
+                awayTeam.winDiff = awayTeam.wins - awayTeam.losses
+                awayTeam.starter.simPitcher.wins += 1
+                homeTeam.starter.simPitcher.losses += 1
             }
         }
 
@@ -259,17 +213,16 @@ class BallGame {
             if (gameLogEnabled) {
                 gameLog.debug ""
                 gameLog.debug ""
-                gameLog.debug "Final score:  ${awayTeamName} ${awayScore}  ${homeTeamName} ${homeScore}"
+                gameLog.debug "Final score:  ${awayTeam.year} ${awayTeam.teamName} ${awayScore}     ${homeTeam.year} ${homeTeam.teamName} ${homeScore}"
             }
-            //println "Final score:  ${awayTeamName} ${awayScore}  ${homeTeamName} ${homeScore}"
             highlightsLog.debug ""
             highlightsLog.debug "${format("Teams", 20)}  1  2  3  4  5  6  7  8  9   ${format("R", 3)}  ${format("H", 3)}  ${format("E", 3)}"
-            highlightsLog.debug "${format(awayTeamName, 20)}  ${format(awayInnings[0], 2)} ${format(awayInnings[1], 2)} ${format(awayInnings[2], 2)} ${format(awayInnings[3], 2)} ${format(awayInnings[4], 2)} ${format(awayInnings[5], 2)} ${format(awayInnings[6], 2)} ${format(awayInnings[7], 2)} ${format(awayInnings[8], 2)}  ${format(awayScore, 3)}  ${format(awayHits, 3)}  ${format(awayErrors, 3)}"
-            highlightsLog.debug "${format(homeTeamName, 20)}  ${format(homeInnings[0], 2)} ${format(homeInnings[1], 2)} ${format(homeInnings[2], 2)} ${format(homeInnings[3], 2)} ${format(homeInnings[4], 2)} ${format(homeInnings[5], 2)} ${format(homeInnings[6], 2)} ${format(homeInnings[7], 2)} ${format(homeInnings[8], 2)}  ${format(homeScore, 3)}  ${format(homeHits, 3)}  ${format(homeErrors, 3)}"
+            highlightsLog.debug "${format(awayTeam.year + " " + awayTeam.teamName, 20)}  ${format(awayInnings[0], 2)} ${format(awayInnings[1], 2)} ${format(awayInnings[2], 2)} ${format(awayInnings[3], 2)} ${format(awayInnings[4], 2)} ${format(awayInnings[5], 2)} ${format(awayInnings[6], 2)} ${format(awayInnings[7], 2)} ${format(awayInnings[8], 2)}  ${format(awayScore, 3)}  ${format(awayHits, 3)}  ${format(awayErrors, 3)}"
+            highlightsLog.debug "${format(homeTeam.year + " " + homeTeam.teamName, 20)}  ${format(homeInnings[0], 2)} ${format(homeInnings[1], 2)} ${format(homeInnings[2], 2)} ${format(homeInnings[3], 2)} ${format(homeInnings[4], 2)} ${format(homeInnings[5], 2)} ${format(homeInnings[6], 2)} ${format(homeInnings[7], 2)} ${format(homeInnings[8], 2)}  ${format(homeScore, 3)}  ${format(homeHits, 3)}  ${format(homeErrors, 3)}"
             logBoxScore()
         } else {
             if (gameLogEnabled) {
-                gameLog.debug "Score: ${awayTeamName}   ${awayScore}        ${homeTeamName}   ${homeScore}       ${side} inning ${inning}"
+                gameLog.debug "Score: ${awayTeam.year} ${awayTeam.teamName}   ${awayScore}        ${homeTeam.year} ${homeTeam.teamName}   ${homeScore}       ${side} inning ${inning}"
                 gameLog.debug ""
             }
         }
@@ -279,29 +232,29 @@ class BallGame {
         if (boxscoreLogEnabled) {
             boxscoreLog.debug ""
             boxscoreLog.debug ""
-            boxscoreLog.debug "Final score:  ${awayTeamName} ${awayScore}  ${homeTeamName} ${homeScore}"
+            boxscoreLog.debug "Final score:  ${awayTeam.year} ${awayTeam.teamName} ${awayScore}   ${homeTeam.year} ${homeTeam.teamName} ${homeScore}"
             boxscoreLog.debug ""
             boxscoreLog.debug "BOX SCORE"
             boxscoreLog.debug ""
-            boxscoreLog.debug "$awayTeamName:"
+            boxscoreLog.debug "${awayTeam.year} ${awayTeam.teamName}:"
             boxscoreLog.debug "${format("Batter", 20)}  ${format("AB", 3)}  ${format("R", 3)}  ${format("H", 3)}  ${format("2B", 3)}  ${format("3B", 3)}  ${format("HR", 3)}  ${format("RBI", 4)}  ${format("BB", 3)}  ${format("SO", 3)}  ${format("SB", 3)}  ${format("CS", 3)}  ${format("AVG", 5)} "
-            awayLineup.each {
+            awayTeam.lineup.each {
                 boxscoreLog.debug "${format(it.nameFirst + " " + it.nameLast, 20)}  ${format(it.atBats, 3)}  ${format(it.runs, 3)}  ${format(it.hits, 3)}  ${format(it.doubles, 3)}  ${format(it.triples, 3)}  ${format(it.homers, 3)}  ${format(it.rbi, 4)}  ${format(it.walks, 3)}  ${format(it.strikeouts, 3)}  ${format(it.stolenBases, 3)}  ${format(it.caughtStealing, 3)}  ${format(it.simBatter.battingAvg + "0000", 5)}"
             }
             boxscoreLog.debug ""
-            def era = awayStarter.runs / (awayStarter.battersRetired/27)
+            def era = awayTeam.starter.runs / (awayTeam.starter.battersRetired/27)
             boxscoreLog.debug "${format("Pitcher", 20)}  ${format("W", 3)}  ${format("L", 3)}  ${format("IP", 5)}  ${format("R", 3)}  ${format("ERA", 5)}  ${format("H", 3)}  ${format("HR", 3)}  ${format("BB", 3)}  ${format("SO", 3)}"
-            boxscoreLog.debug "${format(awayStarter.nameFirst + " " + awayStarter.nameLast, 20)}  ${format(awayStarter.simPitcher.wins, 3)}  ${format(awayStarter.simPitcher.losses, 3)}  ${format(awayStarter.battersRetired/3, 5)}  ${format(awayStarter.runs, 3)}  ${awayStarter.simPitcher.era}  ${format(awayStarter.hits, 3)}  ${format(awayStarter.homers, 3)}  ${format(awayStarter.walks, 3)}  ${format(awayStarter.strikeouts, 3)}"
+            boxscoreLog.debug "${format(awayTeam.starter.nameFirst + " " + awayTeam.starter.nameLast, 20)}  ${format(awayTeam.starter.simPitcher.wins, 3)}  ${format(awayTeam.starter.simPitcher.losses, 3)}  ${format(awayTeam.starter.battersRetired/3, 5)}  ${format(awayTeam.starter.runs, 3)}  ${awayTeam.starter.simPitcher.era}  ${format(awayTeam.starter.hits, 3)}  ${format(awayTeam.starter.homers, 3)}  ${format(awayTeam.starter.walks, 3)}  ${format(awayTeam.starter.strikeouts, 3)}"
             boxscoreLog.debug ""
             boxscoreLog.debug ""
-            boxscoreLog.debug "$homeTeamName:"
+            boxscoreLog.debug "${homeTeam.year} ${homeTeam.teamName}:"
             boxscoreLog.debug "${format("Batter", 20)}  ${format("AB", 3)}  ${format("R", 3)}  ${format("H", 3)}  ${format("2B", 3)}  ${format("3B", 3)}  ${format("HR", 3)}  ${format("RBI", 4)}  ${format("BB", 3)}  ${format("SO", 3)}  ${format("SB", 3)}  ${format("CS", 3)}  ${format("AVG", 5)} "
-            homeLineup.each {
+            homeTeam.lineup.each {
                 boxscoreLog.debug "${format(it.nameFirst + " " + it.nameLast, 20)}  ${format(it.atBats, 3)}  ${format(it.runs, 3)}  ${format(it.hits, 3)}  ${format(it.doubles, 3)}  ${format(it.triples, 3)}  ${format(it.homers, 3)}  ${format(it.rbi, 4)}  ${format(it.walks, 3)}  ${format(it.strikeouts, 3)}  ${format(it.stolenBases, 3)}  ${format(it.caughtStealing, 3)}  ${format(it.simBatter.battingAvg + "0000", 5)}"
             }
             boxscoreLog.debug ""
             boxscoreLog.debug "${format("Pitcher", 20)}  ${format("W", 3)}  ${format("L", 3)}  ${format("IP", 5)}  ${format("R", 3)}  ${format("ERA", 5)}  ${format("H", 3)}  ${format("HR", 3)}  ${format("BB", 3)}  ${format("SO", 3)}"
-            boxscoreLog.debug "${format(homeStarter.nameFirst + " " + homeStarter.nameLast, 20)}  ${format(homeStarter.simPitcher.wins, 3)}  ${format(homeStarter.simPitcher.losses, 3)}  ${format(homeStarter.battersRetired/3, 5)}  ${format(homeStarter.runs, 3)}  ${homeStarter.simPitcher.era}  ${format(homeStarter.hits, 3)}  ${format(homeStarter.homers, 3)}  ${format(homeStarter.walks, 3)}  ${format(homeStarter.strikeouts, 3)}"
+            boxscoreLog.debug "${format(homeTeam.starter.nameFirst + " " + homeTeam.starter.nameLast, 20)}  ${format(homeTeam.starter.simPitcher.wins, 3)}  ${format(homeTeam.starter.simPitcher.losses, 3)}  ${format(homeTeam.starter.battersRetired/3, 5)}  ${format(homeTeam.starter.runs, 3)}  ${homeTeam.starter.simPitcher.era}  ${format(homeTeam.starter.hits, 3)}  ${format(homeTeam.starter.homers, 3)}  ${format(homeTeam.starter.walks, 3)}  ${format(homeTeam.starter.strikeouts, 3)}"
         }
     }
 
@@ -820,6 +773,7 @@ class BallGame {
             awayHits += hitOnPlay
         } else {
             homeScore += runsScored
+            homeInnings[inning] += runsScored
             homeHits += hitOnPlay
         }
 
@@ -831,18 +785,18 @@ class BallGame {
         }
 
 
-        def msg = new StringBuilder("${batter.nameFirst} ${batter.nameLast}: ${atBatResult.value}.  ${textRunsScored}${bases.value}  $outs out.  ")
+        def msg = new StringBuilder("${batter.simBatter.batter.name}: ${atBatResult.value}.  ${textRunsScored}${bases.value}  $outs out.  ")
         if (notes.trim() != "") {
             msg += "$notes  "
         }
         if (runnerFirst) {
-            msg << "${runnerFirst.nameFirst} ${runnerFirst.nameLast} at first.  "
+            msg << "${runnerFirst.simBatter.batter.name} at first.  "
         }
         if (runnerSecond) {
-            msg << "${runnerSecond.nameFirst} ${runnerSecond.nameLast} at second.  "
+            msg << "${runnerSecond.simBatter.batter.name} at second.  "
         }
         if (runnerThird) {
-            msg << "${runnerThird.nameFirst} ${runnerThird.nameLast} at third.  "
+            msg << "${runnerThird.simBatter.batter.name} at third.  "
         }
         if (gameLogEnabled) {
             gameLog.debug "${msg.toString()}"
@@ -866,7 +820,7 @@ class BallGame {
             SimBatter simBatter = gameBatter.simBatter
             SimPitcher simPitcher = gamePitcher.simPitcher
             def batter = simBatter.batter
-            def pitcher = simPitcher.pitcher
+            def pitcher = simPitcher.pitcher.pitcherStats
             def batterHitRate = batter.getRate(batter.hits)
             def batterWalkRate = batter.getRate(batter.walks + batter.hitByPitch)
             def batterStrikeoutRate = batter.getRate(batter.strikeouts)

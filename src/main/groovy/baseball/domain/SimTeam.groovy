@@ -1,7 +1,11 @@
 package baseball.domain
 
+import org.apache.log4j.Logger
+
 
 class SimTeam {
+    def auditLog = Logger.getLogger('audit')
+
     // Temporary
     def batters = []
     def pitchers = []
@@ -17,17 +21,26 @@ class SimTeam {
     def rotation = []
     def bullpen = []
     String teamName = "MyTeam"
+    String city = "Home City"
+    String year = "2020"
     int nextBatter = 0
-    Player starter
-    Player currentPitcher
-    Player closer
+    int nextReliefPitcher = 0
+    int nextStartingPitcher = 0
+    GamePitcher starter
+    GamePitcher currentPitcher
+    GamePitcher closer
     int pitchCount = 0
     def teamRoster = null
     def positions = [:]
-    int nextStartingPitcher = 0
+    int wins = 0
+    int losses = 0
+    int winDiff = 0
 
-    SimTeam(def teamRoster) {
+    SimTeam(def teamRoster, String city, String teamName, String year) {
         this.teamRoster = teamRoster
+        this.teamName = teamName
+        this.city = city
+        this.year = year
         separatePlayers()
     }
 
@@ -67,6 +80,7 @@ class SimTeam {
             }
         } else if (rotation.size() < 5) {
             // Pull pitchers from bullpen to get up to 5.
+            auditLog.error("TODO: Not enough starting pitchers!!!!")
             throw new Exception("TODO: Not enough starting pitchers!!!!")
         }
 
@@ -79,33 +93,53 @@ class SimTeam {
             }
         } else if (bullpen.size() < 5) {
             // Pull pitchers from bullpen to get up to 5.
+            auditLog.error("TODO: Not enough starting pitchers!!!!")
             throw new Exception("TODO: Not enough starting pitchers!!!!")
         }
 
+        auditLog.info "Rotation:  ${teamName}"
         rotation.each { next ->
-            println "Rotation: ${next.name} GS: ${next.pitcherStats.pitchingGamesStarted} ERA: ${next.pitcherStats.era}"
+            auditLog.info "   ${next.name} GS: ${next.pitcherStats.pitchingGamesStarted} ERA: ${next.pitcherStats.era}"
         }
+        auditLog.info ""
+        auditLog.info "Bullpen:  ${teamName}"
         bullpen.each { next ->
-            println "Bullpen: ${next.name} GS: ${next.pitcherStats.pitchingGamesStarted} ERA: ${next.pitcherStats.era}"
+            auditLog.info "   ${next.name} GS: ${next.pitcherStats.pitchingGamesStarted} ERA: ${next.pitcherStats.era}"
         }
+
+        // Prepare rotation for game (wrap with SimPitcher and GamePitcher).
+        // SimPitcher for season stats, GamePitcher for game stats.
+        def templist = []
+        rotation.each { next ->
+            templist << new GamePitcher(next)
+        }
+        rotation = templist
+
+        // Prepare bullpen for game (wrap with SimPitcher and GamePitcher).
+        // SimPitcher for season stats, GamePitcher for game stats.
+        templist = []
+        bullpen.each { next ->
+            templist << new GamePitcher(next)
+        }
+        bullpen = templist
 
         // Create lineup.
         // POWER: Who hits the most home runs?
         batters.sort { a,b -> a.homers <=> b.homers }
         int i=batters.size()-1
         // Found cleanup hitter.
-        println "#4 hitter: ${batters[i].name} HR: ${batters[i].homers} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+        auditLog.debug "#4 hitter: ${batters[i].name} HR: ${batters[i].homers} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
         power << batters[i]
         batters.remove(i)
         i--
 
         // Found other power hitters.
-        println "#5 hitter: ${batters[i].name} HR: ${batters[i].homers} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+        auditLog.debug "#5 hitter: ${batters[i].name} HR: ${batters[i].homers} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
         power << batters[i]
         batters.remove(i)
         i--
 
-        println "#6 hitter: ${batters[i].name} HR: ${batters[i].homers} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+        auditLog.debug "#6 hitter: ${batters[i].name} HR: ${batters[i].homers} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
         power << batters[i]
         batters.remove(i)
         i--
@@ -116,16 +150,16 @@ class SimTeam {
         while (i>=0 && speed.size() < 2) {
             if (batters[i].battingAvg > new BigDecimal(".290") && batters[i].stolenBases > 25) {
                 // Speed And Contact
-                println "SpeedAndContact Found: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+                auditLog.debug "SpeedAndContact Found: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
                 speedAndContact << batters[i]
                 batters.remove(i)
                 i--
-            } else if (batters[i].stolenBases > 25) {
-                // Speed
-                println "Speed Found: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
-                speed << batters[i]
-                batters.remove(i)
-                i--
+            //} else if (batters[i].stolenBases > 25) {
+            //    // Speed
+            //    println "Speed Found: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+            //    speed << batters[i]
+            //    batters.remove(i)
+            //    i--
             } else {
                 i--
             }
@@ -137,7 +171,7 @@ class SimTeam {
         while (i>=0) {
             if (batters[i].atBats > 200) {
                 // Contact
-                println "Contact Found: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+                auditLog.debug "Contact Found: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
                 contact << batters[i]
                 batters.remove(i)
                 i--
@@ -148,15 +182,15 @@ class SimTeam {
         i=batters.size()-1
         while (i>=0) {
             // Remainder
-            println "Remainder Found: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+            auditLog.debug "Remainder Found: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
             remainder << batters[i]
             batters.remove(i)
             i--
         }
 
         // Players organized. Set lineup and defensive positions.
-        println ""
-        println "Batting Order:"
+        auditLog.info ""
+        auditLog.info "Batting Order:"
         int positionsFilled = 0
         def primaryPosition
         // Speed And Contact
@@ -183,7 +217,13 @@ class SimTeam {
             addIfPositionAvailable(primaryPosition, contact, "Contact")
         }
 
-        println "Remaining: speedAndContact: ${speedAndContact.size()} speed: ${speed.size()} power: ${power.size()} contact: ${contact.size()}"
+        // Out of players? Fill up rest of line up using remainder players.
+        while (lineup.size() < 9 && remainder.size() > 0) {
+            primaryPosition = remainder[0].primaryPosition
+            addIfPositionAvailable(primaryPosition, remainder, "Remainder")
+        }
+
+        auditLog.debug "Remaining: speedAndContact: ${speedAndContact.size()} speed: ${speed.size()} power: ${power.size()} contact: ${contact.size()}"
     }
 
     void addIfPositionAvailable(def primaryPosition, def sourceList, def category) {
@@ -200,14 +240,14 @@ class SimTeam {
                 sourceList[0].primaryPosition = "DH"
                 def batter = new GameBatter(sourceList[0])
                 positions["DH"] = batter
-                println "   ${lineup.size()+1}: ${sourceList[0].name} Pos: ${sourceList[0].primaryPosition} SB: ${sourceList[0].stolenBases} HR: ${sourceList[0].homers} Avg: ${sourceList[0].battingAvg} AB: ${sourceList[0].atBats}   ${category}"
+                auditLog.info "   ${lineup.size()+1}: ${sourceList[0].name} Pos: ${sourceList[0].primaryPosition} SB: ${sourceList[0].stolenBases} HR: ${sourceList[0].homers} Avg: ${sourceList[0].battingAvg} AB: ${sourceList[0].atBats}   ${category}"
                 lineup << batter
                 sourceList.remove(0)
             }
         } else {
             def batter = new GameBatter(sourceList[0])
             positions[primaryPosition] = batter
-            println "   ${lineup.size()+1}: ${sourceList[0].name} Pos: ${sourceList[0].primaryPosition} SB: ${sourceList[0].stolenBases} HR: ${sourceList[0].homers} Avg: ${sourceList[0].battingAvg} AB: ${sourceList[0].atBats}   ${category}"
+            auditLog.info "   ${lineup.size()+1}: ${sourceList[0].name} Pos: ${sourceList[0].primaryPosition} SB: ${sourceList[0].stolenBases} HR: ${sourceList[0].homers} Avg: ${sourceList[0].battingAvg} AB: ${sourceList[0].atBats}   ${category}"
             lineup << batter
             sourceList.remove(0)
         }
@@ -222,11 +262,12 @@ class SimTeam {
     }
 
     int getNextStartingPitcher() {
+        int result = nextStartingPitcher
         nextStartingPitcher++
         if (nextStartingPitcher > 4) {
             nextStartingPitcher = 0
         }
-        nextStartingPitcher
+        result
     }
 
 }

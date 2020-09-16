@@ -39,7 +39,7 @@ class SimPitcher {
     }
 
     public def getAvgBattersRetiredPerGame() {
-        pitcher.avgBattersRetiredPerGame
+        pitcher.pitcherStats.avgBattersRetiredPerGame
     }
 
     def getOppBattingAvg() {

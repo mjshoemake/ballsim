@@ -34,11 +34,6 @@ class Player {
     PitcherStats pitcherStats = null
     BigDecimal calculatedRank = BigDecimal.valueOf(0.0)
 
-    GameBatter gameBatter = new GameBatter()
-    GamePitcher gamePitcher = new GamePitcher()
-    SimBatter simBatter = new SimBatter()
-    SimPitcher simPitcher = new SimPitcher()
-
     // Overall fielding #s
     int putouts = 0
     int assists = 0
