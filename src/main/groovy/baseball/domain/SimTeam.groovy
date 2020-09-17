@@ -4,7 +4,7 @@ import org.apache.log4j.Logger
 
 
 class SimTeam {
-    def auditLog = Logger.getLogger('audit')
+    def auditLog = Logger.getLogger('Audit')
 
     // Temporary
     def batters = []
@@ -97,12 +97,13 @@ class SimTeam {
             throw new Exception("TODO: Not enough starting pitchers!!!!")
         }
 
-        auditLog.info "Rotation:  ${teamName}"
+        auditLog.info ""
+        auditLog.info "Rotation:  $year $teamName"
         rotation.each { next ->
             auditLog.info "   ${next.name} GS: ${next.pitcherStats.pitchingGamesStarted} ERA: ${next.pitcherStats.era}"
         }
         auditLog.info ""
-        auditLog.info "Bullpen:  ${teamName}"
+        auditLog.info "Bullpen:  $year $teamName"
         bullpen.each { next ->
             auditLog.info "   ${next.name} GS: ${next.pitcherStats.pitchingGamesStarted} ERA: ${next.pitcherStats.era}"
         }
@@ -125,6 +126,7 @@ class SimTeam {
 
         // Create lineup.
         // POWER: Who hits the most home runs?
+        auditLog.debug ""
         batters.sort { a,b -> a.homers <=> b.homers }
         int i=batters.size()-1
         // Found cleanup hitter.
@@ -190,7 +192,7 @@ class SimTeam {
 
         // Players organized. Set lineup and defensive positions.
         auditLog.info ""
-        auditLog.info "Batting Order:"
+        auditLog.info "Batting Order:  $year $teamName"
         int positionsFilled = 0
         def primaryPosition
         // Speed And Contact
