@@ -100,12 +100,12 @@ class SimTeam {
         auditLog.info ""
         auditLog.info "Rotation:  $year $teamName"
         rotation.each { next ->
-            auditLog.info "   ${next.name} GS: ${next.pitcherStats.pitchingGamesStarted} ERA: ${next.pitcherStats.era}"
+            auditLog.info "   ${next.name} GS: ${next.pitcherStats.pitchingGamesStarted} GS: ${next.pitcherStats.pitchingGames} ERA: ${next.pitcherStats.era} Batters Retired: ${next.pitcherStats.pitchingBattersRetired} BB: ${next.pitcherStats.pitchingWalks} R: ${next.pitcherStats.pitchingRuns} ER: ${next.pitcherStats.pitchingEarnedRuns} SO: ${next.pitcherStats.pitchingStrikeouts} H: ${next.pitcherStats.pitchingHits} HR: ${next.pitcherStats.pitchingHomers} WP: ${next.pitcherStats.pitchingWildPitch} HBP: ${next.pitcherStats.pitchingHitBatter} Balk: ${next.pitcherStats.pitchingBalks} WHIP: ${next.pitcherStats.pitchingWhip}"
         }
         auditLog.info ""
         auditLog.info "Bullpen:  $year $teamName"
         bullpen.each { next ->
-            auditLog.info "   ${next.name} GS: ${next.pitcherStats.pitchingGamesStarted} ERA: ${next.pitcherStats.era}"
+            auditLog.info "   ${next.name} GS: ${next.pitcherStats.pitchingGamesStarted} GS: ${next.pitcherStats.pitchingGames} ERA: ${next.pitcherStats.era} Batters Retired: ${next.pitcherStats.pitchingBattersRetired} BB: ${next.pitcherStats.pitchingWalks} R: ${next.pitcherStats.pitchingRuns} ER: ${next.pitcherStats.pitchingEarnedRuns} SO: ${next.pitcherStats.pitchingStrikeouts} H: ${next.pitcherStats.pitchingHits} HR: ${next.pitcherStats.pitchingHomers} WP: ${next.pitcherStats.pitchingWildPitch} HBP: ${next.pitcherStats.pitchingHitBatter} Balk: ${next.pitcherStats.pitchingBalks} WHIP: ${next.pitcherStats.pitchingWhip}"
         }
 
         // Prepare rotation for game (wrap with SimPitcher and GamePitcher).

@@ -163,12 +163,14 @@ class Player {
                     pitchingBattersRetired = ((Integer.parseInt(pitchingStats.ab) - Integer.parseInt(pitchingStats.h))  * 2.7).round(0)
                     pitchingWalks = (Integer.parseInt(pitchingStats.bb) * 2.7).round(0)
                     pitchingRuns = (Integer.parseInt(pitchingStats.r) * 2.7).round(0)
+                    pitchingEarnedRuns = (Integer.parseInt(pitchingStats.er) * 2.7).round(0)
                     pitchingStrikeouts = (Integer.parseInt(pitchingStats.so) * 2.7).round(0)
                     pitchingHits = (Integer.parseInt(pitchingStats.h) * 2.7).round(0)
                     pitchingHomers = (Integer.parseInt(pitchingStats.hr) * 2.7).round(0)
                     pitchingWildPitch = (Integer.parseInt(pitchingStats.wp) * 2.7).round(0)
                     pitchingHitBatter = (Integer.parseInt(pitchingStats.hb) * 2.7).round(0)
                     pitchingBalks = (Integer.parseInt(pitchingStats.bk) * 2.7).round(0)
+                    pitchingEra = pitchingStats.era
                     pitchingWhip = pitchingStats.whip
                 }
             }
@@ -194,12 +196,14 @@ class Player {
                     pitchingBattersRetired = Integer.parseInt(pitchingStats.ab) - Integer.parseInt(pitchingStats.h)
                     pitchingWalks = Integer.parseInt(pitchingStats.bb)
                     pitchingRuns = Integer.parseInt(pitchingStats.r)
+                    pitchingEarnedRuns = Integer.parseInt(pitchingStats.er)
                     pitchingStrikeouts = Integer.parseInt(pitchingStats.so)
                     pitchingHits = Integer.parseInt(pitchingStats.h)
                     pitchingHomers = Integer.parseInt(pitchingStats.hr)
                     pitchingWildPitch = Integer.parseInt(pitchingStats.wp)
                     pitchingHitBatter = Integer.parseInt(pitchingStats.hb)
                     pitchingBalks = Integer.parseInt(pitchingStats.bk)
+                    pitchingEra = pitchingStats.era
                     pitchingWhip = pitchingStats.whip
                 }
             }

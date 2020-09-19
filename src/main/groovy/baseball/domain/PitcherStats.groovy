@@ -22,12 +22,14 @@ class PitcherStats {
     int pitchingOrderPos
     int pitchingWalks
     int pitchingRuns
+    int pitchingEarnedRuns
     int pitchingStrikeouts
     int pitchingHits
     int pitchingHomers
     int pitchingWildPitch
     int pitchingHitBatter
     int pitchingBalks
+    String pitchingEra
     double pitchingWhip
     SimPitcher simPitcher
 
@@ -71,13 +73,14 @@ class PitcherStats {
         }
     }
 
+/*
     def getEra() {
         BigDecimal games = new BigDecimal(pitchingBattersRetired)
         games = games.divide(27, 5, RoundingMode.HALF_UP)
         if (games.intValue() == 0) {
             return "0.00"
         }
-        BigDecimal result = new BigDecimal(pitchingRuns)
+        BigDecimal result = new BigDecimal(pitchingEarnedRuns)
         result = result.divide(games, 3, RoundingMode.HALF_UP)
         String padded = result.toString() + "000"
         if (result.intValue() >= 10) {
@@ -86,6 +89,11 @@ class PitcherStats {
             format(padded, 4) + ' '
         }
         result
+    }
+*/
+
+    def getEra() {
+        pitchingEra
     }
 
     private def format(def text, int length) {
