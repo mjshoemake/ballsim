@@ -2994,3 +2994,9 @@ out/production/ballsim/baseball/domain/Player$_loadFromMap_closure2.class
 out/production/ballsim/baseball/domain/Player$_printPlayer_closure3.class
 out/production/ballsim/baseball/domain/SimTeam$_separatePlayers_closure10.class
 out/production/ballsim/baseball/domain/SimTeam$_separatePlayers_closure9.class
+out/production/ballsim/baseball/domain/BallGame$_logBoxScore_closure10.class
+out/production/ballsim/baseball/domain/BallGame$_logBoxScore_closure9.class
+out/production/ballsim/baseball/domain/BallGame$_printTeamHittingStats_closure11.class
+out/production/ballsim/baseball/domain/SimTeam$_separatePlayers_closure11.class
+out/test/ballsim/baseball/SeriesTests$_testSeries_closure1.class
+out/test/ballsim/baseball/SeriesTests.class

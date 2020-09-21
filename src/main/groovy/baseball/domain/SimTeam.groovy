@@ -20,6 +20,8 @@ class SimTeam {
     def bench = []
     def rotation = []
     def bullpen = []
+    def pitchersUsed = []
+    def reservePitchers = []
     String teamName = "MyTeam"
     String city = "Home City"
     String year = "2020"
@@ -72,11 +74,12 @@ class SimTeam {
         }
 
         // Trim down rotation
-        rotation.sort { a,b -> a.pitcherStats.era <=> b.pitcherStats.era }
+        rotation.sort { a, b -> a.pitcherStats.era <=> b.pitcherStats.era }
         if (rotation.size() > 5) {
             // Remove pitchers to get down to 5.
             while (rotation.size() > 5) {
-                rotation.remove(rotation.size()-1)
+                reservePitchers << new GamePitcher(rotation.get(rotation.size() - 1))
+                rotation.remove(rotation.size() - 1)
             }
         } else if (rotation.size() < 5) {
             // Pull pitchers from bullpen to get up to 5.
@@ -85,17 +88,21 @@ class SimTeam {
         }
 
         // Trim down bullpen
-        bullpen.sort { a,b -> a.pitcherStats.era?.toString() <=> b.pitcherStats.era?.toString() }
+        bullpen.sort { a, b -> a.pitcherStats.era?.toString() <=> b.pitcherStats.era?.toString() }
         if (bullpen.size() > 5) {
             // Remove pitchers to get down to 5.
             while (bullpen.size() > 5) {
-                bullpen.remove(bullpen.size()-1)
+                reservePitchers << new GamePitcher(bullpen.get(bullpen.size() - 1))
+                bullpen.remove(bullpen.size() - 1)
             }
         } else if (bullpen.size() < 5) {
             // Pull pitchers from bullpen to get up to 5.
             auditLog.error("TODO: Not enough starting pitchers!!!!")
             throw new Exception("TODO: Not enough starting pitchers!!!!")
         }
+
+        // Sort reserve pitchers
+        reservePitchers.sort { a, b -> a.simPitcher.pitcher.pitcherStats.era <=> b.simPitcher.pitcher.pitcherStats.era }
 
         auditLog.info ""
         auditLog.info "Rotation:  $year $teamName"
@@ -127,8 +134,8 @@ class SimTeam {
         // Create lineup.
         // POWER: Who hits the most home runs?
         auditLog.debug ""
-        batters.sort { a,b -> a.homers <=> b.homers }
-        int i=batters.size()-1
+        batters.sort { a, b -> a.homers <=> b.homers }
+        int i = batters.size() - 1
         // Found cleanup hitter.
         auditLog.debug "#4 hitter: ${batters[i].name} HR: ${batters[i].homers} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
         power << batters[i]
@@ -147,30 +154,30 @@ class SimTeam {
         i--
 
         // SPEED: Who steals the most bases?
-        batters.sort { a,b -> a.stolenBases <=> b.stolenBases }
-        i=batters.size()-1
-        while (i>=0 && speed.size() < 2) {
+        batters.sort { a, b -> a.stolenBases <=> b.stolenBases }
+        i = batters.size() - 1
+        while (i >= 0 && speed.size() < 2) {
             if (batters[i].battingAvg > new BigDecimal(".290") && batters[i].stolenBases > 25) {
                 // Speed And Contact
                 auditLog.debug "SpeedAndContact Found: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
                 speedAndContact << batters[i]
                 batters.remove(i)
                 i--
-            //} else if (batters[i].stolenBases > 25) {
-            //    // Speed
-            //    println "Speed Found: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
-            //    speed << batters[i]
-            //    batters.remove(i)
-            //    i--
+                //} else if (batters[i].stolenBases > 25) {
+                //    // Speed
+                //    println "Speed Found: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+                //    speed << batters[i]
+                //    batters.remove(i)
+                //    i--
             } else {
                 i--
             }
         }
 
         // CONTACT: Who has the best batting avg?
-        batters.sort { a,b -> a.battingAvg <=> b.battingAvg }
-        i=batters.size()-1
-        while (i>=0) {
+        batters.sort { a, b -> a.battingAvg <=> b.battingAvg }
+        i = batters.size() - 1
+        while (i >= 0) {
             if (batters[i].atBats > 200) {
                 // Contact
                 auditLog.debug "Contact Found: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
@@ -181,8 +188,8 @@ class SimTeam {
                 i--
             }
         }
-        i=batters.size()-1
-        while (i>=0) {
+        i = batters.size() - 1
+        while (i >= 0) {
             // Remainder
             auditLog.debug "Remainder Found: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
             remainder << batters[i]
@@ -242,14 +249,14 @@ class SimTeam {
                 sourceList[0].primaryPosition = "DH"
                 def batter = new GameBatter(sourceList[0])
                 positions["DH"] = batter
-                auditLog.info "   ${lineup.size()+1}: ${sourceList[0].name} Pos: ${sourceList[0].primaryPosition} SB: ${sourceList[0].stolenBases} HR: ${sourceList[0].homers} Avg: ${sourceList[0].battingAvg} AB: ${sourceList[0].atBats}   ${category}"
+                auditLog.info "   ${lineup.size() + 1}: ${sourceList[0].name} Pos: ${sourceList[0].primaryPosition} SB: ${sourceList[0].stolenBases} HR: ${sourceList[0].homers} Avg: ${sourceList[0].battingAvg} AB: ${sourceList[0].atBats}   ${category}"
                 lineup << batter
                 sourceList.remove(0)
             }
         } else {
             def batter = new GameBatter(sourceList[0])
             positions[primaryPosition] = batter
-            auditLog.info "   ${lineup.size()+1}: ${sourceList[0].name} Pos: ${sourceList[0].primaryPosition} SB: ${sourceList[0].stolenBases} HR: ${sourceList[0].homers} Avg: ${sourceList[0].battingAvg} AB: ${sourceList[0].atBats}   ${category}"
+            auditLog.info "   ${lineup.size() + 1}: ${sourceList[0].name} Pos: ${sourceList[0].primaryPosition} SB: ${sourceList[0].stolenBases} HR: ${sourceList[0].homers} Avg: ${sourceList[0].battingAvg} AB: ${sourceList[0].atBats}   ${category}"
             lineup << batter
             sourceList.remove(0)
         }

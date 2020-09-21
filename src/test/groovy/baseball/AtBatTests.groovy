@@ -61,7 +61,7 @@ class AtBatTests {
         def gameBatter = new GameBatter()
         gameBatter.simBatter = new SimBatter(batter: batter)
         def gamePitcher = new GamePitcher()
-        gamePitcher.simPitcher = new SimPitcher(pitcher: pitcher)
+        gamePitcher.simPitcher = new SimPitcher(pitcher: batter)
 
 
         for (int i=0; i <= batter.atBats - 1; i++) {

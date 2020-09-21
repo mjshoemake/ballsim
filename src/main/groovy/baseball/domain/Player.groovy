@@ -222,7 +222,9 @@ class Player {
 
     void setName(String value) {
         this.name = value
-        this.pitcherStats.name = value
+        if (pitcherStats) {
+            this.pitcherStats.name = value
+        }
     }
 
 }
