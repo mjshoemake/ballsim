@@ -88,17 +88,21 @@ class BallGame {
             // New home pitcher.
             if (homeTeam.bullpen.size() >= homeTeam.nextReliefPitcher+1) {
                 homeTeam.currentPitcher = homeTeam.bullpen[homeTeam.nextReliefPitcher]
-                auditLog.info("New pitcher for home team ($homeTeam.nextReliefPitcher). Bullpen size = $homeTeam.bullpen.size() ${homeTeam.currentPitcher.simPitcher.pitcher.name}")
+                auditLog.info "New pitcher for home team ($homeTeam.nextReliefPitcher). Bullpen size = $homeTeam.bullpen.size() ${homeTeam.currentPitcher.simPitcher.pitcher.name}"
                 homeTeam.pitchersUsed << homeTeam.currentPitcher
                 homeTeam.nextReliefPitcher++
                 return homeTeam.currentPitcher
-            } else {
+            } else if (homeTeam.nextReliefPitcher-5 < homeTeam.reservePitchers.size()) {
                 // Bullpen empty. Use reserve pitchers.
-                auditLog.info("New pitcher for home team ($homeTeam.nextReliefPitcher). Bullpen size = $homeTeam.bullpen.size() ")
+                auditLog.info "New pitcher for home team ($homeTeam.nextReliefPitcher). Bullpen size = $homeTeam.bullpen.size() "
                 homeTeam.currentPitcher = homeTeam.reservePitchers[homeTeam.nextReliefPitcher-5]
                 homeTeam.pitchersUsed << homeTeam.currentPitcher
                 homeTeam.nextReliefPitcher++
                 return homeTeam.currentPitcher
+            } else {
+                // Keep the current pitcher. Out of pitchers.
+                auditLog.info "Out of pitchers. Going back to the starter."
+                homeTeam.currentPitcher = homeTeam.starter
             }
         } else {
             // New away pitcher.
@@ -108,13 +112,17 @@ class BallGame {
                 awayTeam.pitchersUsed << awayTeam.currentPitcher
                 awayTeam.nextReliefPitcher++
                 return awayTeam.currentPitcher
-            } else {
+            } else if (awayTeam.nextReliefPitcher-5 < awayTeam.reservePitchers.size()) {
                 // Bullpen empty. Use reserve pitchers.
                 auditLog.info("New pitcher for away team ($awayTeam.nextReliefPitcher). Bullpen size = $awayTeam.bullpen.size() ")
                 awayTeam.currentPitcher = awayTeam.reservePitchers[awayTeam.nextReliefPitcher-5]
                 awayTeam.pitchersUsed << awayTeam.currentPitcher
                 awayTeam.nextReliefPitcher++
                 return awayTeam.currentPitcher
+            } else {
+                // Keep the current pitcher. Out of pitchers.
+                auditLog.info "Out of pitchers. Going back to the starter."
+                awayTeam.currentPitcher = awayTeam.starter
             }
         }
     }
@@ -992,7 +1000,7 @@ class BallGame {
             SimBatter simBatter = gameBatter.simBatter
             SimPitcher simPitcher = gamePitcher.simPitcher
             def batter = simBatter.batter
-            def pitcher = simPitcher.pitcher
+            def pitcher = simPitcher.pitcher.pitcherStats
             def batterHitRate = batter.getRate(batter.hits)
             def batterWalkRate = batter.getRate(batter.walks + batter.hitByPitch, batter.walks + batter.hitByPitch + batter.atBats - batter.hits)
             def batterStrikeoutRate = batter.getRate(batter.strikeouts, batter.walks + batter.hitByPitch + batter.atBats - batter.hits)
