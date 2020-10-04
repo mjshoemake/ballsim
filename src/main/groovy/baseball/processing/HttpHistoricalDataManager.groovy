@@ -2,34 +2,61 @@ package baseball.processing
 
 import baseball.domain.Player
 import baseball.domain.Team
+import baseball.mongo.MongoManager
 import groovy.json.JsonSlurper
 import mjs.common.utils.HttpClient
+import mjs.common.utils.LogUtils
 import mjs.common.utils.PerformanceMetrics
 
 class HttpHistoricalDataManager {
     String baseUrl = "http://lookup-service-prod.mlb.com"
     PerformanceMetrics perf = new PerformanceMetrics()
+    MongoManager mongoManager = new MongoManager()
+    String TABLE_TEAMS_FOR_SEASON = "teamsForSeason"
+    String TABLE_TEAM_MAP_FOR_SEASON = "teamMapForSeason"
+    String TABLE_TEAM_ROSTER_FOR_SEASON = "teamRosterForSeason"
+
+    HttpHistoricalDataManager() {
+        mongoManager.open("ballsim")
+    }
+
+    void close() {
+        mongoManager.close()
+    }
 
     def getTeamsForSeason(String year) {
-        String json = HttpClient.requestGet("$baseUrl/json/named.team_all_season.bam?season=${year}&active_sw='Y'&all_star_sw='N'&sport_code='mlb'")
-        JsonSlurper jsonSlurper = new JsonSlurper()
-        def result = jsonSlurper.parseText(json)
-        result["team_all_season"]["queryResults"]["row"]
+        def teamsForSeason = mongoManager.find(TABLE_TEAMS_FOR_SEASON, ["year": year])
+        if (! teamsForSeason) {
+            String json = HttpClient.requestGet("$baseUrl/json/named.team_all_season.bam?season=${year}&active_sw='Y'&all_star_sw='N'&sport_code='mlb'")
+            JsonSlurper jsonSlurper = new JsonSlurper()
+            def response = jsonSlurper.parseText(json)
+            def result = response["team_all_season"]["queryResults"]["row"]
+            mongoManager.addToCollection(TABLE_TEAMS_FOR_SEASON, ["year": year, "value": result])
+            result["value"]
+        } else {
+            teamsForSeason[0]
+        }
     }
 
     def getTeamMapForSeason(String year) {
-        String json = HttpClient.requestGet("$baseUrl/json/named.team_all_season.bam?season=${year}&active_sw='Y'&all_star_sw='N'&sport_code='mlb'")
-        JsonSlurper jsonSlurper = new JsonSlurper()
-        def result = jsonSlurper.parseText(json)
-        def teams = result["team_all_season"]["queryResults"]["row"]
-        def teamMap = [:]
+        def teamMapForSeason = mongoManager.find(TABLE_TEAM_MAP_FOR_SEASON, ["year": year])
+        if (! teamMapForSeason) {
+            String json = HttpClient.requestGet("$baseUrl/json/named.team_all_season.bam?season=${year}&active_sw='Y'&all_star_sw='N'&sport_code='mlb'")
+            JsonSlurper jsonSlurper = new JsonSlurper()
+            def result = jsonSlurper.parseText(json)
+            def teams = result["team_all_season"]["queryResults"]["row"]
+            def teamMap = ["year": year]
 
-        teams.each { next ->
-            Team team = new Team()
-            team.load(next).printTeam()
-            teamMap[team.name] = team
+            teams.each { next ->
+                Team team = new Team()
+                team.load(next).printTeam()
+                teamMap[team.name] = team
+            }
+            mongoManager.addToCollection(TABLE_TEAM_MAP_FOR_SEASON, teamMap)
+            teamMap
+        } else {
+            teamMapForSeason[0]
         }
-        teamMap
     }
 
     def get40ManRoster(String team_id) {
@@ -79,36 +106,45 @@ class HttpHistoricalDataManager {
     }
 
     def get40ManRoster(String team_id, String year) {
-        def result = []
         perf.resetMetrics("LoadHistoricalData.get40ManRoster")
         perf.startEvent("LoadHistoricalData.get40ManRoster", "Main")
-        perf.startEvent("LoadHistoricalData.get40ManRoster", "getTeamRoster")
-        def playerList = getTeamRoster(team_id, year)
-        perf.endEvent("LoadHistoricalData.get40ManRoster", "getTeamRoster")
-        playerList.each { person ->
-            // Get batting stats
-            perf.startEvent("LoadHistoricalData.get40ManRoster", "getPlayerBattingStats")
-            def battingStats = getPlayerBattingStats(person.player_id, team_id, year)
-            perf.endEvent("LoadHistoricalData.get40ManRoster", "getPlayerBattingStats")
+        def teamRoster = mongoManager.find(TABLE_TEAM_ROSTER_FOR_SEASON, ["year": year, "team": team_id])
+        def result
+        if (teamRoster?.size() > 0) {
+            result = teamRoster[0]["value"]
+        } else {
+            result = []
+            perf.startEvent("LoadHistoricalData.get40ManRoster", "getTeamRoster")
+            def playerList = getTeamRoster(team_id, year)
+            perf.endEvent("LoadHistoricalData.get40ManRoster", "getTeamRoster")
+            playerList.each { person ->
+                // Get batting stats
+                perf.startEvent("LoadHistoricalData.get40ManRoster", "getPlayerBattingStats")
+                def battingStats = getPlayerBattingStats(person.player_id, team_id, year)
+                perf.endEvent("LoadHistoricalData.get40ManRoster", "getPlayerBattingStats")
 
-            def pitchingStats = null
-            if (person.primary_position == "P") {
-                // Player is a pitcher. Load pitching stats.
-                perf.startEvent("LoadHistoricalData.get40ManRoster", "loadPitcherProperties[Map]")
-                pitchingStats = getPlayerPitchingStats(person.player_id, team_id, year)
-                perf.endEvent("LoadHistoricalData.get40ManRoster", "loadPitcherProperties[Map]")
+                def pitchingStats = null
+                if (person.primary_position == "P") {
+                    // Player is a pitcher. Load pitching stats.
+                    perf.startEvent("LoadHistoricalData.get40ManRoster", "loadPitcherProperties[Map]")
+                    pitchingStats = getPlayerPitchingStats(person.player_id, team_id, year)
+                    if (pitchingStats)
+                    perf.endEvent("LoadHistoricalData.get40ManRoster", "loadPitcherProperties[Map]")
+                }
+
+                perf.startEvent("LoadHistoricalData.get40ManRoster", "loadBatterProperties")
+                Player batter = new Player()
+                batter.loadFromMap(person, battingStats, pitchingStats, team_id, year)
+                result << batter
+                perf.endEvent("LoadHistoricalData.get40ManRoster", "loadBatterProperties")
             }
+            mongoManager.addToCollection(TABLE_TEAM_ROSTER_FOR_SEASON, ["year": year, "team": team_id, "value": result])
+        }
 
-            perf.startEvent("LoadHistoricalData.get40ManRoster", "loadBatterProperties")
-            Player batter = new Player()
-            batter.loadFromMap(person, battingStats, pitchingStats, team_id, year)
-            result << batter
-            perf.endEvent("LoadHistoricalData.get40ManRoster", "loadBatterProperties")
-        }
         perf.endEvent("LoadHistoricalData.get40ManRoster", "Main")
-        result.each { next ->
-            next.printPlayer()
-        }
+        //result.each { next ->
+        //    next.printPlayer()
+        //}
 
         perf.writeMetricsToLog()
         result

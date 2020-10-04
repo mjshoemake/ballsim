@@ -97,6 +97,7 @@ class SeriesTests {
         teams = dataMgr.getTeamMapForSeason(awayYear)
         def away = teams["Braves"]
 
+        auditLog.info "Home Team ID: $home.team_id  Away Team ID: $away.team_id"
         def homeRoster = dataMgr.get40ManRoster(home.team_id, homeYear)
         def awayRoster = dataMgr.get40ManRoster(away.team_id, awayYear)
         if (numGames % 2 == 0) {

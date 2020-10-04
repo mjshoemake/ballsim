@@ -13,6 +13,7 @@ import org.bson.conversions.Bson
 import org.bson.types.ObjectId
 
 import mjs.common.utils.BsonConverter
+import mjs.common.utils.LogUtils
 
 
 /**
@@ -46,11 +47,13 @@ class MongoManager {
     }
 
     ObjectId addToCollection(String collection, Object obj) {
-        obj._id = generateObjectId()
-        println "Adding new object to collection $collection."
+        def id = generateObjectId()
+        obj["_id"] = id
+        //println "Adding new object to collection $collection."
         String json = new JsonBuilder(obj).toPrettyString()
+        //println "addToCollection [$collection]  $json"
         privateAddToCollection(collection, json)
-        return obj._id
+        return obj["_id"]
     }
 
     private void privateAddToCollection(String collection, String json) {
@@ -93,6 +96,14 @@ class MongoManager {
         result.deletedCount
     }
 
+    long deleteAll(String collection) {
+        MongoCollection<Document> table = db.getCollection(collection)
+        Bson filter = new BsonConverter().objectToBson([:])
+        DeleteResult result = table.deleteMany(filter)
+        // Return the number of rows deleted.
+        result.deletedCount
+    }
+
     List findAll(String collection) {
         MongoCollection<Document> table = db.getCollection(collection)
         MongoCursor<Document> iter = table.find().iterator()
@@ -116,8 +127,11 @@ class MongoManager {
         JsonSlurper jsonSlurper = new JsonSlurper()
         while (iter.hasNext()) {
             Document nextDoc = iter.next()
-            Object obj = jsonSlurper.parseText(nextDoc.toJson())
-            list << bsonConverter.reconstructBean(obj);
+            String json = nextDoc.toJson()
+            //println "find [$collection]  $json"
+            Object obj = jsonSlurper.parseText(json)
+            //LogUtils.println(obj, "   ", true)
+            list << bsonConverter.reconstructBean(obj)
         }
         list
     }

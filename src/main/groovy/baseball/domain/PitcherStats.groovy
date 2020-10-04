@@ -36,6 +36,30 @@ class PitcherStats {
     PitcherStats() {
     }
 
+    PitcherStats(Map source) {
+        //println "Converting Map to PitcherStats..."
+        this.name = source.name
+        this.pitchingGames = source.pitchingGames
+        this.pitchingGamesStarted = source.pitchingGamesStarted
+        this.pitchingBattersRetired = source.pitchingBattersRetired
+        this.pitchingOrderPos = source.pitchingOrderPos
+        this.pitchingWalks = source.pitchingWalks
+        this.pitchingRuns = source.pitchingRuns
+        this.pitchingEarnedRuns = source.pitchingEarnedRuns
+        this.pitchingStrikeouts = source.pitchingStrikeouts
+        this.pitchingHits = source.pitchingHits
+        this.pitchingHomers = source.pitchingHomers
+        this.pitchingWildPitch = source.pitchingWildPitch
+        this.pitchingHitBatter = source.pitchingHitBatter
+        this.pitchingBalks = source.pitchingBalks
+        this.pitchingEra = source.pitchingEra
+        this.pitchingWhip = source.pitchingWhip
+        if (source.simPitcher) {
+            this.simPitcher = new SimPitcher(source.simPitcher)
+        }
+        //println "Converting Map to PitcherStats... DONE."
+    }
+
     public def getBattersFaced() {
         pitchingBattersRetired + pitchingWalks + pitchingHits + pitchingHitBatter
     }

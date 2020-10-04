@@ -3000,3 +3000,7 @@ out/production/ballsim/baseball/domain/BallGame$_printTeamHittingStats_closure11
 out/production/ballsim/baseball/domain/SimTeam$_separatePlayers_closure11.class
 out/test/ballsim/baseball/SeriesTests$_testSeries_closure1.class
 out/test/ballsim/baseball/SeriesTests.class
+out/production/ballsim/baseball/MongoTests.class
+out/production/ballsim/baseball/ProcessTeamPlayersTests.class
+out/test/ballsim/baseball/CleanMongoTests.class
+out/test/ballsim/baseball/MongoTests.class

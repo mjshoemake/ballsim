@@ -3,6 +3,7 @@ package baseball
 
 import baseball.domain.Player
 import baseball.domain.FieldingPosition
+import baseball.processing.HttpHistoricalDataManager
 import mjs.common.utils.BsonConverter
 import mjs.common.utils.LogUtils
 import org.bson.BsonValue
@@ -25,12 +26,13 @@ class BsonConverterTest {
     }
 
     @Test
-    void testConversion() {
-        HashMap positions = new HashMap<String, FieldingPosition>()
-        positions[]
-        Player batter = new Player(teamID: "1", playerID: "5", nameFirst: "Bob", nameLast: "Horner", atBats: 57, hits: 19, homers: 5, caughtStealing: 0, doubles: 2, hitByPitch: 1, name: "Bob Horner", position: "3B", stolenBases: 0, strikeouts: 6, teamName: "Braves", year: 1982, triples: 2, walks: 3)
-        BsonValue result = converter.objectToBson(batter)
-        LogUtils.println(result)
+    void testConversionTeam() {
+        HttpHistoricalDataManager dataMgr = new HttpHistoricalDataManager()
+        def team_id = "144"
+        def year = "1991"
+        def roster = dataMgr.get40ManRoster(team_id, year)
+        println "Roster loaded (1991 Braves)."
+
     }
 }
 

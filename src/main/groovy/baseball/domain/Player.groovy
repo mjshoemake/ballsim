@@ -44,6 +44,49 @@ class Player {
     //Map<String, FieldingPosition> position = new HashMap<String, FieldingPosition>()
 
     Player() {
+        //println "Creating Player..."
+    }
+
+    Player(Map source) {
+        //println "Converting Map to Player..."
+        this._id = source._id
+        this.type = Player.class.name
+        this.year = source.year
+        this.teamID = source.teamID
+        this.playerID = source.playerID
+        this.nameFirst = source.nameFirst
+        this.nameLast = source.nameLast
+        this.nameNick = source.nameNick
+        this.name = source.name
+        this.birthYear = source.birthYear
+        this.armBats = source.armBats
+        this.armThrows = source.armThrows
+        this.games = source.games
+        this.atBats = source.atBats
+        this.walks = source.walks
+        this.strikeouts = source.strikeouts
+        this.hits = source.hits
+        this.doubles = source.doubles
+        this.triples = source.triples
+        this.homers = source.homers
+        this.rbi = source.rbi
+        this.hitByPitch = source.hitByPitch
+        this.stolenBases = source.stolenBases
+        this.caughtStealing = source.caughtStealing
+        this.sacrificeFlies = source.sacrificeFlies
+        this.isPitcher = source.isPitcher
+        this.primaryPosition = source.primaryPosition
+        if (source.pitcherStats) {
+            this.pitcherStats = new PitcherStats(source.pitcherStats)
+        }
+        this.calculatedRank = BigDecimal.valueOf(source.calculatedRank)
+
+        // Overall fielding #s
+        this.putouts = source.putouts
+        this.assists = source.assists
+        this.errors = source.errors
+        this.catcherSteals = source.catcherSteals
+        this.catcherCaught = source.catcherCaught
     }
 
     static String getBoxScoreHeader() {
@@ -158,20 +201,20 @@ class Player {
             if (pitchingStats != null && pitchingStats.size() > 0) {
                 this.pitcherStats = new PitcherStats()
                 this.pitcherStats.with {
-                    pitchingGames = (Integer.parseInt(pitchingStats.g) * 2.7).round(0)
-                    pitchingGamesStarted = (Integer.parseInt(pitchingStats.gs) * 2.7).round(0)
-                    pitchingBattersRetired = ((Integer.parseInt(pitchingStats.ab) - Integer.parseInt(pitchingStats.h))  * 2.7).round(0)
-                    pitchingWalks = (Integer.parseInt(pitchingStats.bb) * 2.7).round(0)
-                    pitchingRuns = (Integer.parseInt(pitchingStats.r) * 2.7).round(0)
-                    pitchingEarnedRuns = (Integer.parseInt(pitchingStats.er) * 2.7).round(0)
-                    pitchingStrikeouts = (Integer.parseInt(pitchingStats.so) * 2.7).round(0)
-                    pitchingHits = (Integer.parseInt(pitchingStats.h) * 2.7).round(0)
-                    pitchingHomers = (Integer.parseInt(pitchingStats.hr) * 2.7).round(0)
-                    pitchingWildPitch = (Integer.parseInt(pitchingStats.wp) * 2.7).round(0)
-                    pitchingHitBatter = (Integer.parseInt(pitchingStats.hb) * 2.7).round(0)
-                    pitchingBalks = (Integer.parseInt(pitchingStats.bk) * 2.7).round(0)
-                    pitchingEra = pitchingStats.era
-                    pitchingWhip = pitchingStats.whip
+                    it.pitchingGames = (Integer.parseInt(pitchingStats.g) * 2.7).round(0)
+                    it.pitchingGamesStarted = (Integer.parseInt(pitchingStats.gs) * 2.7).round(0)
+                    it.pitchingBattersRetired = ((Integer.parseInt(pitchingStats.ab) - Integer.parseInt(pitchingStats.h))  * 2.7).round(0)
+                    it.pitchingWalks = (Integer.parseInt(pitchingStats.bb) * 2.7).round(0)
+                    it.pitchingRuns = (Integer.parseInt(pitchingStats.r) * 2.7).round(0)
+                    it.pitchingEarnedRuns = (Integer.parseInt(pitchingStats.er) * 2.7).round(0)
+                    it.pitchingStrikeouts = (Integer.parseInt(pitchingStats.so) * 2.7).round(0)
+                    it.pitchingHits = (Integer.parseInt(pitchingStats.h) * 2.7).round(0)
+                    it.pitchingHomers = (Integer.parseInt(pitchingStats.hr) * 2.7).round(0)
+                    it.pitchingWildPitch = (Integer.parseInt(pitchingStats.wp) * 2.7).round(0)
+                    it.pitchingHitBatter = (Integer.parseInt(pitchingStats.hb) * 2.7).round(0)
+                    it.pitchingBalks = (Integer.parseInt(pitchingStats.bk) * 2.7).round(0)
+                    it.pitchingEra = pitchingStats.era
+                    it.pitchingWhip = pitchingStats.whip
                 }
             }
         } else {
@@ -191,31 +234,45 @@ class Player {
             if (pitchingStats != null && pitchingStats.size() > 0) {
                 this.pitcherStats = new PitcherStats()
                 this.pitcherStats.with {
-                    pitchingGames = Integer.parseInt(pitchingStats.g)
-                    pitchingGamesStarted = Integer.parseInt(pitchingStats.gs)
-                    pitchingBattersRetired = Integer.parseInt(pitchingStats.ab) - Integer.parseInt(pitchingStats.h)
-                    pitchingWalks = Integer.parseInt(pitchingStats.bb)
-                    pitchingRuns = Integer.parseInt(pitchingStats.r)
-                    pitchingEarnedRuns = Integer.parseInt(pitchingStats.er)
-                    pitchingStrikeouts = Integer.parseInt(pitchingStats.so)
-                    pitchingHits = Integer.parseInt(pitchingStats.h)
-                    pitchingHomers = Integer.parseInt(pitchingStats.hr)
-                    pitchingWildPitch = Integer.parseInt(pitchingStats.wp)
-                    pitchingHitBatter = Integer.parseInt(pitchingStats.hb)
-                    pitchingBalks = Integer.parseInt(pitchingStats.bk)
-                    pitchingEra = pitchingStats.era
-                    pitchingWhip = pitchingStats.whip
+                    it.pitchingGames = Integer.parseInt(pitchingStats.g)
+                    it.pitchingGamesStarted = Integer.parseInt(pitchingStats.gs)
+                    it.pitchingBattersRetired = Integer.parseInt(pitchingStats.ab) - Integer.parseInt(pitchingStats.h)
+                    it.pitchingWalks = Integer.parseInt(pitchingStats.bb)
+                    it.pitchingRuns = Integer.parseInt(pitchingStats.r)
+                    it.pitchingEarnedRuns = Integer.parseInt(pitchingStats.er)
+                    it.pitchingStrikeouts = Integer.parseInt(pitchingStats.so)
+                    it.pitchingHits = Integer.parseInt(pitchingStats.h)
+                    it.pitchingHomers = Integer.parseInt(pitchingStats.hr)
+                    it.pitchingWildPitch = Integer.parseInt(pitchingStats.wp)
+                    it.pitchingHitBatter = Integer.parseInt(pitchingStats.hb)
+                    it.pitchingBalks = Integer.parseInt(pitchingStats.bk)
+                    it.pitchingEra = pitchingStats.era
+                    it.pitchingWhip = pitchingStats.whip
                 }
             }
         }
+    }
+
+    void setPitcherStats(Map value) {
+        this.pitcherStats = new PitcherStats(value)
+        if (this.pitcherStats != null) {
+            println "Added pitcherStats for $name."
+        }
+    }
+
+    void setCalculatedRank(Object value) {
+        this.calculatedRank = BigDecimal.valueOf(value)
     }
 
     void printPlayer() {
         println "Name: ${this.name} Pos: ${this.primaryPosition} ID: ${this.playerID} Year: ${year} Pitcher: ${this.isPitcher} Bats: ${this.armBats} Throws: ${this.armThrows}"
         println "   HR: ${this.homers} 3B: ${this.triples} 2B: ${this.doubles} Hits: ${this.hits} Walks: ${this.walks} Strikeouts: ${this.strikeouts} Steals: ${this.stolenBases} Atbats: ${this.atBats} CS: ${this.caughtStealing} HBP: ${this.hitByPitch} G: ${this.games}"
         if (this.isPitcher) {
+            if (! pitcherStats) {
+                println "   This is a pitcher, but pitcherStats is NULL..."
+            }
             this.pitcherStats.with {
-                println "   GS: ${pitchingGamesStarted} G: ${pitchingGames} ERA: ${era} Strikeouts: ${pitchingStrikeouts} Walks: ${pitchingWalks}"
+                println "   GS: ${it.pitchingGamesStarted} G: ${it.pitchingGames} ERA: ${it.era} Strikeouts: ${it.pitchingStrikeouts} Walks: ${it.pitchingWalks}"
             }
         }
     }

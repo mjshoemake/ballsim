@@ -252,7 +252,9 @@ public class LogUtils {
                         else
                             line.append(val.getClass().getName());
                         lines.add(line.toString());
-                        processBean(val, level + 1, lines, showTypes);
+                        if (! key.equals("_id")) {
+                            processBean(val, level + 1, lines, showTypes);
+                        }
                     }
                 }
             } else if (bean instanceof Document) {
