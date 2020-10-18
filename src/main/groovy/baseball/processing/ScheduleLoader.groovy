@@ -1,8 +1,16 @@
 package baseball.processing
 
+import baseball.domain.ScheduledGame
+import baseball.domain.ScheduledRound
+import baseball.domain.ScheduledSeason
+import mjs.common.utils.LogUtils
+import org.apache.log4j.Logger
+
 class ScheduleLoader {
 
-
+    def Logger log = Logger.getLogger("Core");
+    def highlightsLog = Logger.getLogger('highlights')
+    /*
     def loadRoundRobinScheduleFromFile(def league) {
         return loadRoundRobinScheduleFromFile(league, false)
     }
@@ -46,6 +54,68 @@ class ScheduleLoader {
             }
         }
         schedule
+    }
+*/
+    def loadScheduleFromFile(String scheduleName, int teamCount) {
+        println "loadScheduleFromFile() START"
+        int gameCount = 0
+        boolean trimTeamName = false
+
+        def scheduleText = this.class.getResource("/schedules/${scheduleName}-team-schedule.txt")?.text
+        if (! scheduleText) {
+            trimTeamName = true
+            scheduleText = this.class.getResource("/schedules/${teamCount}-team-schedule.txt")?.text
+        }
+        ScheduledSeason scheduledSeason = new ScheduledSeason()
+
+        int roundNum = 0
+        int gameNum = 0
+        int lastRoundNum = 1
+        ScheduledRound currentRound = new ScheduledRound(1)
+
+        scheduleText.eachLine() {
+            def columns = it.split("\t")
+
+            if ((! (columns[0] == "Round" && columns[1] == "Game #" && columns[2] == "Home Team")) && (columns[0] != "")) {
+                roundNum = Integer.parseInt(columns[0])
+                gameNum = Integer.parseInt(columns[1])
+                println("$roundNum - $gameNum")
+                def homeTeam
+                def awayTeam
+                if (trimTeamName) {
+                    homeTeam = (Integer.parseInt(columns[2].substring(5)) - 1)
+                    awayTeam = (Integer.parseInt(columns[3].substring(5)) - 1)
+                } else {
+                    homeTeam = columns[2]
+                    awayTeam = columns[3]
+                }
+                if (roundNum != lastRoundNum) {
+                    println "Adding round: ${currentRound.roundNum}"
+                    scheduledSeason.addRound(currentRound)
+                    for (int i=1; i <= roundNum - lastRoundNum - 1; i++) {
+                        // Complete existing round.
+                        currentRound = currentRound.copy()
+                        println "Adding round: ${currentRound.roundNum}"
+                        scheduledSeason.addRound(currentRound)
+                    }
+                    lastRoundNum = roundNum
+                    currentRound.roundNum++
+                    currentRound.games.clear()
+                }
+                def game = new ScheduledGame()
+                game.roundNum = roundNum
+                game.gameNum = gameNum++
+                game.homeTeam = homeTeam
+                game.awayTeam = awayTeam
+                currentRound.addGame(game)
+            }
+        }
+
+        println("PRINTING!!!")
+        //LogUtils.info(log, scheduledSeason, "   ", true)
+        println("PRINTING!!! Done")
+        LogUtils.println(scheduledSeason, "   ", true)
+        scheduledSeason
     }
 
 }

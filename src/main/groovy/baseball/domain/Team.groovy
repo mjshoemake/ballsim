@@ -11,16 +11,15 @@ class Team {
     String name = ""
     String city = ""
 
-    def load(def teamMap) {
-        team_id = teamMap["team_id"]
-        name_display_full = teamMap["name_display_full"]
-        league = teamMap["league"]
-        name_abbrev = teamMap["name_abbrev"]
-        name = teamMap["name"]
-        city = teamMap["city"]
-        division = teamMap["division"]
-        division_full = teamMap["division_full"]
-        this
+    Team(Map value) {
+        team_id = value.team_id
+        name_display_full = value.name_display_full
+        league = value.league
+        name_abbrev = value.name_abbrev
+        name = value.name
+        city = value.city
+        division = value.division
+        division_full = value.division_full
     }
 
     def printTeam() {

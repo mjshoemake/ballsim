@@ -39,24 +39,35 @@ class HttpHistoricalDataManager {
     }
 
     def getTeamMapForSeason(String year) {
+        boolean loadedFromAPI = false
         def teamMapForSeason = mongoManager.find(TABLE_TEAM_MAP_FOR_SEASON, ["year": year])
+        def teams = []
         if (! teamMapForSeason) {
             String json = HttpClient.requestGet("$baseUrl/json/named.team_all_season.bam?season=${year}&active_sw='Y'&all_star_sw='N'&sport_code='mlb'")
+            loadedFromAPI = true
             JsonSlurper jsonSlurper = new JsonSlurper()
             def result = jsonSlurper.parseText(json)
-            def teams = result["team_all_season"]["queryResults"]["row"]
-            def teamMap = ["year": year]
-
-            teams.each { next ->
-                Team team = new Team()
-                team.load(next).printTeam()
+            teams = result["team_all_season"]["queryResults"]["row"]
+        } else {
+            def oldMap = teamMapForSeason[0]
+            oldMap.each() { nextTeam ->
+                if (nextTeam.key != "_id" && nextTeam.key != "year") {
+                    teams << nextTeam["value"]
+                }
+            }
+        }
+        def teamMap = ["year": year]
+        teams.each { next ->
+            Team team = new Team(next)
+            if (! team.league.isEmpty()) {
+                team.printTeam()
                 teamMap[team.name] = team
             }
-            mongoManager.addToCollection(TABLE_TEAM_MAP_FOR_SEASON, teamMap)
-            teamMap
-        } else {
-            teamMapForSeason[0]
         }
+        if (loadedFromAPI) {
+            mongoManager.addToCollection(TABLE_TEAM_MAP_FOR_SEASON, teamMap)
+        }
+        teamMap
     }
 
     def get40ManRoster(String team_id) {

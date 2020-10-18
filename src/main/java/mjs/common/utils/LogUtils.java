@@ -65,7 +65,9 @@ public class LogUtils {
      * @throws CoreException
      */
     public static void println(Object obj, String prefix, boolean showTypes) throws CoreException {
+        System.out.println("LogUtils.println() START   Calling dataToStrings()...");
         String[] lines = dataToStrings(obj, showTypes);
+        System.out.println("LogUtils.println() START   Calling dataToStrings()... DONE");
         for (int i=0; i <= lines.length-1; i++) {
             System.out.println(prefix + lines[i]);
         }
@@ -174,6 +176,7 @@ public class LogUtils {
     public static String[] dataToStrings(Object bean, boolean showTypes) throws CoreException {
         ArrayList<String> lines = new ArrayList<String>();
         String[] result = null;
+        System.out.println("Called dataToStrings("+bean.getClass().getName()+", showTypes=" + showTypes+")");
 
         if (bean == null) {
             result = new String[1];
@@ -185,7 +188,9 @@ public class LogUtils {
         //String fieldName = null;
 
         try {
+            System.out.println("Initial call to processBean()...");
             processBean(bean, 0, lines, showTypes);
+            System.out.println("Initial call to processBean()... Done");
 
             result = new String[lines.size()];
             // Convert Vector to array.
@@ -206,8 +211,13 @@ public class LogUtils {
 
         if (bean == null) {
             lines.add(indent(level) + "null");
+            //System.out.println(indent(level) + "null");
             return lines;
-        }    
+        } else {
+            lines.add(indent(level) + bean.getClass().getName());
+            //System.out.println(indent(level) + bean.getClass().getName());
+        }
+
         try {
             Object[] args = new Object[0];
             String fieldName = null;
@@ -222,8 +232,10 @@ public class LogUtils {
             if (bean instanceof Map) {
                 Map map = (Map)bean;
                 Iterator keys = map.keySet().iterator();
-                if (! keys.hasNext())
+                if (! keys.hasNext()) {
                     lines.add(indent(level) + "Map is empty.");
+                    //System.out.println(indent(level) + "Map is empty.");
+                }
                 while (keys.hasNext()) {
                     String key = keys.next().toString();
                     Object val = map.get(key);
@@ -242,6 +254,7 @@ public class LogUtils {
                         line.append(" = ");
                         line.append(val.toString());
                         lines.add(line.toString());
+                        //System.out.println(indent(level) + line.toString());
                     } else {
                         line = new StringBuffer();
                         line.append(indent(level));
@@ -252,6 +265,7 @@ public class LogUtils {
                         else
                             line.append(val.getClass().getName());
                         lines.add(line.toString());
+                        //System.out.println(indent(level) + line.toString());
                         if (! key.equals("_id")) {
                             processBean(val, level + 1, lines, showTypes);
                         }
@@ -277,10 +291,13 @@ public class LogUtils {
                         Node attr = attributes.item(i);
                         name = attr.getNodeName();
                         value = attr.getNodeValue();
-                        if (value == null)
-                            lines.add(indent(level+2) + "Attr: " + name);
-                        else
-                            lines.add(indent(level+2) + "Attr: " + name + " = " + value);
+                        if (value == null) {
+                            lines.add(indent(level + 2) + "Attr: " + name);
+                            //System.out.println(indent(level + 2) + "Attr: " + name);
+                        } else {
+                            lines.add(indent(level + 2) + "Attr: " + name + " = " + value);
+                            //System.out.println(indent(level + 2) + "Attr: " + name + " = " + value);
+                        }
                     }    
                 }
                 
@@ -324,11 +341,14 @@ public class LogUtils {
                         Node attr = attributes.item(i);
                         name = attr.getNodeName();
                         value = attr.getNodeValue();
-                        if (value == null)
-                            lines.add(indent(level+1) + "Attr: " + name);
-                        else
-                            lines.add(indent(level+1) + "Attr: " + name + " = " + value);
-                    }    
+                        if (value == null) {
+                            lines.add(indent(level + 1) + "Attr: " + name);
+                            //System.out.println(indent(level + 1) + "Attr: " + name);
+                        } else {
+                            lines.add(indent(level + 1) + "Attr: " + name + " = " + value);
+                            //System.out.println(indent(level + 1) + "Attr: " + name + " = " + value);
+                        }
+                    }
                 }
                 
                 if (element != null) {
@@ -368,6 +388,7 @@ public class LogUtils {
                         nextItem.append("Item #" + k + ": ");
                         
                     lines.add(nextItem.toString());
+                    //System.out.println(nextItem.toString());
 
                     // Process the next bean.
                     if (! (list[k] instanceof String))
@@ -378,7 +399,7 @@ public class LogUtils {
                 //log.debug(indent(level) + "Extracting bean properties...   count=" + pds.length);
                 for (int i = 0; i < pds.length; i++) {
                     fieldName = pds[i].getName();
-                    
+
                     try {
                         if (! (fieldName.equalsIgnoreCase("class") ||
                                fieldName.equalsIgnoreCase("parent") ||
@@ -420,7 +441,9 @@ public class LogUtils {
                                             line.append("List");
 
                                         lines.add(line.toString());
+                                        //System.out.println(line.toString());
                                         //log.debug(indent(level) + "    Property is a collection.  Calling processBean()...");
+                                        //System.out.println("Calling processBean()... "+fieldName+"  (Collection)");
                                         processBean(value, level + 1, lines, showTypes);
                                     } else if (value instanceof Integer
                                             || value instanceof Long
@@ -434,10 +457,12 @@ public class LogUtils {
                                         // Append the actual property value converted to a String.
                                         line.append(value.toString());
                                         lines.add(line.toString());
+                                        //System.out.println(line.toString());
                                     } else {
                                         // Append the actual property value converted to a String.
                                         line.append(value.getClass().getName());
                                         lines.add(line.toString());
+                                        //System.out.println(line.toString());
 
                                         // Process the next bean.
                                         processBean(value, level + 1, lines, showTypes);
@@ -449,6 +474,8 @@ public class LogUtils {
                                 line.append("   ");
                                 line.append(fieldName);
                                 line.append(" = NO GET METHOD FOUND.");
+                                lines.add(line.toString());
+                                //System.out.println(line.toString());
                             }
                         }
                     } catch (Exception e) {
@@ -457,6 +484,7 @@ public class LogUtils {
                         line.append(fieldName);
                         line.append(" = ERROR: " + e.getMessage());
                         lines.add(line.toString());
+                        //System.out.println(line.toString());
                     }
                 }
             }

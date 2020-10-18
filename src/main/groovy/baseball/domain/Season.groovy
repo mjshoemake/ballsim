@@ -1,4 +1,6 @@
 package baseball.domain
+
+import baseball.processing.ScheduleLoader
 import org.apache.log4j.Logger
 
 class Season {
@@ -7,16 +9,30 @@ class Season {
      * The Log4J logger used by this object.
      */
     protected Logger log = Logger.getLogger("Core");
-
-    int nextGameIndex = 0
-    def final league
-    def final schedule
-    def final teamList = []
     def highlightsLog = Logger.getLogger('highlights')
     def seasonStatsLog = Logger.getLogger('seasonStats')
-    def gameLogEnabled = true
-    def highlightsLogEnabled = true
-    def boxscoreLogEnabled = true
+
+    String year
+    int nextGameIndex = 0
+    Map leagues = [:]
+    def final teamMap = [:]
+
+    def final schedule
+
+    Season(Map teamMap) {
+        this.year = teamMap.year
+        this.teamMap = teamMap
+        League league = null
+        teamMap.remove("year")
+        teamMap.each() { next ->
+            addTeamToSeason(next.value)
+        }
+        String scheduleName = getScheduleName()
+        // Schedule
+        def scheduleLoader = new ScheduleLoader()
+        def schedule = scheduleLoader.loadRoundRobinScheduleFromFile(league)
+
+    }
 
     Season(def league, schedule) {
         this.league = league
@@ -28,7 +44,49 @@ class Season {
                 teamList << next
             }
         }
+        String scheduleName = getScheduleName()
     }
+
+    void addTeamToSeason(Team team) {
+        League league = null
+        if (! leagues.containsKey(team.league)) {
+            league = new League(team.league)
+            leagues[team.league] = league
+        } else {
+            league = leagues[team.league]
+        }
+        league.addTeam(team)
+    }
+
+    String getScheduleName() {
+        StringBuilder builder = new StringBuilder()
+        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+        int i = 1
+        leagues.keySet().each { nextKey ->
+            if (i > 1) {
+                builder.append("_")
+            }
+            League nextLeague = leagues[nextKey]
+            String lID = alphabet.substring(i-1,i)
+            int j = 1
+            nextLeague.divisions.keySet().each() { nextDiv ->
+                if (j > 1) {
+                    builder.append("-")
+                }
+                Division nextDivision = nextLeague.divisions[nextDiv]
+                String dID = alphabet.substring(j-1,j)
+                int dSize = nextDivision.teams.size()
+                builder.append("$lID$dID$dSize")
+                j++
+            }
+            i++
+        }
+        def result = builder.toString()
+        println "Schedule name: $result"
+        result
+    }
+
 
     void playSeason() {
         playSeason(162)
