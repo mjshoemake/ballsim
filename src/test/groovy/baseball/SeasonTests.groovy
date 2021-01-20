@@ -8,7 +8,7 @@ import mjs.common.model.DatabaseDriver
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import baseball.domain.Season
+import baseball.domain.Simulation
 import baseball.processing.ScheduleLoader
 
 class SeasonTests {
@@ -87,7 +87,7 @@ class SeasonTests {
         def scheduleLoader = new ScheduleLoader()
         def schedule = scheduleLoader.loadRoundRobinScheduleFromFile(league)
 
-        season = new Season(league, schedule)
+        season = new Simulation(league, schedule)
         season.playSeason(5)
     }
 

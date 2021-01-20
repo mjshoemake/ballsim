@@ -79,7 +79,7 @@ class ScheduleLoader {
             if ((! (columns[0] == "Round" && columns[1] == "Game #" && columns[2] == "Home Team")) && (columns[0] != "")) {
                 roundNum = Integer.parseInt(columns[0])
                 gameNum = Integer.parseInt(columns[1])
-                println("$roundNum - $gameNum")
+                //println("$roundNum - $gameNum")
                 def homeTeam
                 def awayTeam
                 if (trimTeamName) {
@@ -90,17 +90,16 @@ class ScheduleLoader {
                     awayTeam = columns[3]
                 }
                 if (roundNum != lastRoundNum) {
-                    println "Adding round: ${currentRound.roundNum}"
+                    //println "Adding round: ${currentRound.roundNum}  home: ${currentRound.games[0].homeTeam}  away: ${currentRound.games[0].awayTeam}"
                     scheduledSeason.addRound(currentRound)
                     for (int i=1; i <= roundNum - lastRoundNum - 1; i++) {
                         // Complete existing round.
                         currentRound = currentRound.copy()
-                        println "Adding round: ${currentRound.roundNum}"
                         scheduledSeason.addRound(currentRound)
+                        //println "Adding round: ${currentRound.roundNum} Size: ${scheduledSeason.rounds.size()}  home: ${currentRound.games[0].homeTeam}  away: ${currentRound.games[0].awayTeam}"
                     }
                     lastRoundNum = roundNum
-                    currentRound.roundNum++
-                    currentRound.games.clear()
+                    currentRound = new ScheduledRound(roundNum)
                 }
                 def game = new ScheduledGame()
                 game.roundNum = roundNum
@@ -111,10 +110,8 @@ class ScheduleLoader {
             }
         }
 
-        println("PRINTING!!!")
         //LogUtils.info(log, scheduledSeason, "   ", true)
-        println("PRINTING!!! Done")
-        LogUtils.println(scheduledSeason, "   ", true)
+        //LogUtils.println(scheduledSeason, "   ", true)
         scheduledSeason
     }
 

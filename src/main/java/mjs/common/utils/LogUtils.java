@@ -176,7 +176,14 @@ public class LogUtils {
     public static String[] dataToStrings(Object bean, boolean showTypes) throws CoreException {
         ArrayList<String> lines = new ArrayList<String>();
         String[] result = null;
-        System.out.println("Called dataToStrings("+bean.getClass().getName()+", showTypes=" + showTypes+")");
+        String beanType = null;
+        try {
+            beanType = bean.getClass().getName();
+            System.out.println("BeanType: " + beanType);
+        } catch(Exception e) {
+            beanType = "Unable to get bean class name: " + e.getMessage();
+        }
+        System.out.println("Called dataToStrings("+beanType+", showTypes=" + showTypes+")");
 
         if (bean == null) {
             result = new String[1];
@@ -238,36 +245,42 @@ public class LogUtils {
                 }
                 while (keys.hasNext()) {
                     String key = keys.next().toString();
-                    Object val = map.get(key);
-                    if (val instanceof Integer 
-                     || val instanceof Long
-                     || val instanceof Double
-                     || val instanceof Boolean
-                     || val instanceof BigDecimal
-                     || val instanceof BigInteger
-                     || val instanceof java.util.Date
-                     || val instanceof Float
-                     || val instanceof String) {
-                        line = new StringBuffer();
-                        line.append(indent(level));
-                        line.append(key);
-                        line.append(" = ");
-                        line.append(val.toString());
-                        lines.add(line.toString());
-                        //System.out.println(indent(level) + line.toString());
-                    } else {
-                        line = new StringBuffer();
-                        line.append(indent(level));
-                        line.append(key);
-                        line.append(" = ");
-                        if (val == null)
-                            line.append("null");
-                        else
-                            line.append(val.getClass().getName());
-                        lines.add(line.toString());
-                        //System.out.println(indent(level) + line.toString());
-                        if (! key.equals("_id")) {
-                            processBean(val, level + 1, lines, showTypes);
+                    System.out.println(indent(level) + "Key: key");
+                    if (! (key.equalsIgnoreCase("class") ||
+                           key.equalsIgnoreCase("parent") ||
+                           key.equalsIgnoreCase("metaClass") ||
+                           key.equalsIgnoreCase("declaringclass"))) {
+                        Object val = map.get(key);
+                        if (val instanceof Integer
+                                || val instanceof Long
+                                || val instanceof Double
+                                || val instanceof Boolean
+                                || val instanceof BigDecimal
+                                || val instanceof BigInteger
+                                || val instanceof java.util.Date
+                                || val instanceof Float
+                                || val instanceof String) {
+                            line = new StringBuffer();
+                            line.append(indent(level));
+                            line.append(key);
+                            line.append(" = ");
+                            line.append(val.toString());
+                            lines.add(line.toString());
+                            //System.out.println(indent(level) + line.toString());
+                        } else {
+                            line = new StringBuffer();
+                            line.append(indent(level));
+                            line.append(key);
+                            line.append(" = ");
+                            if (val == null)
+                                line.append("null");
+                            else
+                                line.append(val.getClass().getName());
+                            lines.add(line.toString());
+                            //System.out.println(indent(level) + line.toString());
+                            if (! key.equals("_id")) {
+                                processBean(val, level + 1, lines, showTypes);
+                            }
                         }
                     }
                 }
@@ -403,6 +416,7 @@ public class LogUtils {
                     try {
                         if (! (fieldName.equalsIgnoreCase("class") ||
                                fieldName.equalsIgnoreCase("parent") ||
+                               fieldName.equalsIgnoreCase("metaClass") ||
                                fieldName.equalsIgnoreCase("declaringclass"))) {
                             //log.debug(indent(level) + "   " + fieldName);
 

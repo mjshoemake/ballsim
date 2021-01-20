@@ -10,6 +10,7 @@ class Team {
     String division_full = ""
     String name = ""
     String city = ""
+    String scheduleLookupKey
 
     Team(Map value) {
         team_id = value.team_id

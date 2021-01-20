@@ -50,7 +50,9 @@ class MongoManager {
         def id = generateObjectId()
         obj["_id"] = id
         //println "Adding new object to collection $collection."
-        String json = new JsonBuilder(obj).toPrettyString()
+        LogUtils.println(obj, "   ", true)
+        //String json = new JsonBuilder(obj).toPrettyString()
+        String json = new JsonBuilder(obj).toString()
         //println "addToCollection [$collection]  $json"
         privateAddToCollection(collection, json)
         return obj["_id"]

@@ -1,61 +1,100 @@
 package baseball.domain
 
+import baseball.mongo.MongoManager
 import baseball.processing.ScheduleLoader
 import org.apache.log4j.Logger
+import mjs.common.utils.LogUtils
+import mjs.common.utils.TransactionIdGen
+import org.bson.types.ObjectId
 
-class Season {
+class Simulation {
 
     /**
      * The Log4J logger used by this object.
      */
     protected Logger log = Logger.getLogger("Core");
-    def highlightsLog = Logger.getLogger('highlights')
-    def seasonStatsLog = Logger.getLogger('seasonStats')
+    protected Logger highlightsLog = Logger.getLogger('highlights')
+    protected Logger seasonStatsLog = Logger.getLogger('seasonStats')
 
+    ObjectId _id
+    String simulationID = "TestSim"
+    String simulationName = "Test Sim"
     String year
-    int nextGameIndex = 0
+    String name
     Map leagues = [:]
-    def final teamMap = [:]
+    Map teamMap = [:]
+    Map scheduleTeamLookup = [:]
+    // List of League objects, to preserve order.
+    List leagueList = []
+    // Letters to use for divisionKey.
+    List<String> keyTokens = ["A","B","C","D","E","F","G","H","I","J","K","L"]
 
-    def final schedule
+    ScheduledSeason schedule = null
 
-    Season(Map teamMap) {
-        this.year = teamMap.year
-        this.teamMap = teamMap
-        League league = null
-        teamMap.remove("year")
-        teamMap.each() { next ->
-            addTeamToSeason(next.value)
-        }
-        String scheduleName = getScheduleName()
-        // Schedule
-        def scheduleLoader = new ScheduleLoader()
-        def schedule = scheduleLoader.loadRoundRobinScheduleFromFile(league)
-
+    Simulation() {
     }
 
-    Season(def league, schedule) {
-        this.league = league
-        this.schedule = schedule
-        def it = league.keySet().iterator()
-        while (it.hasNext()) {
-            def div = league[it.next()]
-            div.each { next ->
-                teamList << next
-            }
+    Simulation(Map map) {
+        this.simulationID = map.simulationID
+        this.simulationName = map.simulationName
+        this.year = map.year
+        this.name = map.name
+        map.teamMap.keySet.each { nextKey ->
+            teamMap[nextKey] = new Team(teamMap[nextKey])
         }
-        String scheduleName = getScheduleName()
+        map.leagues.keySet().each { key ->
+            League league = new League(map.leagues[key], teamMap, map.leagueKey)
+            this.leagues[key] = league
+            this.leagueList << league
+        }
+    }
+
+    Map toMap() {
+        Map result = [:]
+        result["simulationID"] = simulationID
+        result["simulationName"] = simulationName
+        result["year"] = year
+        result["name"] = name
+        result["leagues"] = leagues
+        result["teamMap"] = teamMap
+        result["schedule"] = schedule
+        result
+    }
+
+    ScheduledGame getNextGame() {
+        ScheduledGame game = null
+        if (schedule?.rounds?.size() > 0) {
+            ScheduledRound round = schedule?.rounds[0]
+            if (round?.games.size() > 0)
+            game = round?.games[0]
+        }
+        println("Next Game:")
+        LogUtils.println(game, "   ", true)
+        game
+    }
+
+    static String generateSimulationID() {
+        generateSimulationID("Test")
+    }
+
+    static String generateSimulationID(String prefix) {
+        if (prefix) {
+            TransactionIdGen.nextVal(prefix)
+        } else {
+            TransactionIdGen.nextVal("Test")
+        }
     }
 
     void addTeamToSeason(Team team) {
-        League league = null
+        League league
         if (! leagues.containsKey(team.league)) {
-            league = new League(team.league)
+            String leagueKey = keyTokens[leagues.size()]
+            league = new League(team.league, leagueKey)
             leagues[team.league] = league
         } else {
             league = leagues[team.league]
         }
-        league.addTeam(team)
+        league.addTeam(team, scheduleTeamLookup)
     }
 
     String getScheduleName() {
@@ -87,6 +126,22 @@ class Season {
         result
     }
 
+    int getTeamCount() {
+        int total = 0
+        leagues.keySet().each { nextKey ->
+            League nextLeague = leagues[nextKey]
+            nextLeague.divisions.keySet().each() { nextDiv ->
+                Division nextDivision = nextLeague.divisions[nextDiv]
+                int dSize = nextDivision.teams.size()
+                total += dSize
+            }
+        }
+        total
+    }
+
+    void loadFromJson(def json) {
+
+    }
 
     void playSeason() {
         playSeason(162)
@@ -128,6 +183,17 @@ class Season {
 
     private void reworkLineup(Map team) {
 
+    }
+
+    void logDivisions(Logger log) {
+       leagueList.each() { next ->
+           log.info("League: ${next.abbreviation} key=${next.leagueKey}")
+           println("League: ${next.abbreviation} key=${next.leagueKey}")
+           next.divisionsList.each() { nextDiv ->
+               log.info("   Division: ${nextDiv.name}  (${nextDiv.abbreviation})  key: ${nextDiv.divisionKey}")
+               println("   Division: ${nextDiv.name}  (${nextDiv.abbreviation})  key: ${nextDiv.divisionKey}")
+           }
+       }
     }
 
     private String[] logStandings(Logger log) {

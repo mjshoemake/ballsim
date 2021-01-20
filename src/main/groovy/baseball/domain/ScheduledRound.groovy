@@ -25,10 +25,10 @@ class ScheduledRound {
 
     ScheduledRound copy() {
         ScheduledRound newRound = new ScheduledRound(this.roundNum + 1)
-        println "Copying RD: ${newRound.roundNum}  gameCount=${this.games.size()}"
+        //println "Copying RD: ${newRound.roundNum}  gameCount=${this.games.size()}"
         games.each { next ->
             def copy = next.copy()
-            println "   Copying GM: ${copy.roundNum} - ${copy.gameNum}"
+            //println "   Copying GM: ${copy.roundNum} - ${copy.gameNum}"
             newRound.games << next.copy()
         }
         newRound
