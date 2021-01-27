@@ -7,7 +7,9 @@ import com.mongodb.MongoClient
 import com.mongodb.MongoClientURI
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.result.DeleteResult
-import groovy.json.*
+import groovy.json.JsonBuilder
+import groovy.json.JsonSlurper
+import org.apache.log4j.Logger
 import org.bson.Document
 import org.bson.conversions.Bson
 import org.bson.types.ObjectId
@@ -21,6 +23,7 @@ import mjs.common.utils.LogUtils
  */
 class MongoManager {
 
+    def payloadLog = Logger.getLogger('Payload')
     MongoClient client = null
     MongoDatabase db = null
 
@@ -50,7 +53,7 @@ class MongoManager {
         def id = generateObjectId()
         obj["_id"] = id
         //println "Adding new object to collection $collection."
-        LogUtils.println(obj, "   ", true)
+        LogUtils.debug(payloadLog, obj, "   ", true)
         //String json = new JsonBuilder(obj).toPrettyString()
         String json = new JsonBuilder(obj).toString()
         //println "addToCollection [$collection]  $json"

@@ -243,7 +243,11 @@ class Player {
                     it.pitchingStrikeouts = Integer.parseInt(pitchingStats.so)
                     it.pitchingHits = Integer.parseInt(pitchingStats.h)
                     it.pitchingHomers = Integer.parseInt(pitchingStats.hr)
-                    it.pitchingWildPitch = Integer.parseInt(pitchingStats.wp)
+                    if (pitchingStats.wp.equals("")) {
+                        it.pitchingWildPitch = 0
+                    } else {
+                        it.pitchingWildPitch = Integer.parseInt(pitchingStats.wp)
+                    }
                     it.pitchingHitBatter = Integer.parseInt(pitchingStats.hb)
                     it.pitchingBalks = Integer.parseInt(pitchingStats.bk)
                     it.pitchingEra = pitchingStats.era

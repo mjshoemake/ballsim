@@ -41,7 +41,7 @@ class DatabankTeamLoaderTest {
 
         // Load teams
         def team = dbTeamLoader.loadTeamFromMysql("Braves", 2003)
-        LogUtils.println(team, "   ", true)
+        //LogUtils.println(team, "   ", true)
 
 
 /*

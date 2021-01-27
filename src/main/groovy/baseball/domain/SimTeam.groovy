@@ -1,10 +1,11 @@
 package baseball.domain
 
+import baseball.processing.HttpHistoricalDataManager
 import org.apache.log4j.Logger
 
 
 class SimTeam {
-    def auditLog = Logger.getLogger('Audit')
+    private auditLog = Logger.getLogger('Audit')
 
     // Temporary
     def batters = []
@@ -37,12 +38,26 @@ class SimTeam {
     int wins = 0
     int losses = 0
     int winDiff = 0
+    Team team = null
+
+    SimTeam() {
+    }
 
     SimTeam(def teamRoster, String city, String teamName, String year) {
         this.teamRoster = teamRoster
         this.teamName = teamName
         this.city = city
         this.year = year
+        separatePlayers()
+    }
+
+    SimTeam(Team team) {
+        HttpHistoricalDataManager dataMgr = new HttpHistoricalDataManager()
+        this.teamRoster = dataMgr.get40ManRoster(team.team_id, team.year)
+        this.teamName = team.name
+        this.city = team.city
+        this.year = team.year
+        this.team = team
         separatePlayers()
     }
 
@@ -53,6 +68,43 @@ class SimTeam {
             positions << [position: batter]
             return true
         }
+    }
+
+    SimTeam clear() {
+        // Temporary
+        batters = []
+        pitchers = []
+        remainder = []
+        contact = []
+        power = []
+        speed = []
+        speedAndContact = []
+
+        // Primary for game
+        lineup = []
+        bench = []
+        rotation = []
+        bullpen = []
+        pitchersUsed = []
+        reservePitchers = []
+        teamName = "MyTeam"
+        city = "Home City"
+        year = "2020"
+        nextBatter = 0
+        nextReliefPitcher = 0
+        nextStartingPitcher = 0
+        starter = null
+        currentPitcher = null
+        closer = null
+        pitchCount = 0
+        teamRoster = null
+        positions = [:]
+        wins = 0
+        losses = 0
+        winDiff = 0
+        team = null
+
+        this
     }
 
     void separatePlayers() {
@@ -231,6 +283,14 @@ class SimTeam {
             primaryPosition = remainder[0].primaryPosition
             addIfPositionAvailable(primaryPosition, remainder, "Remainder")
         }
+
+        batters = []
+        pitchers = []
+        remainder = []
+        contact = []
+        power = []
+        speed = []
+        speedAndContact = []
 
         auditLog.debug "Remaining: speedAndContact: ${speedAndContact.size()} speed: ${speed.size()} power: ${power.size()} contact: ${contact.size()}"
     }

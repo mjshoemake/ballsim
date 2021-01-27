@@ -3,12 +3,15 @@ package baseball
 import baseball.domain.*
 import baseball.mongo.MongoManager
 import mjs.common.utils.LogUtils
+import org.apache.log4j.Logger
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
 class MongoTests {
 
+    def log
+    def payloadLog
     MongoManager mongoManager
 
     @Before
@@ -16,6 +19,8 @@ class MongoTests {
         if (! LogUtils.isLoggingConfigured()) {
             LogUtils.initializeLogging()
         }
+        log = Logger.getLogger('Debug')
+        payloadLog = Logger.getLogger('Payload')
         mongoManager = new MongoManager()
     }
 
@@ -51,17 +56,17 @@ class MongoTests {
 
         println "FindAll:"
         def result = mongoManager.findAll(collection)
-        LogUtils.println(result, "   ", true)
+        LogUtils.debug(log, result, "   ", true)
         println ""
 
         println "Find name='Wilma':"
         result = mongoManager.find(collection, ['name': 'Wilma'])
-        LogUtils.println(result, "   ", true)
+        LogUtils.debug(log, result, "   ", true)
         println ""
 
         println "Find bats='L':"
         result = mongoManager.find(collection, ['bats': 'L'])
-        LogUtils.println(result, "   ", true)
+        LogUtils.debug(log, result, "   ", true)
         println ""
     }
 }

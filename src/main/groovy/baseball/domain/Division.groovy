@@ -20,8 +20,8 @@ class Division {
         this.teams = map.teams
     }
 
-    void addTeam(Team team) {
-        this.teams << team.name
+    void addTeam(SimTeam simTeam) {
+        this.teams << simTeam.teamName
     }
 
 }

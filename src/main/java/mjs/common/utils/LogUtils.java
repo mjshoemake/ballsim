@@ -65,9 +65,7 @@ public class LogUtils {
      * @throws CoreException
      */
     public static void println(Object obj, String prefix, boolean showTypes) throws CoreException {
-        System.out.println("LogUtils.println() START   Calling dataToStrings()...");
         String[] lines = dataToStrings(obj, showTypes);
-        System.out.println("LogUtils.println() START   Calling dataToStrings()... DONE");
         for (int i=0; i <= lines.length-1; i++) {
             System.out.println(prefix + lines[i]);
         }
@@ -179,25 +177,25 @@ public class LogUtils {
         String beanType = null;
         try {
             beanType = bean.getClass().getName();
-            System.out.println("BeanType: " + beanType);
+            log.debug("BeanType: " + beanType);
         } catch(Exception e) {
             beanType = "Unable to get bean class name: " + e.getMessage();
         }
-        System.out.println("Called dataToStrings("+beanType+", showTypes=" + showTypes+")");
+        log.debug("Called dataToStrings("+beanType+", showTypes=" + showTypes+")");
 
         if (bean == null) {
             result = new String[1];
             result[0] = "null";
             return result;
-        }    
-        
-        //log.debug("Extracting bean properties...   " + bean.getClass().getName());
+        }
+
+        log.debug("Extracting bean properties...   " + bean.getClass().getName());
         //String fieldName = null;
 
         try {
-            System.out.println("Initial call to processBean()...");
+            log.debug("Initial call to processBean()...");
             processBean(bean, 0, lines, showTypes);
-            System.out.println("Initial call to processBean()... Done");
+            log.debug("Initial call to processBean()... Done");
 
             result = new String[lines.size()];
             // Convert Vector to array.

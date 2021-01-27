@@ -2,6 +2,8 @@ package baseball.domain
 
 import baseball.mongo.MongoManager
 import baseball.processing.ScheduleLoader
+import groovy.json.JsonBuilder
+import groovy.json.JsonOutput
 import org.apache.log4j.Logger
 import mjs.common.utils.LogUtils
 import mjs.common.utils.TransactionIdGen
@@ -12,10 +14,11 @@ class Simulation {
     /**
      * The Log4J logger used by this object.
      */
-    protected Logger log = Logger.getLogger("Core");
-    protected Logger highlightsLog = Logger.getLogger('highlights')
-    protected Logger seasonStatsLog = Logger.getLogger('seasonStats')
+    private Logger log = Logger.getLogger("Debug");
+    private Logger highlightsLog = Logger.getLogger('highlights')
+    private Logger seasonStatsLog = Logger.getLogger('seasonStats')
 
+    def C = "Simulation"
     ObjectId _id
     String simulationID = "TestSim"
     String simulationName = "Test Sim"
@@ -40,7 +43,7 @@ class Simulation {
         this.year = map.year
         this.name = map.name
         map.teamMap.keySet.each { nextKey ->
-            teamMap[nextKey] = new Team(teamMap[nextKey])
+            teamMap[nextKey] = new Team(teamMap[nextKey], this.year)
         }
         map.leagues.keySet().each { key ->
             League league = new League(map.leagues[key], teamMap, map.leagueKey)
@@ -56,20 +59,56 @@ class Simulation {
         result["year"] = year
         result["name"] = name
         result["leagues"] = leagues
+        result["leagueList"] = leagueList
         result["teamMap"] = teamMap
         result["schedule"] = schedule
+        result["scheduleTeamLookup"] = scheduleTeamLookup
+
         result
     }
 
-    ScheduledGame getNextGame() {
+    /*
+    Map toJsonMap() {
+        Map result = new HashMap()
+        result["simulationID"] = simulationID
+        result["simulationName"] = simulationName
+        result["year"] = year
+        result["name"] = name
+        //result["leagues"] = leagues
+        //result["leagueList"] = leagueList
+        //result["teamMap"] = teamMap
+        //result["schedule"] = schedule
+        //result["scheduleTeamLookup"] = scheduleTeamLookup
+        result
+    }
+    */
+
+    String toJson() {
+        def m = "${C}.toJson() - "
+        //Map jsonMap = toJsonMap()
+        Map jsonMap = toMap()
+        //String jSim = new JsonBuilder(jsonMap).toString()
+        String jSim = JsonOutput.toJson(jsonMap)
+        log.debug("$m Converted to JSON successfully.")
+    }
+
+    synchronized ScheduledGame popNextGame() {
         ScheduledGame game = null
         if (schedule?.rounds?.size() > 0) {
             ScheduledRound round = schedule?.rounds[0]
-            if (round?.games.size() > 0)
-            game = round?.games[0]
+            if (round?.games.size() > 0) {
+                game = round?.games[0]
+                // Removing the game from the list.
+                round?.games.remove(game)
+            } else {
+                throw new SimulationException("Expected at least one game remaining in round but none found.")
+            }
+            if (round?.games.size() == 0) {
+                // Done with this round. Removing from the list of rounds.
+                schedule.rounds.remove(round)
+            }
+
         }
-        println("Next Game:")
-        LogUtils.println(game, "   ", true)
         game
     }
 
@@ -137,6 +176,22 @@ class Simulation {
             }
         }
         total
+    }
+
+    void playSimGame() {
+        def m = "${C}.playSimGame() - "
+        // Get the next game to play.
+        ScheduledGame game = popNextGame()
+        //log.debug "$m scheduleTeamLookup:"
+        //LogUtils.debug(log, sim.scheduleTeamLookup, "   ", true)
+
+        // Get the next two teams.
+        SimTeam homeTeam = scheduleTeamLookup[game.homeTeam]
+        SimTeam awayTeam = scheduleTeamLookup[game.awayTeam]
+        log.debug "$m Next game:  Home: ${homeTeam.teamName}  Away: ${awayTeam.teamName}  Round #: ${game.roundNum}  Game #: ${game.gameNum}"
+
+        // Play game.
+
     }
 
     void loadFromJson(def json) {

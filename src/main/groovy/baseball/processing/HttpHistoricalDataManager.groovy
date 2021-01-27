@@ -58,7 +58,7 @@ class HttpHistoricalDataManager {
         }
         def teamMap = ["year": year]
         teams.each { next ->
-            Team team = new Team(next)
+            Team team = new Team(next, year)
             if (! team.league.isEmpty()) {
                 team.printTeam()
                 teamMap[team.name] = team

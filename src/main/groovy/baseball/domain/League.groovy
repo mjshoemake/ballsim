@@ -38,8 +38,10 @@ class League {
     }
 
     void addTeam(Team team, Map scheduleTeamLookup) {
+        // Create SimTeam instance for this team.
+        SimTeam simTeam = new SimTeam(team)
         teams << team.name
-        teamMap[team.name] = team
+        teamMap[team.name] = simTeam
         Division division = null
         if (! divisions.containsKey(team.division)) {
             String divisionKey = leagueKey + keyTokens[divisions.size()]
@@ -49,7 +51,7 @@ class League {
             division = divisions.get(team.division)
         }
         team.scheduleLookupKey = division.divisionKey + (division.teams.size() + 1)
-        division.addTeam(team)
-        scheduleTeamLookup[team.scheduleLookupKey, team]
+        division.addTeam(simTeam)
+        scheduleTeamLookup[team.scheduleLookupKey] = simTeam
     }
 }

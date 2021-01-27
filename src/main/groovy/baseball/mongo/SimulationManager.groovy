@@ -1,9 +1,7 @@
 package baseball.mongo
 
 import baseball.domain.*
-import baseball.mongo.MongoManager
 import baseball.processing.ScheduleLoader
-import mjs.common.utils.TransactionIdGen
 import mjs.common.utils.LogUtils
 import org.apache.log4j.Logger
 
@@ -12,7 +10,8 @@ class SimulationManager {
     /**
      * The Log4J logger used by this object.
      */
-    protected Logger log = Logger.getLogger("Core");
+    def C = "SimulationManager"
+    protected Logger log = Logger.getLogger("Debug");
     def highlightsLog = Logger.getLogger('highlights')
     def seasonStatsLog = Logger.getLogger('seasonStats')
     final String collection = "simulations"
@@ -21,10 +20,11 @@ class SimulationManager {
     MongoManager mongoManager = new MongoManager()
 
     SimulationManager() {
-        log.info "Opening Mongo connection..."
+        def m = "${C}.constructor() - "
+        log.info "$m Opening Mongo connection..."
         mongoManager.open("ballsim")
         deleteAllSimulations()
-        log.info "Opening Mongo connection... Done!"
+        log.info "$m Opening Mongo connection... Done!"
     }
 
     void close() {
@@ -43,9 +43,12 @@ class SimulationManager {
     }
 
     Simulation findSimulation(String simulationID) {
+        Simulation sim = null
         def result = mongoManager.find(collection, ["simulationID": simulationID])
         // Populate Simulation from JSON data.
-        Simulation sim = new Simulation(result[0])
+        if (result.size() > 0) {
+            sim = new Simulation(result[0])
+        }
         sim
     }
 
@@ -55,6 +58,7 @@ class SimulationManager {
     }
 
     Simulation startNewSimulation(Map teamMap, String idPrefix, String simulationName, String simulationID) {
+        def m = "${C}.startNewSimulation() - "
         Simulation sim = new Simulation()
         sim.year = teamMap.year
         sim.simulationID = simulationID
@@ -64,15 +68,25 @@ class SimulationManager {
         sim.teamMap.each() { next ->
             sim.addTeamToSeason(next.value)
         }
-        LogUtils.println(sim.scheduleTeamLookup, "   ", true)
+        log.debug "$m scheduleTeamLookup:"
+        LogUtils.debug(log, sim.scheduleTeamLookup, "   ", true)
 
         // Schedule
         def scheduleLoader = new ScheduleLoader()
         String scheduleName = sim.getScheduleName()
+        log.debug "$m Loading schedule from file..."
         sim.schedule = scheduleLoader.loadScheduleFromFile(scheduleName, sim.getTeamCount())
+        log.debug "$m Loading schedule from file... Done."
+
+        log.debug "$m Preparing to save simulation (converting to Json)..."
+        //Map jsonMap = sim.toJsonMap()
+        Map jsonMap = sim.toMap()
+        log.debug "$m Preparing to save simulation (converting to Json)... Done."
 
         // Save simulation.
-        mongoManager.addToCollection(collection, sim)
+        log.debug "$m Saving simulation to datastore..."
+        mongoManager.addToCollection(collection, jsonMap)
+        log.debug "$m Saving simulation to datastore... Done."
 
 
         // Return
@@ -86,15 +100,9 @@ class SimulationManager {
     }
 
     Simulation playSimGame(Simulation sim) {
-        // Get the next game to play.
-        ScheduledGame game = sim.getNextGame()
-        LogUtils.println(game, "   ", true)
 
-        // Get the next two teams.
-        Team homeTeam = sim.scheduleTeamLookup[game.homeTeam]
-        Team awayTeam = sim.scheduleTeamLookup[game.awayTeam]
-        println "Next game:  Home: ${homeTeam.name}  Away: ${awayTeam.name}"
-
+        // Play the game.
+        sim.playSimGame()
         // Return
         sim
     }
