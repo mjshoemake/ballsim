@@ -14,7 +14,8 @@ import java.math.RoundingMode
 
 
 //import org.apache.log4j.Logger
-class PitcherStats {
+class PitcherStats extends Comparable {
+    def C = "PitcherStats"
     String name = ""
     int pitchingGames
     int pitchingGamesStarted
@@ -29,8 +30,8 @@ class PitcherStats {
     int pitchingWildPitch
     int pitchingHitBatter
     int pitchingBalks
-    String pitchingEra
     double pitchingWhip
+    String pitchingEra
     SimPitcher simPitcher
 
     PitcherStats() {
@@ -58,6 +59,61 @@ class PitcherStats {
             this.simPitcher = new SimPitcher(source.simPitcher)
         }
         //println "Converting Map to PitcherStats... DONE."
+    }
+
+    // Is the specified object equal to this one?
+    boolean equals(PitcherStats target) {
+        boolean result = true
+        def m = "${C}.equals() - "
+        if (! compareString("pitchingEra", pitchingEra, target.pitchingEra)) { result = false }
+        else if (! compareString("name", name, target.name)) { result = false }
+        else if (! compareInt("pitchingGames", pitchingGames, target.pitchingGames)) { result = false }
+        else if (! compareInt("pitchingGamesStarted", pitchingGamesStarted, target.pitchingGamesStarted)) { result = false }
+        else if (! compareInt("pitchingBattersRetired", pitchingBattersRetired, target.pitchingBattersRetired)) { result = false }
+        else if (! compareInt("pitchingOrderPos", pitchingOrderPos, target.pitchingOrderPos)) { result = false }
+        else if (! compareInt("pitchingWalks", pitchingWalks, target.pitchingWalks)) { result = false }
+        else if (! compareInt("pitchingRuns", pitchingRuns, target.pitchingRuns)) { result = false }
+        else if (! compareInt("pitchingEarnedRuns", pitchingEarnedRuns, target.pitchingEarnedRuns)) { result = false }
+        else if (! compareInt("pitchingStrikeouts", pitchingStrikeouts, target.pitchingStrikeouts)) { result = false }
+        else if (! compareInt("pitchingHits", pitchingHits, target.pitchingHits)) { result = false }
+        else if (! compareInt("pitchingHomers", pitchingHomers, target.pitchingHomers)) { result = false }
+        else if (! compareInt("pitchingWildPitch", pitchingWildPitch, target.pitchingWildPitch)) { result = false }
+        else if (! compareInt("pitchingHitBatter", pitchingHitBatter, target.pitchingHitBatter)) { result = false }
+        else if (! compareInt("pitchingBalks", pitchingBalks, target.pitchingBalks)) { result = false }
+        else if (! compareObject("simPitcher", simPitcher, target.simPitcher)) { result = false }
+        else if (! compareDouble("pitchingWhip", pitchingWhip, target.pitchingWhip)) { result = false }
+        return result
+    }
+
+    // Is the specified object equal to this one?
+    boolean equals(PitcherStats target, List builder) {
+        boolean result = true
+        def m = "${C}.equals() - "
+        if (! compareString("pitchingEra", pitchingEra, target.pitchingEra, builder)) { result = false }
+        if (! compareString("name", name, target.name, builder)) { result = false }
+        if (! compareInt("pitchingGames", pitchingGames, target.pitchingGames, builder)) { result = false }
+        if (! compareInt("pitchingGamesStarted", pitchingGamesStarted, target.pitchingGamesStarted, builder)) { result = false }
+        if (! compareInt("pitchingBattersRetired", pitchingBattersRetired, target.pitchingBattersRetired, builder)) { result = false }
+        if (! compareInt("pitchingOrderPos", pitchingOrderPos, target.pitchingOrderPos, builder)) { result = false }
+        if (! compareInt("pitchingWalks", pitchingWalks, target.pitchingWalks, builder)) { result = false }
+        if (! compareInt("pitchingRuns", pitchingRuns, target.pitchingRuns, builder)) { result = false }
+        if (! compareInt("pitchingEarnedRuns", pitchingEarnedRuns, target.pitchingEarnedRuns, builder)) { result = false }
+        if (! compareInt("pitchingStrikeouts", pitchingStrikeouts, target.pitchingStrikeouts, builder)) { result = false }
+        if (! compareInt("pitchingHits", pitchingHits, target.pitchingHits, builder)) { result = false }
+        if (! compareInt("pitchingHomers", pitchingHomers, target.pitchingHomers, builder)) { result = false }
+        if (! compareInt("pitchingWildPitch", pitchingWildPitch, target.pitchingWildPitch, builder)) { result = false }
+        if (! compareInt("pitchingHitBatter", pitchingHitBatter, target.pitchingHitBatter, builder)) { result = false }
+        if (! compareInt("pitchingBalks", pitchingBalks, target.pitchingBalks, builder)) { result = false }
+        if (! compareDouble("pitchingWhip", pitchingWhip, target.pitchingWhip, builder)) { result = false }
+        if (! compareObject("simPitcher", simPitcher, target.simPitcher, builder)) { result = false }
+
+        if (result) {
+            builder << "$m PitcherStats match?  OK"
+        } else {
+            builder << "$m PitcherStats match?  NO MATCH"
+        }
+
+        return result
     }
 
     public def getBattersFaced() {

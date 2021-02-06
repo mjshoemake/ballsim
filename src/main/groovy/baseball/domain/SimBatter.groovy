@@ -1,7 +1,8 @@
 package baseball.domain
 
-class SimBatter {
+class SimBatter extends Comparable {
 
+    def C = "SimBatter"
     String nameFirst, nameLast
     int battingPos = 0
     int atBats = 0
@@ -18,6 +19,61 @@ class SimBatter {
     int rbi = 0
     Player batter
     boolean maxedOut = false
+
+    // Is the specified object equal to this one?
+    boolean equals(SimBatter target) {
+        boolean result = true
+        def m = "${C}.equals() - "
+        if (! compareString("nameFirst", nameFirst, target.nameFirst)) { result = false }
+        else if (! compareString("nameLast", nameLast, target.nameLast)) { result = false }
+        else if (! compareInt("battingPos", battingPos, target.battingPos)) { result = false }
+        else if (! compareInt("atBats", atBats, target.atBats)) { result = false }
+        else if (! compareInt("walks", walks, target.walks)) { result = false }
+        else if (! compareInt("strikeouts", strikeouts, target.strikeouts)) { result = false }
+        else if (! compareInt("hits", hits, target.hits)) { result = false }
+        else if (! compareInt("doubles", doubles, target.doubles)) { result = false }
+        else if (! compareInt("triples", triples, target.triples)) { result = false }
+        else if (! compareInt("homers", homers, target.homers)) { result = false }
+        else if (! compareInt("runs", runs, target.runs)) { result = false }
+        else if (! compareInt("rbi", rbi, target.rbi)) { result = false }
+        else if (! compareInt("hitByPitch", hitByPitch, target.hitByPitch)) { result = false }
+        else if (! compareInt("stolenBases", stolenBases, target.stolenBases)) { result = false }
+        else if (! compareInt("caughtStealing", caughtStealing, target.caughtStealing)) { result = false }
+        else if (! compareInt("maxedOut", maxedOut, target.maxedOut)) { result = false }
+        else if (! compareObject("batter", batter, target.batter)) { result = false }
+
+        return result
+    }
+
+    // Is the specified object equal to this one?
+    boolean equals(SimBatter target, List builder) {
+        boolean result = true
+        def m = "${C}.equals() - "
+        if (! compareString("nameFirst", nameFirst, target.nameFirst, builder)) { result = false }
+        if (! compareString("nameLast", nameLast, target.nameLast, builder)) { result = false }
+        if (! compareInt("battingPos", battingPos, target.battingPos, builder)) { result = false }
+        if (! compareInt("atBats", atBats, target.atBats, builder)) { result = false }
+        if (! compareInt("walks", walks, target.walks, builder)) { result = false }
+        if (! compareInt("strikeouts", strikeouts, target.strikeouts, builder)) { result = false }
+        if (! compareInt("hits", hits, target.hits, builder)) { result = false }
+        if (! compareInt("doubles", doubles, target.doubles, builder)) { result = false }
+        if (! compareInt("triples", triples, target.triples, builder)) { result = false }
+        if (! compareInt("homers", homers, target.homers, builder)) { result = false }
+        if (! compareInt("runs", runs, target.runs, builder)) { result = false }
+        if (! compareInt("rbi", rbi, target.rbi, builder)) { result = false }
+        if (! compareInt("hitByPitch", hitByPitch, target.hitByPitch, builder)) { result = false }
+        if (! compareInt("stolenBases", stolenBases, target.stolenBases, builder)) { result = false }
+        if (! compareInt("caughtStealing", caughtStealing, target.caughtStealing, builder)) { result = false }
+        if (! compareBoolean("maxedOut", maxedOut, target.maxedOut, builder)) { result = false }
+        if (! compareObject("batter", batter, target.batter, builder)) { result = false }
+        if (result) {
+            builder << "$m SimBatters match?  OK"
+        } else {
+            builder << "$m SimBatters match?  NO MATCH"
+        }
+
+        return result
+    }
 
     void setAtBats(int value) {
         atBats = value

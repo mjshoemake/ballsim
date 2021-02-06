@@ -1,9 +1,11 @@
 package baseball.domain
 
-
+import org.apache.log4j.Logger
 import org.bson.types.ObjectId
 
-class Player {
+class Player extends Comparable {
+    def C = "Player"
+    private Logger log = Logger.getLogger("Debug");
     ObjectId _id
     String type = Player.class.name
     String year
@@ -87,6 +89,96 @@ class Player {
         this.errors = source.errors
         this.catcherSteals = source.catcherSteals
         this.catcherCaught = source.catcherCaught
+    }
+
+    // Is the specified object equal to this one?
+    boolean equals(Player target) {
+        boolean result = true
+        def m = "${C}.equals() - "
+        if (compareString("type", type.toString(), target.type.toString())) { result = false }
+        else if (! compareString("year", year, target.year)) { result = false }
+        else if (! compareString("teamID", teamID, target.teamID)) { result = false }
+        else if (! compareString("playerID", playerID, target.playerID)) { result = false }
+        else if (! compareString("nameFirst", nameFirst, target.nameFirst)) { result = false }
+        else if (! compareString("nameLast", nameLast, target.nameLast)) { result = false }
+        else if (! compareString("nameNick", nameNick, target.nameNick)) { result = false }
+        else if (! compareString("name", name, target.name)) { result = false }
+        else if (! compareString("armBats", armBats, target.armBats)) { result = false }
+        else if (! compareString("armThrows", armThrows, target.armThrows)) { result = false }
+        else if (! compareString("teamID", teamID, target.teamID)) { result = false }
+        else if (! compareString("teamID", teamID, target.teamID)) { result = false }
+        else if (! compareString("primaryPosition", primaryPosition, target.primaryPosition)) { result = false }
+        else if (! compareInt("birthYear", birthYear, target.birthYear)) { result = false }
+        else if (! compareInt("games", games, target.games)) { result = false }
+        else if (! compareInt("atBats", atBats, target.atBats)) { result = false }
+        else if (! compareInt("walks", walks, target.walks)) { result = false }
+        else if (! compareInt("strikeouts", strikeouts, target.strikeouts)) { result = false }
+        else if (! compareInt("hits", hits, target.hits)) { result = false }
+        else if (! compareInt("doubles", doubles, target.doubles)) { result = false }
+        else if (! compareInt("triples", triples, target.triples)) { result = false }
+        else if (! compareInt("homers", homers, target.homers)) { result = false }
+        else if (! compareInt("rbi", rbi, target.rbi)) { result = false }
+        else if (! compareInt("hitByPitch", hitByPitch, target.hitByPitch)) { result = false }
+        else if (! compareInt("stolenBases", stolenBases, target.stolenBases)) { result = false }
+        else if (! compareInt("caughtStealing", caughtStealing, target.caughtStealing)) { result = false }
+        else if (! compareInt("sacrificeFlies", sacrificeFlies, target.sacrificeFlies)) { result = false }
+        else if (! compareInt("putouts", putouts, target.putouts)) { result = false }
+        else if (! compareInt("assists", assists, target.assists)) { result = false }
+        else if (! compareInt("errors", errors, target.errors)) { result = false }
+        else if (! compareInt("catcherSteals", catcherSteals, target.catcherSteals)) { result = false }
+        else if (! compareInt("catcherCaught", catcherCaught, target.catcherCaught)) { result = false }
+        else if (! compareBoolean("isPitcher", isPitcher, target.isPitcher)) { result = false }
+        else if (! pitcherStats.equals(target.pitcherStats)) { result = false }
+
+        return result
+    }
+
+    // Is the specified object equal to this one?
+    boolean equals(Player target, List builder) {
+        boolean result = true
+        def m = "${C}.equals() - "
+        if (! compareString("year", year, target.year, builder)) { result = false }
+        if (! compareString("teamID", teamID, target.teamID, builder)) { result = false }
+        if (! compareString("playerID", playerID, target.playerID, builder)) { result = false }
+        if (! compareString("nameFirst", nameFirst, target.nameFirst, builder)) { result = false }
+        if (! compareString("nameLast", nameLast, target.nameLast, builder)) { result = false }
+        if (! compareString("nameNick", nameNick, target.nameNick, builder)) { result = false }
+        if (! compareString("name", name, target.name, builder)) { result = false }
+        if (! compareString("armBats", armBats, target.armBats, builder)) { result = false }
+        if (! compareString("armThrows", armThrows, target.armThrows, builder)) { result = false }
+        if (! compareString("teamID", teamID, target.teamID, builder)) { result = false }
+        if (! compareString("teamID", teamID, target.teamID, builder)) { result = false }
+        if (! compareString("primaryPosition", primaryPosition, target.primaryPosition, builder)) { result = false }
+        if (! compareInt("birthYear", birthYear, target.birthYear, builder)) { result = false }
+        if (! compareInt("games", games, target.games, builder)) { result = false }
+        if (! compareInt("atBats", atBats, target.atBats, builder)) { result = false }
+        if (! compareInt("walks", walks, target.walks, builder)) { result = false }
+        if (! compareInt("strikeouts", strikeouts, target.strikeouts, builder)) { result = false }
+        if (! compareInt("hits", hits, target.hits, builder)) { result = false }
+        if (! compareInt("doubles", doubles, target.doubles, builder)) { result = false }
+        if (! compareInt("triples", triples, target.triples, builder)) { result = false }
+        if (! compareInt("homers", homers, target.homers, builder)) { result = false }
+        if (! compareInt("rbi", rbi, target.rbi, builder)) { result = false }
+        if (! compareInt("hitByPitch", hitByPitch, target.hitByPitch, builder)) { result = false }
+        if (! compareInt("stolenBases", stolenBases, target.stolenBases, builder)) { result = false }
+        if (! compareInt("caughtStealing", caughtStealing, target.caughtStealing, builder)) { result = false }
+        if (! compareInt("sacrificeFlies", sacrificeFlies, target.sacrificeFlies, builder)) { result = false }
+        if (! compareInt("putouts", putouts, target.putouts, builder)) { result = false }
+        if (! compareInt("assists", assists, target.assists, builder)) { result = false }
+        if (! compareInt("errors", errors, target.errors, builder)) { result = false }
+        if (! compareInt("catcherSteals", catcherSteals, target.catcherSteals, builder)) { result = false }
+        if (! compareInt("catcherCaught", catcherCaught, target.catcherCaught, builder)) { result = false }
+        if (! compareBoolean("isPitcher", isPitcher, target.isPitcher, builder)) { result = false }
+        //if (! compareString("calculatedRank", calculatedRank.toString(), target.calculatedRank.toString(), builder)) { result = false }
+        if (! compareObject("pitcherStats", pitcherStats, target.pitcherStats, builder)) { result = false }
+        if (! compareString("type", type.toString(), target.type.toString(), builder)) { result = false }
+        if (result) {
+            builder << "$m Players match?  OK"
+        } else {
+            builder << "$m Players match?  NO MATCH"
+        }
+
+        return result
     }
 
     static String getBoxScoreHeader() {

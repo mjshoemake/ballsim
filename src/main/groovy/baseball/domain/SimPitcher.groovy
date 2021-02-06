@@ -2,8 +2,9 @@ package baseball.domain
 
 import java.math.RoundingMode
 
-class SimPitcher {
+class SimPitcher extends Comparable {
 
+    def C = "SimPitcher"
     String nameFirst, nameLast
     int wins = 0
     int losses = 0
@@ -25,6 +26,71 @@ class SimPitcher {
     int pitchesGame4 = 0
     int pitchesGame5 = 0
     Player pitcher
+
+    // Is the specified object equal to this one?
+    boolean equals(SimPitcher target) {
+        boolean result = true
+        def m = "${C}.equals() - "
+        if (! compareString("nameFirst", nameFirst, target.nameFirst)) { result = false }
+        else if (! compareString("nameLast", nameLast, target.nameLast)) { result = false }
+        else if (! compareInt("wins", wins, target.wins)) { result = false }
+        else if (! compareInt("losses", losses, target.losses)) { result = false }
+        else if (! compareInt("saves", saves, target.saves)) { result = false }
+        else if (! compareInt("blownSaves", blownSaves, target.blownSaves)) { result = false }
+        else if (! compareInt("battersRetired", battersRetired, target.battersRetired)) { result = false }
+        else if (! compareInt("orderPos", orderPos, target.orderPos)) { result = false }
+        else if (! compareInt("walks", walks, target.walks)) { result = false }
+        else if (! compareInt("strikeouts", strikeouts, target.strikeouts)) { result = false }
+        else if (! compareInt("hits", hits, target.hits)) { result = false }
+        else if (! compareInt("homers", homers, target.homers)) { result = false }
+        else if (! compareInt("hitByPitch", hitByPitch, target.hitByPitch)) { result = false }
+        else if (! compareInt("balks", balks, target.balks)) { result = false }
+        else if (! compareInt("runs", runs, target.runs)) { result = false }
+        else if (! compareInt("pitchesGame1", pitchesGame1, target.pitchesGame1)) { result = false }
+        else if (! compareInt("pitchesGame2", pitchesGame2, target.pitchesGame2)) { result = false }
+        else if (! compareInt("pitchesGame3", pitchesGame3, target.pitchesGame3)) { result = false }
+        else if (! compareInt("pitchesGame4", pitchesGame4, target.pitchesGame4)) { result = false }
+        else if (! compareInt("pitchesGame5", pitchesGame5, target.pitchesGame5)) { result = false }
+        else if (! compareDouble("whip", whip, target.whip)) { result = false }
+        else if (! compareObject("pitcher", pitcher, target.pitcher)) { result = false }
+
+        return result
+    }
+
+    // Is the specified object equal to this one?
+    boolean equals(SimPitcher target, List builder) {
+        boolean result = true
+        def m = "${C}.equals() - "
+        if (! compareString("nameFirst", nameFirst, target.nameFirst, builder)) { result = false }
+        else if (! compareString("nameLast", nameLast, target.nameLast, builder)) { result = false }
+        else if (! compareInt("wins", wins, target.wins, builder)) { result = false }
+        else if (! compareInt("losses", losses, target.losses, builder)) { result = false }
+        else if (! compareInt("saves", saves, target.saves, builder)) { result = false }
+        else if (! compareInt("blownSaves", blownSaves, target.blownSaves, builder)) { result = false }
+        else if (! compareInt("battersRetired", battersRetired, target.battersRetired, builder)) { result = false }
+        else if (! compareInt("orderPos", orderPos, target.orderPos, builder)) { result = false }
+        else if (! compareInt("walks", walks, target.walks, builder)) { result = false }
+        else if (! compareInt("strikeouts", strikeouts, target.strikeouts, builder)) { result = false }
+        else if (! compareInt("hits", hits, target.hits, builder)) { result = false }
+        else if (! compareInt("homers", homers, target.homers, builder)) { result = false }
+        else if (! compareInt("hitByPitch", hitByPitch, target.hitByPitch, builder)) { result = false }
+        else if (! compareInt("balks", balks, target.balks, builder)) { result = false }
+        else if (! compareInt("runs", runs, target.runs, builder)) { result = false }
+        else if (! compareInt("pitchesGame1", pitchesGame1, target.pitchesGame1, builder)) { result = false }
+        else if (! compareInt("pitchesGame2", pitchesGame2, target.pitchesGame2, builder)) { result = false }
+        else if (! compareInt("pitchesGame3", pitchesGame3, target.pitchesGame3, builder)) { result = false }
+        else if (! compareInt("pitchesGame4", pitchesGame4, target.pitchesGame4, builder)) { result = false }
+        else if (! compareInt("pitchesGame5", pitchesGame5, target.pitchesGame5, builder)) { result = false }
+        else if (! compareDouble("whip", whip, target.whip, builder)) { result = false }
+        else if (! compareObject("pitcher", pitcher, target.pitcher, builder)) { result = false }
+        if (result) {
+            builder << "$m SimPitchers match?  OK"
+        } else {
+            builder << "$m SimPitchers match?  NO MATCH"
+        }
+
+        return result
+    }
 
     def getBattersFaced() {
         battersRetired + walks + hits + hitByPitch

@@ -23,7 +23,7 @@ class SimulationManager {
         def m = "${C}.constructor() - "
         log.info "$m Opening Mongo connection..."
         mongoManager.open("ballsim")
-        deleteAllSimulations()
+        //deleteAllSimulations()
         log.info "$m Opening Mongo connection... Done!"
     }
 
@@ -78,19 +78,23 @@ class SimulationManager {
         sim.schedule = scheduleLoader.loadScheduleFromFile(scheduleName, sim.getTeamCount())
         log.debug "$m Loading schedule from file... Done."
 
-        log.debug "$m Preparing to save simulation (converting to Json)..."
-        //Map jsonMap = sim.toJsonMap()
-        Map jsonMap = sim.toMap()
-        log.debug "$m Preparing to save simulation (converting to Json)... Done."
-
         // Save simulation.
         log.debug "$m Saving simulation to datastore..."
+        Map jsonMap = sim.toMap()
         mongoManager.addToCollection(collection, jsonMap)
         log.debug "$m Saving simulation to datastore... Done."
 
-
         // Return
         sim
+    }
+
+    void saveSimulation(Simulation sim) {
+        def m = "${C}.saveSimulation() - "
+        // Save simulation.
+        log.debug "$m Saving simulation to datastore..."
+        Map jsonMap = sim.toMap()
+        mongoManager.addToCollection(collection, jsonMap)
+        log.debug "$m Saving simulation to datastore... Done."
     }
 
     Simulation playSimGame(String simulationID) {
@@ -100,10 +104,15 @@ class SimulationManager {
     }
 
     Simulation playSimGame(Simulation sim) {
+        def m = "${C}.playSimGame() - "
 
         // Play the game.
         sim.playSimGame()
-        // Return
+
+        // Simulation has now changed. Need to save current state.
+        saveSimulation(sim)
+
+        // Return Simulation object.
         sim
     }
 

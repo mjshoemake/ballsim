@@ -2,6 +2,7 @@ package baseball.domain
 
 class GameBatter extends GameBatterComparable {
 
+    def C = "GameBatter"
     def simBatter
 
     String nameFirst, nameLast
@@ -26,6 +27,62 @@ class GameBatter extends GameBatterComparable {
     GameBatter(Player player) {
         simBatter = new SimBatter()
         simBatter.batter = player
+    }
+
+
+    // Is the specified object equal to this one?
+    boolean equals(GameBatter target) {
+        boolean result = true
+        def m = "${C}.equals() - "
+        if (! compareString("nameFirst", nameFirst, target.nameFirst)) { result = false }
+        else if (! compareString("nameLast", nameLast, target.nameLast)) { result = false }
+        else if (! compareString("position", position, target.position)) { result = false }
+        else if (! compareInt("battingPos", battingPos, target.battingPos)) { result = false }
+        else if (! compareInt("atBats", atBats, target.atBats)) { result = false }
+        else if (! compareInt("walks", walks, target.walks)) { result = false }
+        else if (! compareInt("strikeouts", strikeouts, target.strikeouts)) { result = false }
+        else if (! compareInt("hits", hits, target.hits)) { result = false }
+        else if (! compareInt("doubles", doubles, target.doubles)) { result = false }
+        else if (! compareInt("triples", triples, target.triples)) { result = false }
+        else if (! compareInt("homers", homers, target.homers)) { result = false }
+        else if (! compareInt("runs", runs, target.runs)) { result = false }
+        else if (! compareInt("rbi", rbi, target.rbi)) { result = false }
+        else if (! compareInt("hitByPitch", hitByPitch, target.hitByPitch)) { result = false }
+        else if (! compareInt("stolenBases", stolenBases, target.stolenBases)) { result = false }
+        else if (! compareInt("caughtStealing", caughtStealing, target.caughtStealing)) { result = false }
+        else if (! compareObject("simBatter", simBatter, target.simBatter)) { result = false }
+
+        return result
+    }
+
+    // Is the specified object equal to this one?
+    boolean equals(GameBatter target, List builder) {
+        boolean result = true
+        def m = "${C}.equals() - "
+        if (! compareString("nameFirst", nameFirst, target.nameFirst, builder)) { result = false }
+        else if (! compareString("nameLast", nameLast, target.nameLast, builder)) { result = false }
+        else if (! compareString("position", position, target.position, builder)) { result = false }
+        else if (! compareInt("battingPos", battingPos, target.battingPos, builder)) { result = false }
+        else if (! compareInt("atBats", atBats, target.atBats, builder)) { result = false }
+        else if (! compareInt("walks", walks, target.walks, builder)) { result = false }
+        else if (! compareInt("strikeouts", strikeouts, target.strikeouts, builder)) { result = false }
+        else if (! compareInt("hits", hits, target.hits, builder)) { result = false }
+        else if (! compareInt("doubles", doubles, target.doubles, builder)) { result = false }
+        else if (! compareInt("triples", triples, target.triples, builder)) { result = false }
+        else if (! compareInt("homers", homers, target.homers, builder)) { result = false }
+        else if (! compareInt("runs", runs, target.runs, builder)) { result = false }
+        else if (! compareInt("rbi", rbi, target.rbi, builder)) { result = false }
+        else if (! compareInt("hitByPitch", hitByPitch, target.hitByPitch, builder)) { result = false }
+        else if (! compareInt("stolenBases", stolenBases, target.stolenBases, builder)) { result = false }
+        else if (! compareInt("caughtStealing", caughtStealing, target.caughtStealing, builder)) { result = false }
+        else if (! compareObject("simBatter", simBatter, target.simBatter, builder)) { result = false }
+        if (result) {
+            builder << "$m Batters match?  OK"
+        } else {
+            builder << "$m Batters match?  NO MATCH"
+        }
+
+        return result
     }
 
     def getPositions() {

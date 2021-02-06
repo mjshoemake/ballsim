@@ -9,7 +9,7 @@ import mjs.common.utils.LogUtils
 import mjs.common.utils.TransactionIdGen
 import org.bson.types.ObjectId
 
-class Simulation {
+class Simulation extends Comparable {
 
     /**
      * The Log4J logger used by this object.
@@ -37,19 +37,40 @@ class Simulation {
     Simulation() {
     }
 
+    // MJS: TODO This is WRONG. Does not rebuild correctly.
     Simulation(Map map) {
         this.simulationID = map.simulationID
         this.simulationName = map.simulationName
         this.year = map.year
         this.name = map.name
-        map.teamMap.keySet.each { nextKey ->
-            teamMap[nextKey] = new Team(teamMap[nextKey], this.year)
+        map.teamMap.keySet().each { nextKey ->
+            Team team = new Team(map.teamMap[nextKey], this.year)
+            teamMap[nextKey] = team
+            //scheduleTeamLookup[team.scheduleLookupKey] = team
         }
         map.leagues.keySet().each { key ->
-            League league = new League(map.leagues[key], teamMap, map.leagueKey)
+            League league = new League(map.leagues[key], teamMap, map.leagueKey, scheduleTeamLookup)
             this.leagues[key] = league
             this.leagueList << league
         }
+        this.schedule = new ScheduledSeason(map.schedule)
+    }
+
+    // Is the specified object equal to this one?
+    boolean equals(Simulation target) {
+        boolean result = true
+        def m = "${C}.equals() - "
+        if (! compareString("simulationName", simulationName, target.simulationName)) { result = false }
+        if (! compareString("simulationID", simulationID, target.simulationID)) { result = false }
+        if (! compareString("name", name, target.name)) { result = false }
+        if (! compareString("year", year, target.year)) { result = false }
+        if (! compareList("leagueList", leagueList, target.leagueList)) { result = false }
+        if (! compareMap("scheduleTeamLookup", scheduleTeamLookup, target.scheduleTeamLookup)) { result = false }
+        if (! compareMap("teamMap", teamMap, target.teamMap)) { result = false }
+        if (! compareMap("leagues", leagues, target.leagues)) { result = false }
+        if (! compareObject("schedule", schedule, target.schedule)) { result = false }
+
+        return result
     }
 
     Map toMap() {
@@ -63,7 +84,6 @@ class Simulation {
         result["teamMap"] = teamMap
         result["schedule"] = schedule
         result["scheduleTeamLookup"] = scheduleTeamLookup
-
         result
     }
 
@@ -130,6 +150,7 @@ class Simulation {
             String leagueKey = keyTokens[leagues.size()]
             league = new League(team.league, leagueKey)
             leagues[team.league] = league
+            leagueList << league
         } else {
             league = leagues[team.league]
         }

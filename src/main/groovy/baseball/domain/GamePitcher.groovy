@@ -4,6 +4,7 @@ import java.math.RoundingMode
 
 class GamePitcher extends GamePitcherComparable
 {
+    def C = "GamePitcher"
     def simPitcher
 
     String nameFirst, nameLast
@@ -20,6 +21,55 @@ class GamePitcher extends GamePitcherComparable
     int pitches = 0
 
     GamePitcher() {
+    }
+
+    // Is the specified object equal to this one?
+    boolean equals(GamePitcher target) {
+        boolean result = true
+        def m = "${C}.equals() - "
+        if (! compareString("nameFirst", nameFirst, target.nameFirst)) { result = false }
+        else if (! compareString("nameLast", nameLast, target.nameLast)) { result = false }
+        else if (! compareInt("battersRetired", battersRetired, target.battersRetired)) { result = false }
+        else if (! compareInt("order", order, target.order)) { result = false }
+        else if (! compareInt("walks", walks, target.walks)) { result = false }
+        else if (! compareInt("strikeouts", strikeouts, target.strikeouts)) { result = false }
+        else if (! compareInt("hits", hits, target.hits)) { result = false }
+        else if (! compareInt("homers", homers, target.homers)) { result = false }
+        else if (! compareInt("hitByPitch", hitByPitch, target.hitByPitch)) { result = false }
+        else if (! compareInt("whip", whip, target.whip)) { result = false }
+        else if (! compareInt("balks", balks, target.balks)) { result = false }
+        else if (! compareInt("runs", runs, target.runs)) { result = false }
+        else if (! compareInt("pitches", pitches, target.pitches)) { result = false }
+        else if (! compareObject("simPitcher", simPitcher, target.simPitcher)) { result = false }
+
+        return result
+    }
+
+    // Is the specified object equal to this one?
+    boolean equals(GamePitcher target, List builder) {
+        boolean result = true
+        def m = "${C}.equals() - "
+        if (! compareString("nameFirst", nameFirst, target.nameFirst, builder)) { result = false }
+        else if (! compareString("nameLast", nameLast, target.nameLast, builder)) { result = false }
+        else if (! compareInt("battersRetired", battersRetired, target.battersRetired, builder)) { result = false }
+        else if (! compareInt("order", order, target.order, builder)) { result = false }
+        else if (! compareInt("walks", walks, target.walks, builder)) { result = false }
+        else if (! compareInt("strikeouts", strikeouts, target.strikeouts, builder)) { result = false }
+        else if (! compareInt("hits", hits, target.hits, builder)) { result = false }
+        else if (! compareInt("homers", homers, target.homers, builder)) { result = false }
+        else if (! compareInt("hitByPitch", hitByPitch, target.hitByPitch, builder)) { result = false }
+        else if (! compareInt("whip", whip, target.whip, builder)) { result = false }
+        else if (! compareInt("balks", balks, target.balks, builder)) { result = false }
+        else if (! compareInt("runs", runs, target.runs, builder)) { result = false }
+        else if (! compareInt("pitches", pitches, target.pitches, builder)) { result = false }
+        else if (! compareObject("simPitcher", simPitcher, target.simPitcher, builder)) { result = false }
+        if (result) {
+            builder << "$m Pitchers match?  OK"
+        } else {
+            builder << "$m Pitchers match?  NO MATCH"
+        }
+
+        return result
     }
 
     GamePitcher(Player player) {

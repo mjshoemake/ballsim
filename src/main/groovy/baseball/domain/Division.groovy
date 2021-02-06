@@ -1,6 +1,7 @@
 package baseball.domain
 
-class Division {
+class Division extends Comparable {
+    def C = "Division"
     String abbreviation = "E"
     String name = "Eastern Division"
     String divisionKey = null
@@ -18,6 +19,40 @@ class Division {
         this.divisionKey = map.divisionKey
         // List of team objects
         this.teams = map.teams
+    }
+
+    // Is the specified object equal to this one?
+    boolean equals(Division target) {
+        boolean result = true
+        def m = "${C}.equals() - "
+
+        if (! compareString("abbreviation", abbreviation, target.abbreviation)) { result = false }
+        if (! compareString("name", name, target.name)) { result = false }
+        if (! compareString("divisionKey", divisionKey, target.divisionKey)) { result = false }
+        if (! compareList("teams", teams, target.teams)) { result = false }
+        if (result) {
+            log.debug("$m Divisions match?  OK")
+        } else {
+            log.debug("$m Divisions match?  NO MATCH")
+        }
+        return result
+    }
+
+    // Is the specified object equal to this one?
+    boolean equals(Division target, List builder) {
+        boolean result = true
+        def m = "${C}.equals() - "
+
+        if (! compareString("abbreviation", abbreviation, target.abbreviation, builder)) { result = false }
+        if (! compareString("name", name, target.name, builder)) { result = false }
+        if (! compareString("divisionKey", divisionKey, target.divisionKey, builder)) { result = false }
+        if (! compareList("teams", teams, target.teams, builder)) { result = false }
+        if (result) {
+            builder << "$m Divisions match?  OK"
+        } else {
+            builder << "$m Divisions match?  NO MATCH"
+        }
+        return result
     }
 
     void addTeam(SimTeam simTeam) {

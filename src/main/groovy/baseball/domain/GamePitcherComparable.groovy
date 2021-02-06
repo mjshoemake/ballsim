@@ -3,7 +3,7 @@ package baseball.domain
 /**
  * Created by Dad on 6/25/16.
  */
-class GamePitcherComparable implements Comparable {
+class GamePitcherComparable extends baseball.domain.Comparable implements java.lang.Comparable {
 
     GamePitcherComparable() {
     }

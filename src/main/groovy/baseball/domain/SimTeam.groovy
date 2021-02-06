@@ -4,7 +4,8 @@ import baseball.processing.HttpHistoricalDataManager
 import org.apache.log4j.Logger
 
 
-class SimTeam {
+class SimTeam extends Comparable {
+    def C = "SimTeam"
     private auditLog = Logger.getLogger('Audit')
 
     // Temporary
@@ -59,6 +60,86 @@ class SimTeam {
         this.year = team.year
         this.team = team
         separatePlayers()
+    }
+
+    // MJS: TODO This is WRONG. Does not rebuild correctly.
+    SimTeam(Map map) {
+        this.teamName = map.teamName
+        this.city = map.city
+        this.year = map.year
+        this.team = new Team(map.team)
+        this.nextBatter = map.nextBatter
+        this.nextReliefPitcher = map.nextReliefPitcher
+        this.nextStartingPitcher = map.nextStartingPitcher
+        this.pitchCount = map.pitchCount
+        this.wins = map.wins
+        this.losses = map.losses
+        this.winDiff = map.winDiff
+    }
+
+    // Is the specified object equal to this one?
+    boolean equals(SimTeam target) {
+        boolean result = true
+        def m = "${C}.equals() - "
+        if (! compareString("teamName", teamName, target.teamName)) { result = false }
+        else if (! compareString("city", city, target.city)) { result = false }
+        else if (! compareString("year", year, target.year)) { result = false }
+        else if (! compareInt("nextBatter", nextBatter, target.nextBatter)) { result = false }
+        else if (! compareInt("nextReliefPitcher", nextReliefPitcher, target.nextReliefPitcher)) { result = false }
+        else if (! compareInt("nextStartingPitcher", nextStartingPitcher, target.nextStartingPitcher)) { result = false }
+        else if (! compareInt("pitchCount", pitchCount, target.pitchCount)) { result = false }
+        else if (! compareInt("wins", wins, target.wins)) { result = false }
+        else if (! compareInt("losses", losses, target.losses)) { result = false }
+        else if (! compareInt("winDiff", winDiff, target.winDiff)) { result = false }
+        else if (! compareObject("starter", starter, target.starter)) { result = false }
+        else if (! compareObject("currentPitcher", currentPitcher, target.currentPitcher)) { result = false }
+        else if (! compareObject("closer", closer, target.closer)) { result = false }
+        else if (! compareObject("team", team, target.team)) { result = false }
+        else if (! teamRoster.equals(target.teamRoster)) { result = false }
+        else if (! positions.equals(target.positions)) { result = false }
+        else if (! lineup.equals(target.lineup)) { result = false }
+        else if (! bench.equals(target.bench)) { result = false }
+        else if (! rotation.equals(target.rotation)) { result = false }
+        else if (! pitchersUsed.equals(target.pitchersUsed)) { result = false }
+        else if (! bullpen.equals(target.bullpen)) { result = false }
+        else if (! reservePitchers.equals(target.reservePitchers)) { result = false }
+
+        return result
+    }
+
+    // Is the specified object equal to this one?
+    boolean equals(SimTeam target, List builder) {
+        boolean result = true
+        def m = "${C}.equals() - "
+        if (! compareString("teamName", teamName, target.teamName, builder)) { result = false }
+        if (! compareString("city", city, target.city, builder)) { result = false }
+        if (! compareString("year", year, target.year, builder)) { result = false }
+        if (! compareInt("nextBatter", nextBatter, target.nextBatter, builder)) { result = false }
+        if (! compareInt("nextReliefPitcher", nextReliefPitcher, target.nextReliefPitcher, builder)) { result = false }
+        if (! compareInt("nextStartingPitcher", nextStartingPitcher, target.nextStartingPitcher, builder)) { result = false }
+        if (! compareInt("pitchCount", pitchCount, target.pitchCount, builder)) { result = false }
+        if (! compareInt("wins", wins, target.wins, builder)) { result = false }
+        if (! compareInt("losses", losses, target.losses, builder)) { result = false }
+        if (! compareInt("winDiff", winDiff, target.winDiff, builder)) { result = false }
+        if (! compareObject("starter", starter, target.starter, builder)) { result = false }
+        if (! compareObject("currentPitcher", currentPitcher, target.currentPitcher, builder)) { result = false }
+        if (! compareObject("closer", closer, target.closer, builder)) { result = false }
+        if (! compareObject("team", team, target.team, builder)) { result = false }
+        if (! compareList("lineup", lineup, target.lineup, builder)) { result = false }
+        if (! compareList("bench", bench, target.bench, builder)) { result = false }
+        if (! compareList("rotation", rotation, target.rotation, builder)) { result = false }
+        if (! compareList("bullpen", bullpen, target.bullpen, builder)) { result = false }
+        if (! compareList("reservePitchers", reservePitchers, target.reservePitchers, builder)) { result = false }
+        if (! compareList("pitchersUsed", pitchersUsed, target.pitchersUsed, builder)) { result = false }
+        if (! compareList("teamRoster", teamRoster, target.teamRoster, builder)) { result = false }
+        if (! compareMap("positions", positions, target.positions, builder)) { result = false }
+        if (result) {
+            builder << "$m SimTeams match?  OK"
+        } else {
+            builder << "$m SimTeams match?  NO MATCH"
+        }
+
+        return result
     }
 
     boolean assignPosition(Player batter, String position) {
