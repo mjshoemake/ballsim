@@ -5,7 +5,7 @@ class Division extends Comparable {
     String abbreviation = "E"
     String name = "Eastern Division"
     String divisionKey = null
-    List teams = []
+    List<SimTeam> teams = []
 
     Division(String abbreviation, String fullName, divisionKey) {
         this.abbreviation = abbreviation
@@ -13,12 +13,15 @@ class Division extends Comparable {
         this.divisionKey = divisionKey
     }
 
-    Division(Map map, Map<Team> teamMap) {
+    Division(Map map) {
         this.abbreviation = map.abbreviation
         this.name = map.name
         this.divisionKey = map.divisionKey
         // List of team objects
-        this.teams = map.teams
+        map.teams.each { simTeamMap ->
+            SimTeam nextSimTeam = new SimTeam(simTeamMap)
+            teams << nextSimTeam
+        }
     }
 
     // Is the specified object equal to this one?
@@ -56,7 +59,7 @@ class Division extends Comparable {
     }
 
     void addTeam(SimTeam simTeam) {
-        this.teams << simTeam.teamName
+        this.teams << simTeam
     }
 
 }

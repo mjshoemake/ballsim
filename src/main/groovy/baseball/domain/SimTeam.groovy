@@ -16,6 +16,7 @@ class SimTeam extends Comparable {
     def power = []
     def speed = []
     def speedAndContact = []
+    def middleInfielders = []
 
     // Primary for game
     def lineup = []
@@ -34,40 +35,39 @@ class SimTeam extends Comparable {
     GamePitcher currentPitcher
     GamePitcher closer
     int pitchCount = 0
-    def teamRoster = null
     def positions = [:]
     int wins = 0
     int losses = 0
     int winDiff = 0
+    String gamesBack = ""
+    boolean lineupSet = false
     Team team = null
 
     SimTeam() {
     }
 
     SimTeam(def teamRoster, String city, String teamName, String year) {
-        this.teamRoster = teamRoster
+        def roster = teamRoster
         this.teamName = teamName
         this.city = city
         this.year = year
-        separatePlayers()
+        separatePlayers(roster)
     }
 
     SimTeam(Team team) {
         HttpHistoricalDataManager dataMgr = new HttpHistoricalDataManager()
-        this.teamRoster = dataMgr.get40ManRoster(team.team_id, team.year)
+        def roster = dataMgr.get40ManRoster(team.team_id, team.year)
         this.teamName = team.name
         this.city = team.city
         this.year = team.year
         this.team = team
-        separatePlayers()
+        separatePlayers(roster)
     }
 
-    // MJS: TODO This is WRONG. Does not rebuild correctly.
     SimTeam(Map map) {
         this.teamName = map.teamName
         this.city = map.city
         this.year = map.year
-        this.team = new Team(map.team)
         this.nextBatter = map.nextBatter
         this.nextReliefPitcher = map.nextReliefPitcher
         this.nextStartingPitcher = map.nextStartingPitcher
@@ -75,6 +75,44 @@ class SimTeam extends Comparable {
         this.wins = map.wins
         this.losses = map.losses
         this.winDiff = map.winDiff
+        this.lineupSet = map.lineupSet
+        if (map.team) {
+            this.team = new Team(map.team)
+        }
+        if (map.starter) {
+            this.starter = new GamePitcher(map.starter)
+        }
+        if (map.currentPitcher) {
+            this.currentPitcher = new GamePitcher(map.currentPitcher)
+        }
+        if (map.closer) {
+            this.closer = new GamePitcher(map.closer)
+        }
+
+        // Repopulate lists and maps.
+        map.positions.keySet().each { key ->
+            GameBatter batter = new GameBatter(map.positions[key])
+            this.positions[key] = batter
+        }
+        map.lineup.each() { Map p ->
+            this.lineup << new GameBatter(p)
+        }
+        map.bench.each() { Map q ->
+            this.bench << new GameBatter(q)
+        }
+        // Repopulate lists and maps.
+        map.rotation.each() { Map r ->
+            this.rotation << new GamePitcher(r)
+        }
+        map.bullpen.each() { Map s ->
+            this.bullpen << new GamePitcher(s)
+        }
+        map.pitchersUsed.each() { Map s ->
+            this.pitchersUsed << new GamePitcher(s)
+        }
+        map.reservePitchers.each() { Map s ->
+            this.reservePitchers << new GamePitcher(s)
+        }
     }
 
     // Is the specified object equal to this one?
@@ -151,6 +189,14 @@ class SimTeam extends Comparable {
         }
     }
 
+    List getTeamRoster() {
+        []
+    }
+
+    String getScheduleLookupKey() {
+        team.scheduleLookupKey
+    }
+
     SimTeam clear() {
         // Temporary
         batters = []
@@ -188,7 +234,7 @@ class SimTeam extends Comparable {
         this
     }
 
-    void separatePlayers() {
+    void separatePlayers(def teamRoster) {
         teamRoster.each() { next ->
             if (next.isPitcher) {
                 // Pitcher
@@ -364,6 +410,12 @@ class SimTeam extends Comparable {
             primaryPosition = remainder[0].primaryPosition
             addIfPositionAvailable(primaryPosition, remainder, "Remainder")
         }
+        if (! positions["SS"]) {
+            addIfPositionAvailable("SS", middleInfielders, "MiddleInfielders")
+        }
+        if (! positions["2B"]) {
+            addIfPositionAvailable("2B", middleInfielders, "MiddleInfielders")
+        }
 
         batters = []
         pitchers = []
@@ -372,17 +424,32 @@ class SimTeam extends Comparable {
         power = []
         speed = []
         speedAndContact = []
+        middleInfielders = []
 
         auditLog.debug "Remaining: speedAndContact: ${speedAndContact.size()} speed: ${speed.size()} power: ${power.size()} contact: ${contact.size()}"
     }
 
     void addIfPositionAvailable(def primaryPosition, def sourceList, def category) {
+        if (primaryPosition == "OF") {
+            if (! positions["LF"]) {
+                primaryPosition = "LF"
+            } else if (! positions["RF"]) {
+                primaryPosition = "RF"
+            } else if (! positions["CF"]) {
+                primaryPosition = "CF"
+            } else {
+                primaryPosition = "LF"
+            }
+        }
         // Assign a fielding position and make sure that position is not taken.
         if (positions[primaryPosition]) {
             // Already taken. DH?
             if (positions["DH"]) {
                 // Already taken. Skip this person.
                 def batter = new GameBatter(sourceList[0])
+                if (primaryPosition in ["2B","SS"]) {
+                   middleInfielders << sourceList[0]
+                }
                 bench << batter
                 sourceList.remove(0)
             } else {
@@ -390,15 +457,22 @@ class SimTeam extends Comparable {
                 sourceList[0].primaryPosition = "DH"
                 def batter = new GameBatter(sourceList[0])
                 positions["DH"] = batter
-                auditLog.info "   ${lineup.size() + 1}: ${sourceList[0].name} Pos: ${sourceList[0].primaryPosition} SB: ${sourceList[0].stolenBases} HR: ${sourceList[0].homers} Avg: ${sourceList[0].battingAvg} AB: ${sourceList[0].atBats}   ${category}"
+                batter.position = "DH"
+                auditLog.info "   ${lineup.size() + 1}: ${sourceList[0].name} Pos: ${batter.position} SB: ${sourceList[0].stolenBases} HR: ${sourceList[0].homers} Avg: ${sourceList[0].battingAvg} AB: ${sourceList[0].atBats}   ${category}"
                 lineup << batter
+                bench.remove(batter)
                 sourceList.remove(0)
             }
         } else {
+            if (sourceList[0] == null) {
+                throw new Exception("Batter is null!!!")
+            }
             def batter = new GameBatter(sourceList[0])
             positions[primaryPosition] = batter
-            auditLog.info "   ${lineup.size() + 1}: ${sourceList[0].name} Pos: ${sourceList[0].primaryPosition} SB: ${sourceList[0].stolenBases} HR: ${sourceList[0].homers} Avg: ${sourceList[0].battingAvg} AB: ${sourceList[0].atBats}   ${category}"
+            batter.position = primaryPosition
+            auditLog.info "   ${lineup.size() + 1}: ${sourceList[0].name} Pos: $batter.position} SB: ${sourceList[0].stolenBases} HR: ${sourceList[0].homers} Avg: ${sourceList[0].battingAvg} AB: ${sourceList[0].atBats}   ${category}"
             lineup << batter
+            bench.remove(batter)
             sourceList.remove(0)
         }
     }

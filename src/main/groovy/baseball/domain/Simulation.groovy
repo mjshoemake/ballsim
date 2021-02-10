@@ -25,8 +25,6 @@ class Simulation extends Comparable {
     String year
     String name
     Map leagues = [:]
-    Map teamMap = [:]
-    Map scheduleTeamLookup = [:]
     // List of League objects, to preserve order.
     List leagueList = []
     // Letters to use for divisionKey.
@@ -43,13 +41,8 @@ class Simulation extends Comparable {
         this.simulationName = map.simulationName
         this.year = map.year
         this.name = map.name
-        map.teamMap.keySet().each { nextKey ->
-            Team team = new Team(map.teamMap[nextKey], this.year)
-            teamMap[nextKey] = team
-            //scheduleTeamLookup[team.scheduleLookupKey] = team
-        }
         map.leagues.keySet().each { key ->
-            League league = new League(map.leagues[key], teamMap, map.leagueKey, scheduleTeamLookup)
+            League league = new League(map.leagues[key])
             this.leagues[key] = league
             this.leagueList << league
         }
@@ -64,11 +57,11 @@ class Simulation extends Comparable {
         if (! compareString("simulationID", simulationID, target.simulationID)) { result = false }
         if (! compareString("name", name, target.name)) { result = false }
         if (! compareString("year", year, target.year)) { result = false }
-        if (! compareList("leagueList", leagueList, target.leagueList)) { result = false }
-        if (! compareMap("scheduleTeamLookup", scheduleTeamLookup, target.scheduleTeamLookup)) { result = false }
-        if (! compareMap("teamMap", teamMap, target.teamMap)) { result = false }
         if (! compareMap("leagues", leagues, target.leagues)) { result = false }
+        if (! compareList("leagueList", leagueList, target.leagueList)) { result = false }
         if (! compareObject("schedule", schedule, target.schedule)) { result = false }
+        if (! compareMap("teamMap", teamMap, target.teamMap)) { result = false }
+        if (! compareMap("scheduleTeamLookup", scheduleTeamLookup, target.scheduleTeamLookup)) { result = false }
 
         return result
     }
@@ -81,11 +74,36 @@ class Simulation extends Comparable {
         result["name"] = name
         result["leagues"] = leagues
         result["leagueList"] = leagueList
-        result["teamMap"] = teamMap
         result["schedule"] = schedule
-        result["scheduleTeamLookup"] = scheduleTeamLookup
+        //result["teamMap"] = teamMap
+        //result["scheduleTeamLookup"] = scheduleTeamLookup
         result
     }
+
+    List<SimTeam> getTeams() {
+        List<SimTeam> teamsList = []
+        leagueList.each() { League nextLeague ->
+            teamsList << nextLeague.teams
+        }
+        teamsList.flatten()
+    }
+
+    Map getTeamMap() {
+        Map result = [:]
+        teams.each() { SimTeam next ->
+            result[next.teamName] = next
+        }
+        return result
+    }
+
+    Map getScheduleTeamLookup() {
+        Map result = [:]
+        teams.each() { SimTeam next ->
+            result[next.scheduleLookupKey] = next
+        }
+        return result
+    }
+
 
     /*
     Map toJsonMap() {
@@ -132,6 +150,25 @@ class Simulation extends Comparable {
         game
     }
 
+    synchronized int countGamesLeftInRound() {
+        ScheduledGame game = null
+        if (schedule?.rounds?.size() > 0) {
+            ScheduledRound round = schedule?.rounds[0]
+            return round.games.size()
+        } else {
+            return 0
+        }
+    }
+
+    synchronized int getCurrentRoundNumber() {
+        if (schedule?.rounds?.size() > 0) {
+            ScheduledRound round = schedule?.rounds[0]
+            return round.roundNum
+        } else {
+            return -1
+        }
+    }
+
     static String generateSimulationID() {
         generateSimulationID("Test")
     }
@@ -154,7 +191,7 @@ class Simulation extends Comparable {
         } else {
             league = leagues[team.league]
         }
-        league.addTeam(team, scheduleTeamLookup)
+        league.addTeam(team)
     }
 
     String getScheduleName() {
@@ -200,6 +237,41 @@ class Simulation extends Comparable {
     }
 
     void playSimGame() {
+        playSimGame(false)
+    }
+
+    void playSimRound(boolean logStandingsEnabled) {
+        def m = "${C}.playSimRound() - "
+
+        int initialRoundNum = getCurrentRoundNumber()
+        while (getCurrentRoundNumber() == initialRoundNum) {
+            // Get the next game to play.
+            ScheduledGame game = popNextGame()
+            //log.debug "$m scheduleTeamLookup:"
+            //LogUtils.debug(log, sim.scheduleTeamLookup, "   ", true)
+
+            // Get the next two teams.
+            SimTeam homeTeam = scheduleTeamLookup[game.homeTeam]
+            SimTeam awayTeam = scheduleTeamLookup[game.awayTeam]
+            log.debug "$m Next game:  Home: ${homeTeam.teamName}  Away: ${awayTeam.teamName}  Round #: ${game.roundNum}  Game #: ${game.gameNum}"
+
+            // Play game.
+            def ballGame = new BallGame()
+            ballGame.gameLogEnabled = true
+            ballGame.highlightsLogEnabled = true
+            ballGame.boxscoreLogEnabled = true
+            boolean reworkLineup = true
+            ballGame.homeTeam = homeTeam
+            ballGame.awayTeam = awayTeam
+            ballGame.start()
+        }
+
+        if (logStandingsEnabled) {
+            logStandings()
+        }
+    }
+
+    void playSimGame(boolean logStandingsEnabled) {
         def m = "${C}.playSimGame() - "
         // Get the next game to play.
         ScheduledGame game = popNextGame()
@@ -212,7 +284,23 @@ class Simulation extends Comparable {
         log.debug "$m Next game:  Home: ${homeTeam.teamName}  Away: ${awayTeam.teamName}  Round #: ${game.roundNum}  Game #: ${game.gameNum}"
 
         // Play game.
+        def ballGame = new BallGame()
+        ballGame.gameLogEnabled = true
+        ballGame.highlightsLogEnabled = true
+        ballGame.boxscoreLogEnabled = true
+        boolean reworkLineup = true
+        ballGame.homeTeam = homeTeam
+        ballGame.awayTeam = awayTeam
 
+        // Rework lineup automatically
+        //if (reworkLineup) {
+        //    adjustLineup(ballGame.homeTeam)
+        //    adjustLineup(ballGame.awayTeam)
+        //}
+        ballGame.start()
+        if (logStandingsEnabled) {
+            logStandings()
+        }
     }
 
     void loadFromJson(def json) {
@@ -240,10 +328,10 @@ class Simulation extends Comparable {
             ballGame.awayTeam = teamList[game.awayTeamIndex]
 
             // Rework lineup automatically
-            if (reworkLineup) {
-                adjustLineup(ballGame.homeTeam)
-                adjustLineup(ballGame.awayTeam)
-            }
+            //if (reworkLineup) {
+            //    adjustLineup(ballGame.homeTeam)
+            //    adjustLineup(ballGame.awayTeam)
+            //}
 
 
             ballGame.start()
@@ -272,24 +360,29 @@ class Simulation extends Comparable {
        }
     }
 
-    private String[] logStandings(Logger log) {
+    void logStandings() {
         highlightsLog.debug("")
         highlightsLog.debug("")
         highlightsLog.debug("Standings:")
         highlightsLog.debug("")
-        def it = league.keySet().iterator()
-        while (it.hasNext()) {
-            String key = it.next()
-            def div = league[key]
-            logDivisionStandings(log, key, div)
+        def keys = leagues.keySet().iterator()
+        while (keys.hasNext()) {
+            String key = keys.next()
+            League league = leagues[key]
+            def divKeys = league.divisions.keySet().iterator()
+            while (divKeys.hasNext()) {
+                String divKey = divKeys.next()
+                Division division = league.divisions[divKey]
+                logDivisionStandings(key, divKey, division)
+            }
         }
         highlightsLog.debug("")
     }
 
-    private String[] logDivisionStandings(Logger log, String name, def division) {
-        highlightsLog.debug("$name:")
+    private void logDivisionStandings(String leagueKey, String divKey, def division) {
+        highlightsLog.debug("$leagueKey $divKey:")
         highlightsLog.debug "   ${format("Team", 25)}:    ${format("Wins", 4)}   ${format("Losses", 6)}   GB"
-        def sorted = orderTeamsByRecord(division)
+        def sorted = orderTeamsByRecord(division.teams)
         int bestWins = -1
         int bestLosses = -1
         sorted.each {
@@ -372,35 +465,36 @@ class Simulation extends Comparable {
         }
     }
 
-    def adjustLineup(Map team) {
-        def originalLineup = team["lineup"]
-        def originalBench = team["bench"]
-        def selected = []
-        def lineup = []
+    void adjustLineup(SimTeam team) {
+        if (! team.lineupSet) {
+            def originalLineup = team.lineup
+            def originalBench = team.bench
+            def selected = []
+            def lineup = []
 
-        // Sort bench by rank
-        def sortedBench = originalBench.clone()
-        sortedBench.each {
-            it.sortBy = "rank"
-        }
-        Collections.sort(sortedBench)
+            // Sort bench by rank
+            def sortedBench = originalBench.clone()
+            sortedBench.each {
+                it.sortBy = "rank"
+            }
+            Collections.sort(sortedBench)
 
-        def P = []
-        def C = []
-        def first = []
-        def second = []
-        def third = []
-        def shortstop = []
-        def LF = []
-        def RF = []
-        def CF = []
-        def benchByPos = ["P":P, "C":C, "1B":first, "2B":second, "3B":third, "SS":shortstop, "LF":LF, "CF":CF, "RF":RF]
+            def P = []
+            def C = []
+            def first = []
+            def second = []
+            def third = []
+            def shortstop = []
+            def LF = []
+            def RF = []
+            def CF = []
+            def DH = []
+            def benchByPos = ["P":P, "C":C, "1B":first, "2B":second, "3B":third, "SS":shortstop, "LF":LF, "CF":CF, "RF":RF, "DH":DH]
 
-        // Break bench up by positions
-        sortedBench.each() { nextBatter ->
-            Map positions = nextBatter.simBatter.batter.position
-            positions.keySet().each() { next ->
-                switch (next) {
+            // Break bench up by positions
+            sortedBench.each() { nextBatter ->
+                String position = nextBatter.simBatter.batter.primaryPosition
+                switch (position) {
                     case "P":
                         P << nextBatter
                         break
@@ -428,90 +522,94 @@ class Simulation extends Comparable {
                     case "CF":
                         CF << nextBatter
                         break
+                    case "DH":
+                        DH << nextBatter
+                        break
                 }
             }
-        }
 
-        boolean lineupAdjusted = false
-        originalLineup.each {
-            if (it.simBatter.maxedOut) {
-                // Find a replacement
-                int i = 0
-                def posList = benchByPos[it.position]
-                while (i <= posList.size()-1 && posList[i].simBatter.maxedOut) {
-                    i++
-                }
-                if (i <= posList.size()-1) {
-                    // Match found.
-                    log.debug("${team["teamName"]}: Replacing ${it.getNameFirst()} ${it.getNameLast()} with ${posList[i].getNameFirst()} ${posList[i].getNameLast()}.")
-                    originalBench << it
-                    posList[i].position = it.position
-                    selected << posList[i]
-                    originalBench.remove(posList[i])
-                    log.debug("${team["teamName"]}: New Bench")
-                    originalBench.each {
-                        log.debug("   ${it.getNameFirst()} ${it.getNameLast()}")
+            boolean lineupAdjusted = false
+            originalLineup.each {
+                if (it.simBatter.maxedOut) {
+                    // Find a replacement
+                    int i = 0
+                    def posList = benchByPos[it.position]
+                    while (i <= posList.size()-1 && posList[i].simBatter.maxedOut) {
+                        i++
                     }
-                    lineupAdjusted = true
+                    if (i <= posList.size()-1) {
+                        // Match found.
+                        log.debug("${team["teamName"]}: Replacing ${it.getNameFirst()} ${it.getNameLast()} with ${posList[i].getNameFirst()} ${posList[i].getNameLast()}.")
+                        originalBench << it
+                        posList[i].position = it.position
+                        selected << posList[i]
+                        originalBench.remove(posList[i])
+                        log.debug("${team["teamName"]}: New Bench")
+                        originalBench.each {
+                            log.debug("   ${it.getNameFirst()} ${it.getNameLast()}")
+                        }
+                        lineupAdjusted = true
+                    } else {
+                        selected << it
+                    }
                 } else {
                     selected << it
                 }
-            } else {
-                selected << it
             }
-        }
 
-        // Adjusting hitting slots
-        if (lineupAdjusted) {
-            log.debug("${team["teamName"]}: Selected Lineup")
-            selected.each {
-                log.debug("   ${it.getNameFirst()} ${it.getNameLast()}")
+            // Adjusting hitting slots
+            if (lineupAdjusted) {
+                log.debug("${team["teamName"]}: Selected Lineup")
+                selected.each {
+                    log.debug("   ${it.getNameFirst()} ${it.getNameLast()}")
+                }
+                log.debug("Lineup adjusted.")
             }
-            log.debug("Lineup adjusted.")
+            def power = []
+
+            selected.each {item -> item.sortBy = "homers"}
+            Collections.sort(selected)
+
+            // Pick out the two players with the best homers (4 and 5 in the order)
+            power << selected[0]
+            selected.remove(0)
+            power << selected[0]
+            selected.remove(0)
+
+            selected.each {item -> item.sortBy = "obp"}
+            Collections.sort(selected)
+
+            log.debug("Selected count: (should be 8)  ${selected.size()}")
+            // Pick out the three players with the best OBP (1, 2, and 3 in the order)
+            lineup << selected[0]
+            selected.remove(0)
+            lineup << selected[0]
+            selected.remove(0)
+            lineup << selected[0]
+            selected.remove(0)
+
+            // Sort remaining players by OPS
+            selected.each() {item -> item.sortBy = "ops"}
+            Collections.sort(selected)
+
+            // Add power hitters to lineup
+            power.each {item -> lineup << item}
+            // Add remaining players to lineup
+            selected.each {item -> lineup << item}
+
+            // Save new bench
+            team.bench = originalBench
+
+            int index = 1
+            log.debug("Final Lineup:")
+            lineup.each {
+                log.debug("   $index: ${it.simBatter.batter.nameFirst} ${it.simBatter.batter.nameLast} (${it.position})")
+                index++
+            }
+
+            team.lineup = lineup
+            team.lineupSet = true
         }
-        def power = []
-
-        selected.each {item -> item.sortBy = "homers"}
-        Collections.sort(selected)
-
-        // Pick out the two players with the best homers (4 and 5 in the order)
-        power << selected[0]
-        selected.remove(0)
-        power << selected[0]
-        selected.remove(0)
-
-        selected.each {item -> item.sortBy = "obp"}
-        Collections.sort(selected)
-
-        log.debug("Selected count: (should be 8)  ${selected.size()}")
-        // Pick out the three players with the best OBP (1, 2, and 3 in the order)
-        lineup << selected[0]
-        selected.remove(0)
-        lineup << selected[0]
-        selected.remove(0)
-        lineup << selected[0]
-        selected.remove(0)
-
-        // Sort remaining players by OPS
-        selected.each() {item -> item.sortBy = "ops"}
-        Collections.sort(selected)
-
-        // Add power hitters to lineup
-        power.each {item -> lineup << item}
-        // Add remaining players to lineup
-        selected.each {item -> lineup << item}
-
-        // Save new bench
-        team["bench"] = originalBench
-
-        int index = 1
-        log.debug("Final Lineup:")
-        lineup.each {
-            log.debug("   $index: ${it.simBatter.batter.nameFirst} ${it.simBatter.batter.nameLast} (${it.position})")
-            index++
-        }
-
-        team["lineup"] = lineup
     }
 
 }

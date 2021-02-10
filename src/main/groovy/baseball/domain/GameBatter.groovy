@@ -4,9 +4,6 @@ class GameBatter extends GameBatterComparable {
 
     def C = "GameBatter"
     def simBatter
-
-    String nameFirst, nameLast
-    String position
     int battingPos = 0
     int atBats = 0
     int walks = 0
@@ -21,36 +18,48 @@ class GameBatter extends GameBatterComparable {
     int stolenBases = 0
     int caughtStealing = 0
 
-    GameBatter() {
-    }
-
     GameBatter(Player player) {
-        simBatter = new SimBatter()
-        simBatter.batter = player
+        simBatter = new SimBatter(player)
     }
 
+    GameBatter(Map map) {
+        this.battingPos = map.battingPos
+        this.atBats = map.atBats
+        this.walks = map.walks
+        this.strikeouts = map.strikeouts
+        this.hits = map.hits
+        this.doubles = map.doubles
+        this.triples = map.triples
+        this.homers = map.homers
+        this.runs = map.runs
+        this.rbi = map.rbi
+        this.hitByPitch = map.hitByPitch
+        this.stolenBases = map.stolenBases
+        this.caughtStealing = map.caughtStealing
+        this.simBatter = new SimBatter(map.simBatter)
+    }
 
     // Is the specified object equal to this one?
     boolean equals(GameBatter target) {
         boolean result = true
         def m = "${C}.equals() - "
         if (! compareString("nameFirst", nameFirst, target.nameFirst)) { result = false }
-        else if (! compareString("nameLast", nameLast, target.nameLast)) { result = false }
-        else if (! compareString("position", position, target.position)) { result = false }
-        else if (! compareInt("battingPos", battingPos, target.battingPos)) { result = false }
-        else if (! compareInt("atBats", atBats, target.atBats)) { result = false }
-        else if (! compareInt("walks", walks, target.walks)) { result = false }
-        else if (! compareInt("strikeouts", strikeouts, target.strikeouts)) { result = false }
-        else if (! compareInt("hits", hits, target.hits)) { result = false }
-        else if (! compareInt("doubles", doubles, target.doubles)) { result = false }
-        else if (! compareInt("triples", triples, target.triples)) { result = false }
-        else if (! compareInt("homers", homers, target.homers)) { result = false }
-        else if (! compareInt("runs", runs, target.runs)) { result = false }
-        else if (! compareInt("rbi", rbi, target.rbi)) { result = false }
-        else if (! compareInt("hitByPitch", hitByPitch, target.hitByPitch)) { result = false }
-        else if (! compareInt("stolenBases", stolenBases, target.stolenBases)) { result = false }
-        else if (! compareInt("caughtStealing", caughtStealing, target.caughtStealing)) { result = false }
-        else if (! compareObject("simBatter", simBatter, target.simBatter)) { result = false }
+        if (! compareString("nameLast", nameLast, target.nameLast)) { result = false }
+        if (! compareString("position", position, target.position)) { result = false }
+        if (! compareInt("battingPos", battingPos, target.battingPos)) { result = false }
+        if (! compareInt("atBats", atBats, target.atBats)) { result = false }
+        if (! compareInt("walks", walks, target.walks)) { result = false }
+        if (! compareInt("strikeouts", strikeouts, target.strikeouts)) { result = false }
+        if (! compareInt("hits", hits, target.hits)) { result = false }
+        if (! compareInt("doubles", doubles, target.doubles)) { result = false }
+        if (! compareInt("triples", triples, target.triples)) { result = false }
+        if (! compareInt("homers", homers, target.homers)) { result = false }
+        if (! compareInt("runs", runs, target.runs)) { result = false }
+        if (! compareInt("rbi", rbi, target.rbi)) { result = false }
+        if (! compareInt("hitByPitch", hitByPitch, target.hitByPitch)) { result = false }
+        if (! compareInt("stolenBases", stolenBases, target.stolenBases)) { result = false }
+        if (! compareInt("caughtStealing", caughtStealing, target.caughtStealing)) { result = false }
+        if (! compareObject("simBatter", simBatter, target.simBatter)) { result = false }
 
         return result
     }
@@ -85,6 +94,30 @@ class GameBatter extends GameBatterComparable {
         return result
     }
 
+    String getNameFirst() {
+        this.simBatter?.nameFirst
+    }
+
+    String getNameLast() {
+        this.simBatter?.nameLast
+    }
+
+    String getPosition() {
+        this.simBatter?.primaryPosition
+    }
+
+    void setNameFirst(String value) {
+        // Do nothing. This field references the Player object.
+    }
+
+    void setNameLast(String value) {
+        // Do nothing. This field references the Player object.
+    }
+
+    void setPosition(String value) {
+        // Do nothing. This field references the Player object.
+    }
+
     def getPositions() {
         Player myBatter = simBatter.batter
         List<String> result = []
@@ -96,6 +129,10 @@ class GameBatter extends GameBatterComparable {
 
     def getBattingAvg() {
         BigDecimal.valueOf(hits / atBats)
+    }
+
+    void setPlateAppearances(int value) {
+       // Do nothing. This is a calculated field.
     }
 
     def getPlateAppearances() {

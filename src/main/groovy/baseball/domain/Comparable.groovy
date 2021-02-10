@@ -232,6 +232,9 @@ abstract class Comparable {
             } else if (target == null) {
                 builder << "$m $fieldName [${source.size()}] != null."
                 return false
+            } else if (source.size() != target.size()) {
+                builder << "$m $fieldName [${source.size()}] != [${target.size()}]."
+                return false
             } else {
                 for (int i=0; i <= source.size()-1; i++) {
                     Object sourceItem = source.get(i)

@@ -5,7 +5,6 @@ import java.math.RoundingMode
 class SimPitcher extends Comparable {
 
     def C = "SimPitcher"
-    String nameFirst, nameLast
     int wins = 0
     int losses = 0
     int saves = 0
@@ -26,6 +25,37 @@ class SimPitcher extends Comparable {
     int pitchesGame4 = 0
     int pitchesGame5 = 0
     Player pitcher
+
+    SimPitcher(Player pitcher) {
+        this.pitcher = pitcher
+    }
+
+    SimPitcher(Map map) {
+        this.wins = map.wins
+        this.losses = map.losses
+        this.saves =  map.saves
+        this.blownSaves =  map.blownSaves
+        this.battersRetired =  map.battersRetired
+        this.orderPos =  map.orderPos
+        this.walks =  map.walks
+        this.strikeouts =  map.strikeouts
+        this.hits =  map.hits
+        this.homers = homers
+        this.hitByPitch =  map.hitByPitch
+        this.whip =  map.whip
+        this.balks =  map.balks
+        this.runs =  map.runs
+        this.pitchesGame1 = map.pitchesGame1
+        this.pitchesGame2 = map.pitchesGame2
+        this.pitchesGame3 = map.pitchesGame3
+        this.pitchesGame4 = map.pitchesGame4
+        this.pitchesGame5 = map.pitchesGame5
+        if (map.pitcher instanceof Player) {
+            this.pitcher = map.pitcher
+        } else {
+            this.pitcher = new Player(map.pitcher)
+        }
+    }
 
     // Is the specified object equal to this one?
     boolean equals(SimPitcher target) {
@@ -90,6 +120,22 @@ class SimPitcher extends Comparable {
         }
 
         return result
+    }
+
+    String getNameFirst() {
+        pitcher?.nameFirst
+    }
+
+    String getNameLast() {
+        pitcher?.nameLast
+    }
+
+    void setNameFirst(String value) {
+        // Do nothing. This field references the Player object.
+    }
+
+    void setNameLast(String value) {
+        // Do nothing. This field references the Player object.
     }
 
     def getBattersFaced() {

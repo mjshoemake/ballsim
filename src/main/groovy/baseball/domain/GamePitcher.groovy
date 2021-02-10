@@ -6,8 +6,6 @@ class GamePitcher extends GamePitcherComparable
 {
     def C = "GamePitcher"
     def simPitcher
-
-    String nameFirst, nameLast
     int battersRetired = 0
     int order = 0
     int walks = 0
@@ -20,7 +18,23 @@ class GamePitcher extends GamePitcherComparable
     int runs = 0
     int pitches = 0
 
-    GamePitcher() {
+    GamePitcher(Player player) {
+        simPitcher = new SimPitcher(player)
+    }
+
+    GamePitcher(Map map) {
+        this.battersRetired = map.battersRetired
+        this.order = map.order
+        this.walks = map.walks
+        this.strikeouts = map.strikeouts
+        this.hits = map.hits
+        this.homers = map.homers
+        this.hitByPitch = map.hitByPitch
+        this.whip = map.whip
+        this.balks = map.balks
+        this.runs = map.runs
+        this.pitches = map.pitches
+        simPitcher = new SimPitcher(map.simPitcher)
     }
 
     // Is the specified object equal to this one?
@@ -72,9 +86,20 @@ class GamePitcher extends GamePitcherComparable
         return result
     }
 
-    GamePitcher(Player player) {
-        simPitcher = new SimPitcher()
-        simPitcher.pitcher = player
+    String getNameFirst() {
+        this.simPitcher?.nameFirst
+    }
+
+    String getNameLast() {
+        this.simPitcher?.nameLast
+    }
+
+    void setNameFirst(String value) {
+        // Do nothing. This field references the Player object.
+    }
+
+    void setNameLast(String value) {
+        // Do nothing. This field references the Player object.
     }
 
     def getBattersFaced() {

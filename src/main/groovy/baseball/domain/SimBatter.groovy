@@ -1,9 +1,10 @@
 package baseball.domain
 
+import baseball.processing.HttpHistoricalDataManager
+
 class SimBatter extends Comparable {
 
     def C = "SimBatter"
-    String nameFirst, nameLast
     int battingPos = 0
     int atBats = 0
     int walks = 0
@@ -19,6 +20,32 @@ class SimBatter extends Comparable {
     int rbi = 0
     Player batter
     boolean maxedOut = false
+
+    SimBatter(Player batter) {
+        this.batter = batter
+    }
+
+    SimBatter(Map map) {
+        this.battingPos = map.battingPos
+        this.atBats = map.atBats
+        this.walks = map.walks
+        this.strikeouts = map.strikeouts
+        this.hits = map.hits
+        this.doubles = map.doubles
+        this.triples = map.triples
+        this.homers = map.homers
+        this.hitByPitch = map.hitByPitch
+        this.stolenBases = map.stolenBases
+        this.caughtStealing = map.caughtStealing
+        this.runs = map.runs
+        this.rbi = map.rbi
+        if (map.batter instanceof Player) {
+            this.batter = map.batter
+        } else {
+            this.batter = new Player(map.batter)
+        }
+        this.maxedOut = map.maxedOut
+    }
 
     // Is the specified object equal to this one?
     boolean equals(SimBatter target) {
@@ -51,6 +78,7 @@ class SimBatter extends Comparable {
         def m = "${C}.equals() - "
         if (! compareString("nameFirst", nameFirst, target.nameFirst, builder)) { result = false }
         if (! compareString("nameLast", nameLast, target.nameLast, builder)) { result = false }
+        if (! compareString("primaryPosition", primaryPosition, target.primaryPosition, builder)) { result = false }
         if (! compareInt("battingPos", battingPos, target.battingPos, builder)) { result = false }
         if (! compareInt("atBats", atBats, target.atBats, builder)) { result = false }
         if (! compareInt("walks", walks, target.walks, builder)) { result = false }
@@ -73,6 +101,34 @@ class SimBatter extends Comparable {
         }
 
         return result
+    }
+
+    void setBatter(Player batter) {
+        this.batter = batter
+    }
+
+    String getNameFirst() {
+        batter?.nameFirst
+    }
+
+    String getNameLast() {
+        batter?.nameLast
+    }
+
+    String getPrimaryPosition() {
+        batter?.primaryPosition
+    }
+
+    void setNameFirst(String value) {
+        // Do nothing. This field references the Player object.
+    }
+
+    void setNameLast(String value) {
+        // Do nothing. This field references the Player object.
+    }
+
+    void setPrimaryPosition(String value) {
+        // Do nothing. This field references the Player object.
     }
 
     void setAtBats(int value) {
