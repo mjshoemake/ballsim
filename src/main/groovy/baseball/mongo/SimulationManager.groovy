@@ -105,8 +105,8 @@ class SimulationManager {
 
     Simulation playSimGame(String simulationID, boolean logStandings) {
         // Save simulation.
-        Simulation sim = findSimulation(simulationID, logStandings)
-        return playSimGame(sim)
+        Simulation sim = findSimulation(simulationID)
+        return playSimGame(sim, logStandings)
     }
 
     Simulation playSimGame(Simulation sim) {
@@ -129,25 +129,43 @@ class SimulationManager {
         sim
     }
 
-    Simulation playSimRound(String simulationID) {
-        playSimRound(simulationID, false)
+    Simulation playSimRound(String simulationID, int numRounds) {
+        playSimRound(simulationID, false, numRounds)
     }
 
-    Simulation playSimRound(String simulationID, boolean logStandings) {
+    Simulation playSimRound(String simulationID, boolean logStandings, int numRounds) {
         // Save simulation.
         Simulation sim = findSimulation(simulationID, logStandings)
-        return playSimRound(sim)
+        return playSimRound(sim, logStandings, numRounds)
     }
 
-    Simulation playSimRound(Simulation sim) {
-        playSimRound(false)
+    Simulation playSimRound(Simulation sim, int numRounds) {
+        playSimRound(sim, false, numRounds)
     }
 
-    Simulation playSimRound(Simulation sim, boolean logStandings) {
+    Simulation playSimRound(Simulation sim, boolean logStandings, int numRounds) {
         def m = "${C}.playSimRound() - "
 
         // Play the game.
-        sim.playSimRound(logStandings)
+        for (int i=0; i <= numRounds-1; i++) {
+            sim.playSimRound(logStandings, numRounds)
+        }
+
+        // Delete the currently saved simulation.
+        deleteSimulation(sim.simulationID)
+
+        // Simulation has now changed. Need to save current state.
+        saveSimulation(sim)
+
+        // Return Simulation object.
+        sim
+    }
+
+    Simulation playSimWeek(Simulation sim, boolean logStandings) {
+        def m = "${C}.playSimRound() - "
+
+        // Play the game.
+        sim.playSimWeek(logStandings)
 
         // Delete the currently saved simulation.
         deleteSimulation(sim.simulationID)

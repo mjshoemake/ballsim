@@ -87,15 +87,15 @@ class SeriesTests {
 
         // 2003 skipped... could only find 8 batters for lineup.
         def homeYear = "1991"
-        def awayYear = "2020"
+        def awayYear = "1991"
         def teams
-        def numGames = 161
+        def numGames = 3
         auditLog.info "# of Games in the Series: $numGames"
 
         teams = dataMgr.getTeamMapForSeason(homeYear)
-        def home = teams["Braves"]
+        def home = teams["Athletics"]
         teams = dataMgr.getTeamMapForSeason(awayYear)
-        def away = teams["Braves"]
+        def away = teams["Mariners"]
 
         auditLog.info "Home Team ID: $home.team_id  Away Team ID: $away.team_id"
         def homeRoster = dataMgr.get40ManRoster(home.team_id, homeYear)

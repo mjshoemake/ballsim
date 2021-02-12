@@ -11,7 +11,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-class PlaySingleRound {
+class PlayOneWeek {
 
     def C = "PlaySingleRound"
     def ballGame = null
@@ -59,7 +59,7 @@ class PlaySingleRound {
 
         // Play Simulation Game
         println "$m calling SimulationManager.playSimGame()... SimID: $simulationID"
-        simMgr.playSimRound(sim, true, 1)
+        simMgr.playSimRound(sim, true, 7)
         println "$m calling SimulationManager.playSimGame()... Done"
 
         println "$m One Game Completed Successfully!"

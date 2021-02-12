@@ -17,6 +17,7 @@ class SimTeam extends Comparable {
     def speed = []
     def speedAndContact = []
     def middleInfielders = []
+    def outerInfielders = []
 
     // Primary for game
     def lineup = []
@@ -316,18 +317,18 @@ class SimTeam extends Comparable {
         batters.sort { a, b -> a.homers <=> b.homers }
         int i = batters.size() - 1
         // Found cleanup hitter.
-        auditLog.debug "#4 hitter: ${batters[i].name} HR: ${batters[i].homers} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+        auditLog.debug "#4 hitter: ${batters[i].name} Pos: ${batters[i].primaryPosition} HR: ${batters[i].homers} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
         power << batters[i]
         batters.remove(i)
         i--
 
         // Found other power hitters.
-        auditLog.debug "#5 hitter: ${batters[i].name} HR: ${batters[i].homers} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+        auditLog.debug "#5 hitter: ${batters[i].name} Pos: ${batters[i].primaryPosition} HR: ${batters[i].homers} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
         power << batters[i]
         batters.remove(i)
         i--
 
-        auditLog.debug "#6 hitter: ${batters[i].name} HR: ${batters[i].homers} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+        auditLog.debug "#6 hitter: ${batters[i].name} Pos: ${batters[i].primaryPosition} HR: ${batters[i].homers} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
         power << batters[i]
         batters.remove(i)
         i--
@@ -338,7 +339,7 @@ class SimTeam extends Comparable {
         while (i >= 0 && speed.size() < 2) {
             if (batters[i].battingAvg > new BigDecimal(".290") && batters[i].stolenBases > 25) {
                 // Speed And Contact
-                auditLog.debug "SpeedAndContact Found: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+                auditLog.debug "SpeedAndContact Found: ${batters[i].name} Pos: ${batters[i].primaryPosition} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
                 speedAndContact << batters[i]
                 batters.remove(i)
                 i--
@@ -359,7 +360,7 @@ class SimTeam extends Comparable {
         while (i >= 0) {
             if (batters[i].atBats > 200) {
                 // Contact
-                auditLog.debug "Contact Found: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+                auditLog.debug "Contact Found: ${batters[i].name} Pos: ${batters[i].primaryPosition} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
                 contact << batters[i]
                 batters.remove(i)
                 i--
@@ -370,7 +371,7 @@ class SimTeam extends Comparable {
         i = batters.size() - 1
         while (i >= 0) {
             // Remainder
-            auditLog.debug "Remainder Found: ${batters[i].name} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
+            auditLog.debug "Remainder Found: ${batters[i].name} Pos: ${batters[i].primaryPosition} SB: ${batters[i].stolenBases} Avg: ${batters[i].battingAvg} AB: ${batters[i].atBats}"
             remainder << batters[i]
             batters.remove(i)
             i--
@@ -416,6 +417,12 @@ class SimTeam extends Comparable {
         if (! positions["2B"]) {
             addIfPositionAvailable("2B", middleInfielders, "MiddleInfielders")
         }
+        if (! positions["3B"]) {
+            addIfPositionAvailable("3B", outerInfielders, "OuterInfielders")
+        }
+        if (! positions["1B"]) {
+            addIfPositionAvailable("1B", outerInfielders, "OuterInfielders")
+        }
 
         batters = []
         pitchers = []
@@ -425,6 +432,7 @@ class SimTeam extends Comparable {
         speed = []
         speedAndContact = []
         middleInfielders = []
+        outerInfielders = []
 
         auditLog.debug "Remaining: speedAndContact: ${speedAndContact.size()} speed: ${speed.size()} power: ${power.size()} contact: ${contact.size()}"
     }
@@ -450,6 +458,9 @@ class SimTeam extends Comparable {
                 if (primaryPosition in ["2B","SS"]) {
                    middleInfielders << sourceList[0]
                 }
+                if (primaryPosition in ["1B","3B"]) {
+                    outerInfielders << sourceList[0]
+                }
                 bench << batter
                 sourceList.remove(0)
             } else {
@@ -470,7 +481,7 @@ class SimTeam extends Comparable {
             def batter = new GameBatter(sourceList[0])
             positions[primaryPosition] = batter
             batter.position = primaryPosition
-            auditLog.info "   ${lineup.size() + 1}: ${sourceList[0].name} Pos: $batter.position} SB: ${sourceList[0].stolenBases} HR: ${sourceList[0].homers} Avg: ${sourceList[0].battingAvg} AB: ${sourceList[0].atBats}   ${category}"
+            auditLog.info "   ${lineup.size() + 1}: ${sourceList[0].name} Pos: ${batter.position} SB: ${sourceList[0].stolenBases} HR: ${sourceList[0].homers} Avg: ${sourceList[0].battingAvg} AB: ${sourceList[0].atBats}   ${category}"
             lineup << batter
             bench.remove(batter)
             sourceList.remove(0)

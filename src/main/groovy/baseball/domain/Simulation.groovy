@@ -151,10 +151,17 @@ class Simulation extends Comparable {
     }
 
     synchronized int countGamesLeftInRound() {
-        ScheduledGame game = null
         if (schedule?.rounds?.size() > 0) {
             ScheduledRound round = schedule?.rounds[0]
             return round.games.size()
+        } else {
+            return 0
+        }
+    }
+
+    synchronized int countRoundsLeftInSeason() {
+        if (schedule?.rounds?.size() > 0) {
+            return schedule?.rounds?.size()
         } else {
             return 0
         }
@@ -236,11 +243,11 @@ class Simulation extends Comparable {
         total
     }
 
-    void playSimGame() {
-        playSimGame(false)
+    void playSimRound(int numRounds) {
+        playSimGame(false, numRounds)
     }
 
-    void playSimRound(boolean logStandingsEnabled) {
+    void playSimRound(boolean logStandingsEnabled, int numRounds) {
         def m = "${C}.playSimRound() - "
 
         int initialRoundNum = getCurrentRoundNumber()
@@ -271,33 +278,39 @@ class Simulation extends Comparable {
         }
     }
 
+    void playSimGame() {
+        playSimGame(false)
+    }
+
     void playSimGame(boolean logStandingsEnabled) {
         def m = "${C}.playSimGame() - "
         // Get the next game to play.
         ScheduledGame game = popNextGame()
-        //log.debug "$m scheduleTeamLookup:"
-        //LogUtils.debug(log, sim.scheduleTeamLookup, "   ", true)
+        if (game != null) {
+            //log.debug "$m scheduleTeamLookup:"
+            //LogUtils.debug(log, sim.scheduleTeamLookup, "   ", true)
 
-        // Get the next two teams.
-        SimTeam homeTeam = scheduleTeamLookup[game.homeTeam]
-        SimTeam awayTeam = scheduleTeamLookup[game.awayTeam]
-        log.debug "$m Next game:  Home: ${homeTeam.teamName}  Away: ${awayTeam.teamName}  Round #: ${game.roundNum}  Game #: ${game.gameNum}"
+            // Get the next two teams.
+            SimTeam homeTeam = scheduleTeamLookup[game.homeTeam]
+            SimTeam awayTeam = scheduleTeamLookup[game.awayTeam]
+            log.debug "$m Next game:  Home: ${homeTeam.teamName}  Away: ${awayTeam.teamName}  Round #: ${game.roundNum}  Game #: ${game.gameNum}"
 
-        // Play game.
-        def ballGame = new BallGame()
-        ballGame.gameLogEnabled = true
-        ballGame.highlightsLogEnabled = true
-        ballGame.boxscoreLogEnabled = true
-        boolean reworkLineup = true
-        ballGame.homeTeam = homeTeam
-        ballGame.awayTeam = awayTeam
+            // Play game.
+            def ballGame = new BallGame()
+            ballGame.gameLogEnabled = true
+            ballGame.highlightsLogEnabled = true
+            ballGame.boxscoreLogEnabled = true
+            boolean reworkLineup = true
+            ballGame.homeTeam = homeTeam
+            ballGame.awayTeam = awayTeam
 
-        // Rework lineup automatically
-        //if (reworkLineup) {
-        //    adjustLineup(ballGame.homeTeam)
-        //    adjustLineup(ballGame.awayTeam)
-        //}
-        ballGame.start()
+            // Rework lineup automatically
+            //if (reworkLineup) {
+            //    adjustLineup(ballGame.homeTeam)
+            //    adjustLineup(ballGame.awayTeam)
+            //}
+            ballGame.start()
+        }
         if (logStandingsEnabled) {
             logStandings()
         }

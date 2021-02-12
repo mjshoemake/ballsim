@@ -3,7 +3,7 @@ package baseball.domain
 /**
  * Created by Dad on 6/25/16.
  */
-class TeamComparable implements Comparable {
+class TeamComparable implements java.lang.Comparable {
 
     final Map myteam;
 
