@@ -15,6 +15,7 @@ class Simulation extends Comparable {
      * The Log4J logger used by this object.
      */
     private Logger log = Logger.getLogger("Debug");
+    private Logger auditLog = Logger.getLogger('Audit')
     private Logger highlightsLog = Logger.getLogger('highlights')
     private Logger seasonStatsLog = Logger.getLogger('seasonStats')
 
@@ -476,6 +477,21 @@ class Simulation extends Comparable {
         } else {
             text.substring(0, length)
         }
+    }
+
+    void logSchedule() {
+        auditLog.debug("")
+        auditLog.debug("Standings:")
+        auditLog.debug("")
+        auditLog.debug("Num Rounds: ${schedule.rounds.size()}  Rounds Completed: ${schedule.roundCompleted}")
+        int nextRound = 1
+        schedule.rounds.each { ScheduledRound round ->
+            if (round.roundNum != nextRound) {
+                auditLog.debug("   Mismatch: ${round.roundNum} != ${nextRound}")
+            }
+            nextRound++
+        }
+        auditLog.debug("Done!")
     }
 
     void adjustLineup(SimTeam team) {

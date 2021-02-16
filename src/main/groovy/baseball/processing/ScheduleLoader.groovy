@@ -100,6 +100,8 @@ class ScheduleLoader {
                     }
                     lastRoundNum = roundNum
                     currentRound = new ScheduledRound(roundNum)
+                } else {
+
                 }
                 def game = new ScheduledGame()
                 game.roundNum = roundNum

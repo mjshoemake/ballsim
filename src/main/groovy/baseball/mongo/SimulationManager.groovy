@@ -183,11 +183,13 @@ class SimulationManager {
 
     Simulation logStandings(Simulation sim) {
         def m = "${C}.logStandings() - "
-
-        // Play the game.
         sim.logStandings()
+        sim
+    }
 
-        // Return Simulation object.
+    Simulation logSchedule(Simulation sim) {
+        def m = "${C}.logSchedules() - "
+        sim.logSchedule()
         sim
     }
 
