@@ -13,6 +13,7 @@ class ScheduledSeason extends Comparable {
     //def seasonStatsLog = Logger.getLogger('seasonStats')
 
     def C = "ScheduledSeason"
+    String simulationID = "TestSim"
     List rounds = []
     int roundCompleted = 0
     int gameCompleted = 0
@@ -21,6 +22,7 @@ class ScheduledSeason extends Comparable {
     }
 
     ScheduledSeason(Map map) {
+        this.simulationID = map.simulationID
         this.roundCompleted = map.roundCompleted
         this.gameCompleted = map.gameCompleted
         map.rounds.each() { Map next ->
@@ -28,10 +30,20 @@ class ScheduledSeason extends Comparable {
         }
     }
 
+    Map toMap() {
+        Map result = [:]
+        result["simulationID"] = simulationID
+        result["rounds"] = rounds
+        result["roundCompleted"] = roundCompleted
+        result["gameCompleted"] = gameCompleted
+        result
+    }
+
     boolean equals(ScheduledSeason target) {
         boolean result = true
         def m = "${C}.equals() - "
         if (! rounds.equals(target.rounds)) { result = false }
+        else if (! compareInt("simulationID", simulationID, target.simulationID)) { result = false }
         else if (! compareInt("roundCompleted", roundCompleted, target.roundCompleted)) { result = false }
         else if (! compareInt("roundNum", gameCompleted, target.gameCompleted)) { result = false }
         return result
@@ -41,6 +53,7 @@ class ScheduledSeason extends Comparable {
         boolean result = true
         def m = "${C}.equals() - "
         if (! rounds.equals(target.rounds)) { result = false }
+        else if (! compareString("simulationID", simulationID, target.simulationID, builder)) { result = false }
         else if (! compareInt("roundCompleted", roundCompleted, target.roundCompleted, builder)) { result = false }
         else if (! compareInt("roundNum", gameCompleted, target.gameCompleted, builder)) { result = false }
         if (result) {

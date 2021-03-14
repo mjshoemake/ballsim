@@ -86,7 +86,8 @@ class GameBatter extends GameBatterComparable {
         else if (! compareInt("caughtStealing", caughtStealing, target.caughtStealing, builder)) { result = false }
         else if (! compareObject("simBatter", simBatter, target.simBatter, builder)) { result = false }
         if (result) {
-            builder << "$m Batters match?  OK"
+            if (! hideOK)
+                builder << "$m Batters match?  OK"
         } else {
             builder << "$m Batters match?  NO MATCH"
         }

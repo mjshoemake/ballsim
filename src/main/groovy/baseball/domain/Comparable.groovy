@@ -4,11 +4,12 @@ import org.apache.log4j.Logger
 
 abstract class Comparable {
     protected Logger log = Logger.getLogger("Debug");
+    boolean hideOK = true
 
     boolean compareString(String fieldName, String source, String target) {
         def m = "${C}.compareString() - "
         if (source == null && target == null) {
-            log.debug("$m    $fieldName null == null.  OK")
+            //log.debug("$m    $fieldName null == null.  OK")
             return true
         } else if (source == null) {
             log.debug("$m    $fieldName null != '$target'.")
@@ -20,7 +21,7 @@ abstract class Comparable {
             log.debug("$m    $fieldName '$source' != '$target'.")
             return false
         } else {
-            log.debug("$m    $fieldName '$source' == '$target'.  OK")
+            //log.debug("$m    $fieldName '$source' == '$target'.  OK")
             return true
         }
     }
@@ -175,6 +176,7 @@ abstract class Comparable {
             }
             return false
         } else {
+            if (! hideOK)
             log.debug("$m $fieldName ${source.toString()} == ${target.toString()}. OK")
             return true
         }
@@ -201,6 +203,7 @@ abstract class Comparable {
             }
         } catch (Exception e) {
             builder << "$m $fieldName ERROR: ${e.getMessage()}"
+            e.printStackTrace()
         }
     }
 
@@ -214,6 +217,7 @@ abstract class Comparable {
             }
             return false
         } else {
+            if (! hideOK)
             log.debug("$m $fieldName [${source.size()}] == [${target.size()}]. OK")
             return true
         }
@@ -227,23 +231,27 @@ abstract class Comparable {
                 //builder << "$m $fieldName null == null.  OK"
                 return true
             } else if (source == null) {
-                builder << "$m fieldName null != [${target.size()}]."
+                builder << "$m $fieldName null != [${target.size()}]."
                 return false
             } else if (target == null) {
                 builder << "$m $fieldName [${source.size()}] != null."
                 return false
             } else if (source.size() != target.size()) {
-                builder << "$m $fieldName [${source.size()}] != [${target.size()}]."
+                builder << "$m $fieldName [${source.size()}] != [${target.size()}]  (size doesn't match)."
                 return false
             } else {
                 for (int i=0; i <= source.size()-1; i++) {
                     Object sourceItem = source.get(i)
                     Object targetItem = target.get(i)
                     try {
-                        if (! sourceItem.equals(targetItem, builder)) {
+                        if (! sourceItem.equals(targetItem)) {
+                            builder << "$m $fieldName ${sourceItem.class.name} NOT equal to target (${targetItem.class.name})."
+
                             result = false
                         }
                     } catch (Exception e) {
+                        e.printStackTrace()
+                        builder << "$m $fieldName ERROR: ${e.message}"
                         if (! sourceItem.equals(targetItem)) {
                             result = false
                         }
@@ -260,6 +268,7 @@ abstract class Comparable {
             }
         } catch(Exception e) {
             builder << "$m $fieldName ERROR: ${e.getMessage()}"
+            e.printStackTrace()
             return false
         }
     }
@@ -274,14 +283,15 @@ abstract class Comparable {
             }
             return false
         } else {
+            if (! hideOK)
             log.debug("$m $fieldName [${source.size()}:] == [${target.size()}:]. OK")
             return true
         }
     }
 
     boolean compareMap(String fieldName, Map source, Map target, List builder) {
+        def m = "${C}.compareMap() - "
         try {
-            def m = "${C}.compareMap() - "
             boolean result = true
             if (source == null && target == null) {
                 //builder << "$m    $fieldName null == null.  OK"
@@ -319,6 +329,7 @@ abstract class Comparable {
             }
         } catch(Exception e) {
             builder << "$m $fieldName ERROR: ${e.getMessage()}"
+            e.printStackTrace()
             return false
         }
     }

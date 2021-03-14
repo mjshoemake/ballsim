@@ -78,7 +78,8 @@ class GamePitcher extends GamePitcherComparable
         else if (! compareInt("pitches", pitches, target.pitches, builder)) { result = false }
         else if (! compareObject("simPitcher", simPitcher, target.simPitcher, builder)) { result = false }
         if (result) {
-            builder << "$m Pitchers match?  OK"
+            if (! hideOK)
+                builder << "$m Pitchers match?  OK"
         } else {
             builder << "$m Pitchers match?  NO MATCH"
         }

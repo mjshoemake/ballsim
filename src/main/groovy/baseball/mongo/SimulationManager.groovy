@@ -15,7 +15,9 @@ class SimulationManager {
     protected Logger log = Logger.getLogger("Debug");
     def highlightsLog = Logger.getLogger('highlights')
     def seasonStatsLog = Logger.getLogger('seasonStats')
-    final String collection = "simulations"
+    final String collectionSimulations = "simulations"
+    final String collectionSchedules = "schedules"
+    final String collectionLeagues = "leagues"
     HttpHistoricalDataManager dataMgr = new HttpHistoricalDataManager()
 
 
@@ -34,22 +36,41 @@ class SimulationManager {
     }
 
     long deleteAllSimulations() {
-        long result = mongoManager.deleteAll(collection)
+        long result = mongoManager.deleteAll(collectionSimulations)
+        mongoManager.deleteAll(collectionSchedules)
+        mongoManager.deleteAll(collectionLeagues)
         result
     }
 
     long deleteSimulation(String simulationID) {
         // Delete all simulations that match this simulationID.
-        long result = mongoManager.deleteMany(collection, ["simulationID":simulationID])
+        long result = mongoManager.deleteMany(collectionSimulations, ["simulationID":simulationID])
+        mongoManager.deleteMany(collectionSchedules, ["simulationID":simulationID])
+        mongoManager.deleteMany(collectionLeagues, ["simulationID":simulationID])
         result
     }
 
     Simulation findSimulation(String simulationID) {
         Simulation sim = null
-        def result = mongoManager.find(collection, ["simulationID": simulationID])
+        ScheduledSeason schedule = null
+        def result = mongoManager.find(collectionSimulations, ["simulationID": simulationID])
         // Populate Simulation from JSON data.
         if (result.size() > 0) {
             sim = new Simulation(result[0])
+        }
+        // Reload schedule
+        def scheduleMap = mongoManager.find(collectionSchedules, ["simulationID": simulationID])
+        // Populate Schedule from JSON data.
+        if (scheduleMap.size() > 0) {
+            schedule = new ScheduledSeason(scheduleMap[0])
+        }
+        sim.schedule = schedule
+        // Reload Leagues
+        sim.leagueKeys.each { nextKey ->
+            def leagueMap = mongoManager.find(collectionLeagues, ["leagueName": "$simulationID-$nextKey"])
+            if (leagueMap.size() > 0) {
+                sim.leagues[nextKey] = new League(leagueMap[0])
+            }
         }
         sim
     }
@@ -80,11 +101,8 @@ class SimulationManager {
         sim.schedule = scheduleLoader.loadScheduleFromFile(scheduleName, sim.getTeamCount())
         log.debug "$m Loading schedule from file... Done."
 
-        // Save simulation.
-        log.debug "$m Saving simulation to datastore..."
-        Map jsonMap = sim.toMap()
-        mongoManager.addToCollection(collection, jsonMap)
-        log.debug "$m Saving simulation to datastore... Done."
+        // Save simulation
+        saveSimulation(sim)
 
         // Return
         sim
@@ -95,7 +113,15 @@ class SimulationManager {
         // Save simulation.
         log.debug "$m Saving simulation to datastore..."
         Map jsonMap = sim.toMap()
-        mongoManager.addToCollection(collection, jsonMap)
+        mongoManager.addToCollection(collectionSimulations, jsonMap)
+        log.debug "$m Saving schedule to datastore..."
+        jsonMap = sim.schedule.toMap()
+        mongoManager.addToCollection(collectionSchedules, jsonMap)
+        log.debug "$m Saving leagues to datastore..."
+        sim.leagues.each { Map.Entry nextLeague ->
+            jsonMap = nextLeague.value.toMap()
+            mongoManager.addToCollection(collectionLeagues, jsonMap)
+        }
         log.debug "$m Saving simulation to datastore... Done."
     }
 
@@ -190,6 +216,12 @@ class SimulationManager {
     Simulation logSchedule(Simulation sim) {
         def m = "${C}.logSchedules() - "
         sim.logSchedule()
+        sim
+    }
+
+    Simulation logStatsAccuracy(Simulation sim) {
+        def m = "${C}.logStasAccuracy() - "
+        sim.logStatsAccuracy()
         sim
     }
 

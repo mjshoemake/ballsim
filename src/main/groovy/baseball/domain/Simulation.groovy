@@ -1,12 +1,9 @@
 package baseball.domain
 
-import baseball.mongo.MongoManager
-import baseball.processing.ScheduleLoader
-import groovy.json.JsonBuilder
+
 import groovy.json.JsonOutput
-import org.apache.log4j.Logger
-import mjs.common.utils.LogUtils
 import mjs.common.utils.TransactionIdGen
+import org.apache.log4j.Logger
 import org.bson.types.ObjectId
 
 class Simulation extends Comparable {
@@ -26,8 +23,9 @@ class Simulation extends Comparable {
     String year
     String name
     Map leagues = [:]
+    List leagueKeys = []
     // List of League objects, to preserve order.
-    List leagueList = []
+    //List leagueList = []
     // Letters to use for divisionKey.
     List<String> keyTokens = ["A","B","C","D","E","F","G","H","I","J","K","L"]
 
@@ -42,12 +40,12 @@ class Simulation extends Comparable {
         this.simulationName = map.simulationName
         this.year = map.year
         this.name = map.name
-        map.leagues.keySet().each { key ->
-            League league = new League(map.leagues[key])
-            this.leagues[key] = league
-            this.leagueList << league
+        map.leagueKeys.each { key ->
+            this.leagueKeys << key
         }
+        map.leagueKeys = map.leagueKeys.sort()
         this.schedule = new ScheduledSeason(map.schedule)
+        this.schedule.simulationID = this.simulationID
     }
 
     // Is the specified object equal to this one?
@@ -58,12 +56,25 @@ class Simulation extends Comparable {
         if (! compareString("simulationID", simulationID, target.simulationID)) { result = false }
         if (! compareString("name", name, target.name)) { result = false }
         if (! compareString("year", year, target.year)) { result = false }
-        if (! compareMap("leagues", leagues, target.leagues)) { result = false }
-        if (! compareList("leagueList", leagueList, target.leagueList)) { result = false }
-        if (! compareObject("schedule", schedule, target.schedule)) { result = false }
+        try {
+            if (! compareList("leagueKeys", leagueKeys.sort(), target.leagueKeys.sort())) { result = false }
+        } catch (Exception e) {
+            println "ERROR!!!! ${e.getMessage()}"
+        }
         if (! compareMap("teamMap", teamMap, target.teamMap)) { result = false }
         if (! compareMap("scheduleTeamLookup", scheduleTeamLookup, target.scheduleTeamLookup)) { result = false }
-
+        if (! compareMap("leagues", leagues, target.leagues)) { result = false }
+        if (! compareObject("schedule", schedule, target.schedule)) { result = false }
+        //if (! compareList("leagueList", leagueList, target.leagueList)) { result = false }
+        if (schedule.rounds.size() > 170) {
+            throw new Exception("Error: Schedule rounds (${schedule.rounds.size()}) should never be greater than 170.")
+        }
+        if (leagues.size() > 4) {
+            throw new Exception("Error: League count (${leagues.size()}) should never be greater than 4.")
+        }
+        if (teamMap.size() > 40) {
+            throw new Exception("Error: Team count (${teamMap.size()}) should never be greater than 40.")
+        }
         return result
     }
 
@@ -73,11 +84,20 @@ class Simulation extends Comparable {
         result["simulationName"] = simulationName
         result["year"] = year
         result["name"] = name
-        result["leagues"] = leagues
-        result["leagueList"] = leagueList
+        //result["leagues"] = leagues
+        result["leagueKeys"] = leagueKeys.sort()
+        //result["leagueList"] = leagueList
         result["schedule"] = schedule
         //result["teamMap"] = teamMap
         //result["scheduleTeamLookup"] = scheduleTeamLookup
+        result
+    }
+
+    List getLeagueList() {
+        List result = []
+        leagues.keySet().each {
+            result << leagues[it]
+        }
         result
     }
 
@@ -86,7 +106,8 @@ class Simulation extends Comparable {
         leagueList.each() { League nextLeague ->
             teamsList << nextLeague.teams
         }
-        teamsList.flatten()
+        def result = teamsList.flatten()
+        result
     }
 
     Map getTeamMap() {
@@ -193,13 +214,15 @@ class Simulation extends Comparable {
         League league
         if (! leagues.containsKey(team.league)) {
             String leagueKey = keyTokens[leagues.size()]
-            league = new League(team.league, leagueKey)
+            league = new League(team.league, leagueKey, simulationID)
             leagues[team.league] = league
+            leagueKeys << team.league
             leagueList << league
         } else {
             league = leagues[team.league]
         }
         league.addTeam(team)
+        leagueKeys = leagueKeys.sort()
     }
 
     String getScheduleName() {
@@ -484,6 +507,78 @@ class Simulation extends Comparable {
         auditLog.debug("Standings:")
         auditLog.debug("")
         auditLog.debug("Num Rounds: ${schedule.rounds.size()}  Rounds Completed: ${schedule.roundCompleted}")
+        int nextRound = 1
+        schedule.rounds.each { ScheduledRound round ->
+            if (round.roundNum != nextRound) {
+                auditLog.debug("   Mismatch: ${round.roundNum} != ${nextRound}")
+            }
+            nextRound++
+        }
+        auditLog.debug("Done!")
+    }
+
+    void logStatsAccuracy() {
+        int pTeamWins = 0
+        int numPlayers = 0
+        auditLog.debug("")
+        auditLog.debug("Stats Accuracy:")
+        auditLog.debug("")
+
+        int numPitchers = 0
+        int simWins, simLosses, simGamesStarted = 0
+        int wins, losses, gamesStarted = 0
+        def ttlWinPercent = 0
+        def ttlLossPercent = 0
+        def ttlGamesStartedPercent = 0
+
+        teams.each() { SimTeam next ->
+            pTeamWins = 0
+            numPlayers = 0
+            next.rotation.each() { GamePitcher nextPitcher ->
+                SimPitcher simPitcher = nextPitcher.simPitcher
+                def winPercent = 0
+                def lossPercent = 0
+                def gsPercent = 0
+                numPitchers++
+                wins += simPitcher.pitcher.pitcherStats.pitchingWins
+                simWins += simPitcher.wins
+                losses += simPitcher.pitcher.pitcherStats.pitchingLosses
+                simLosses += simPitcher.losses
+                gamesStarted += simPitcher.pitcher.pitcherStats.pitchingGamesStarted
+                simGamesStarted += simPitcher.gamesStarted
+                if (simPitcher.pitcher.pitcherStats.pitchingWins != 0) {
+                    winPercent = ((simPitcher.wins - simPitcher.pitcher.pitcherStats.pitchingWins) / simPitcher.pitcher.pitcherStats.pitchingWins) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingLosses != 0) {
+                    lossPercent = ((simPitcher.losses - simPitcher.pitcher.pitcherStats.pitchingLosses) / simPitcher.pitcher.pitcherStats.pitchingLosses) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingGamesStarted != 0) {
+                    gsPercent = ((simPitcher.gamesStarted - simPitcher.pitcher.pitcherStats.pitchingGamesStarted) / simPitcher.pitcher.pitcherStats.pitchingGamesStarted) * 100
+                }
+                StringBuilder builder = new StringBuilder("   ${format(next.teamName, 15)} ")
+                builder << " ${format(simPitcher.nameFirst + " " + simPitcher.nameLast, 30)}"
+                builder << "  ${format(winPercent.toInteger() + "%  -> " + simPitcher.wins + " / " + simPitcher.pitcher.pitcherStats.pitchingWins, 20)}"
+                builder << "  ${format(lossPercent.toInteger() + "%  -> " + simPitcher.losses + " / " + simPitcher.pitcher.pitcherStats.pitchingLosses, 20)}"
+                builder << "  ${format(gsPercent.toInteger() + "%  -> " + simPitcher.gamesStarted + " / " + simPitcher.pitcher.pitcherStats.pitchingGamesStarted, 20)}"
+                auditLog.debug builder.toString()
+            }
+        }
+        if (wins != 0) {
+            ttlWinPercent = ((simWins - wins) / wins) * 100
+        }
+        if (losses != 0) {
+            ttlLossPercent = ((simLosses - losses) / losses) * 100
+        }
+        if (gamesStarted != 0) {
+            ttlGamesStartedPercent = ((simGamesStarted - gamesStarted) / gamesStarted) * 100
+        }
+        StringBuilder builder = new StringBuilder("   ${format("Total:", 46)} ")
+        builder << "  ${format(ttlWinPercent.toInteger() + "%  -> " + simWins + " / " + wins, 20)}"
+        builder << "  ${format(ttlLossPercent.toInteger() + "%  -> " + simLosses + " / " + losses, 20)}"
+        builder << "  ${format(ttlGamesStartedPercent.toInteger() + "%  -> " + simGamesStarted + " / " + gamesStarted, 20)}"
+        auditLog.debug builder.toString()
+
+
         int nextRound = 1
         schedule.rounds.each { ScheduledRound round ->
             if (round.roundNum != nextRound) {

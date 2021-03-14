@@ -95,6 +95,7 @@ class SimBatter extends Comparable {
         if (! compareBoolean("maxedOut", maxedOut, target.maxedOut, builder)) { result = false }
         if (! compareObject("batter", batter, target.batter, builder)) { result = false }
         if (result) {
+            if (! hideOK)
             builder << "$m SimBatters match?  OK"
         } else {
             builder << "$m SimBatters match?  NO MATCH"

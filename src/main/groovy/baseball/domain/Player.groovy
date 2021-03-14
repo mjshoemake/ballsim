@@ -173,7 +173,8 @@ class Player extends Comparable {
         if (! compareObject("pitcherStats", pitcherStats, target.pitcherStats, builder)) { result = false }
         if (! compareString("type", type.toString(), target.type.toString(), builder)) { result = false }
         if (result) {
-            builder << "$m Players match?  OK"
+            if (! hideOK)
+                builder << "$m Players match?  OK"
         } else {
             builder << "$m Players match?  NO MATCH"
         }
@@ -305,6 +306,8 @@ class Player extends Comparable {
                     it.pitchingWildPitch = (Integer.parseInt(pitchingStats.wp) * 2.7).round(0)
                     it.pitchingHitBatter = (Integer.parseInt(pitchingStats.hb) * 2.7).round(0)
                     it.pitchingBalks = (Integer.parseInt(pitchingStats.bk) * 2.7).round(0)
+                    it.pitchingWins = (Integer.parseInt(pitchingStats.w) * 2.7).round(0)
+                    it.pitchingLosses = (Integer.parseInt(pitchingStats.l) * 2.7).round(0)
                     it.pitchingEra = pitchingStats.era
                     it.pitchingWhip = pitchingStats.whip
                 }
@@ -335,6 +338,8 @@ class Player extends Comparable {
                     it.pitchingStrikeouts = Integer.parseInt(pitchingStats.so)
                     it.pitchingHits = Integer.parseInt(pitchingStats.h)
                     it.pitchingHomers = Integer.parseInt(pitchingStats.hr)
+                    it.pitchingWins = Integer.parseInt(pitchingStats.w)
+                    it.pitchingLosses = Integer.parseInt(pitchingStats.l)
                     if (pitchingStats.wp.equals("")) {
                         it.pitchingWildPitch = 0
                     } else {

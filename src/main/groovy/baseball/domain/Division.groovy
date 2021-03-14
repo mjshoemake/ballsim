@@ -38,6 +38,9 @@ class Division extends Comparable {
         } else {
             log.debug("$m Divisions match?  NO MATCH")
         }
+        if (teams.size() > 10) {
+            throw new Exception("Error: Division teams (${teams.size()}) should never be greater than 10.")
+        }
         return result
     }
 
@@ -54,6 +57,9 @@ class Division extends Comparable {
             builder << "$m Divisions match?  OK"
         } else {
             builder << "$m Divisions match?  NO MATCH"
+        }
+        if (teams.size() > 10) {
+            throw new Exception("Error: Division teams (${teams.size()}) should never be greater than 10.")
         }
         return result
     }

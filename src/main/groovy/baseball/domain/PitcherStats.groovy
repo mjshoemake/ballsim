@@ -30,6 +30,8 @@ class PitcherStats extends Comparable {
     int pitchingWildPitch
     int pitchingHitBatter
     int pitchingBalks
+    int pitchingWins
+    int pitchingLosses
     double pitchingWhip
     String pitchingEra
     SimPitcher simPitcher
@@ -55,6 +57,8 @@ class PitcherStats extends Comparable {
         this.pitchingBalks = source.pitchingBalks
         this.pitchingEra = source.pitchingEra
         this.pitchingWhip = source.pitchingWhip
+        this.pitchingWins = source.pitchingWins
+        this.pitchingLosses = source.pitchingLosses
         if (source.simPitcher) {
             this.simPitcher = new SimPitcher(source.simPitcher)
         }
@@ -80,6 +84,9 @@ class PitcherStats extends Comparable {
         else if (! compareInt("pitchingWildPitch", pitchingWildPitch, target.pitchingWildPitch)) { result = false }
         else if (! compareInt("pitchingHitBatter", pitchingHitBatter, target.pitchingHitBatter)) { result = false }
         else if (! compareInt("pitchingBalks", pitchingBalks, target.pitchingBalks)) { result = false }
+        else if (! compareInt("pitchingWildPitch", pitchingWildPitch, target.pitchingWildPitch)) { result = false }
+        else if (! compareInt("pitchingWins", pitchingWins, target.pitchingWins)) { result = false }
+        else if (! compareInt("pitchingLosses", pitchingLosses, target.pitchingLosses)) { result = false }
         else if (! compareObject("simPitcher", simPitcher, target.simPitcher)) { result = false }
         else if (! compareDouble("pitchingWhip", pitchingWhip, target.pitchingWhip)) { result = false }
         return result
@@ -104,11 +111,14 @@ class PitcherStats extends Comparable {
         if (! compareInt("pitchingWildPitch", pitchingWildPitch, target.pitchingWildPitch, builder)) { result = false }
         if (! compareInt("pitchingHitBatter", pitchingHitBatter, target.pitchingHitBatter, builder)) { result = false }
         if (! compareInt("pitchingBalks", pitchingBalks, target.pitchingBalks, builder)) { result = false }
+        if (! compareInt("pitchingWins", pitchingWins, target.pitchingWins, builder)) { result = false }
+        if (! compareInt("pitchingLosses", pitchingLosses, target.pitchingLosses, builder)) { result = false }
         if (! compareDouble("pitchingWhip", pitchingWhip, target.pitchingWhip, builder)) { result = false }
         if (! compareObject("simPitcher", simPitcher, target.simPitcher, builder)) { result = false }
 
         if (result) {
-            builder << "$m PitcherStats match?  OK"
+            if (! hideOK)
+                builder << "$m PitcherStats match?  OK"
         } else {
             builder << "$m PitcherStats match?  NO MATCH"
         }

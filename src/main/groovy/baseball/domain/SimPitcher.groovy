@@ -19,6 +19,8 @@ class SimPitcher extends Comparable {
     double whip = 0
     int balks = 0
     int runs = 0
+    int gamesStarted = 0
+    int games = 0
     int pitchesGame1 = 0
     int pitchesGame2 = 0
     int pitchesGame3 = 0
@@ -50,6 +52,8 @@ class SimPitcher extends Comparable {
         this.pitchesGame3 = map.pitchesGame3
         this.pitchesGame4 = map.pitchesGame4
         this.pitchesGame5 = map.pitchesGame5
+        this.games = map.games
+        this.gamesStarted = map.gamesStarted
         if (map.pitcher instanceof Player) {
             this.pitcher = map.pitcher
         } else {
@@ -76,6 +80,8 @@ class SimPitcher extends Comparable {
         else if (! compareInt("hitByPitch", hitByPitch, target.hitByPitch)) { result = false }
         else if (! compareInt("balks", balks, target.balks)) { result = false }
         else if (! compareInt("runs", runs, target.runs)) { result = false }
+        else if (! compareInt("gamesStarted", gamesStarted, target.gamesStarted)) { result = false }
+        else if (! compareInt("games", games, target.games)) { result = false }
         else if (! compareInt("pitchesGame1", pitchesGame1, target.pitchesGame1)) { result = false }
         else if (! compareInt("pitchesGame2", pitchesGame2, target.pitchesGame2)) { result = false }
         else if (! compareInt("pitchesGame3", pitchesGame3, target.pitchesGame3)) { result = false }
@@ -106,6 +112,8 @@ class SimPitcher extends Comparable {
         else if (! compareInt("hitByPitch", hitByPitch, target.hitByPitch, builder)) { result = false }
         else if (! compareInt("balks", balks, target.balks, builder)) { result = false }
         else if (! compareInt("runs", runs, target.runs, builder)) { result = false }
+        else if (! compareInt("gamesStarted", gamesStarted, target.gamesStarted, builder)) { result = false }
+        else if (! compareInt("games", games, target.games, builder)) { result = false }
         else if (! compareInt("pitchesGame1", pitchesGame1, target.pitchesGame1, builder)) { result = false }
         else if (! compareInt("pitchesGame2", pitchesGame2, target.pitchesGame2, builder)) { result = false }
         else if (! compareInt("pitchesGame3", pitchesGame3, target.pitchesGame3, builder)) { result = false }
@@ -114,7 +122,8 @@ class SimPitcher extends Comparable {
         else if (! compareDouble("whip", whip, target.whip, builder)) { result = false }
         else if (! compareObject("pitcher", pitcher, target.pitcher, builder)) { result = false }
         if (result) {
-            builder << "$m SimPitchers match?  OK"
+            if (! hideOK)
+                builder << "$m SimPitchers match?  OK"
         } else {
             builder << "$m SimPitchers match?  NO MATCH"
         }
@@ -138,7 +147,7 @@ class SimPitcher extends Comparable {
         // Do nothing. This field references the Player object.
     }
 
-    def getBattersFaced() {
+    def getBattersFaced() {7
         battersRetired + walks + hits + hitByPitch
     }
 

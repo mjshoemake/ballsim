@@ -46,6 +46,36 @@ class BallGame {
         awayTeam.pitchersUsed << awayTeam.starter
         homeTeam.nextReliefPitcher = 0
         awayTeam.nextReliefPitcher = 0
+        homeTeam.starter.simPitcher.gamesStarted += 1
+        awayTeam.starter.simPitcher.gamesStarted += 1
+        homeTeam.starter.simPitcher.games += 1
+        awayTeam.starter.simPitcher.games += 1
+        if (homeTeam.starter.simPitcher.gamesStarted >= homeTeam.starter.simPitcher.pitcher.pitcherStats.pitchingGamesStarted) {
+            // This starter is maxed out. Pull a new starter out of the reserved pitchers list.
+            int next = 0
+            while (homeTeam.reservePitchers.get(next).simPitcher.pitcher.pitcherStats.pitchingGamesStarted == 0 && next < homeTeam.reservePitchers.size()-1) {
+                next++
+            }
+            if (homeTeam.reservePitchers.get(next).simPitcher.pitcher.pitcherStats.pitchingGamesStarted > 0) {
+                // Found a starter!
+                def newStarter = homeTeam.reservePitchers.get(next)
+                homeTeam.rotation[homeTeam.nextStartingPitcher] = newStarter
+                homeTeam.doneStarters << homeTeam.starter
+            }
+        }
+        if (awayTeam.starter.simPitcher.gamesStarted >= awayTeam.starter.simPitcher.pitcher.pitcherStats.pitchingGamesStarted) {
+            // This starter is maxed out. Pull a new starter out of the reserved pitchers list.
+            int next = 0
+            while (awayTeam.reservePitchers.get(next).simPitcher.pitcher.pitcherStats.pitchingGamesStarted == 0 && next < awayTeam.reservePitchers.size()-1) {
+                next++
+            }
+            if (awayTeam.reservePitchers.get(next).simPitcher.pitcher.pitcherStats.pitchingGamesStarted > 0) {
+                // Found a starter!
+                def newStarter = awayTeam.reservePitchers.get(next)
+                awayTeam.rotation[awayTeam.nextStartingPitcher] = newStarter
+                awayTeam.doneStarters << awayTeam.starter
+            }
+        }
 
         awayTeam.lineup.each {
             it.reset()
@@ -90,6 +120,7 @@ class BallGame {
                 homeTeam.currentPitcher = homeTeam.bullpen[homeTeam.nextReliefPitcher]
                 auditLog.info "New pitcher for home team ($homeTeam.nextReliefPitcher). Bullpen size = $homeTeam.bullpen.size() ${homeTeam.currentPitcher.simPitcher.pitcher.name}"
                 homeTeam.pitchersUsed << homeTeam.currentPitcher
+                homeTeam.currentPitcher.simPitcher.games += 1
                 homeTeam.nextReliefPitcher++
                 return homeTeam.currentPitcher
             } else if (homeTeam.nextReliefPitcher-5 < homeTeam.reservePitchers.size()) {
@@ -97,6 +128,7 @@ class BallGame {
                 auditLog.info "New pitcher for home team ($homeTeam.nextReliefPitcher). Bullpen size = $homeTeam.bullpen.size() "
                 homeTeam.currentPitcher = homeTeam.reservePitchers[homeTeam.nextReliefPitcher-5]
                 homeTeam.pitchersUsed << homeTeam.currentPitcher
+                homeTeam.currentPitcher.simPitcher.games += 1
                 homeTeam.nextReliefPitcher++
                 return homeTeam.currentPitcher
             } else {
@@ -110,6 +142,7 @@ class BallGame {
             if (awayTeam.bullpen.size() >= awayTeam.nextReliefPitcher+1) {
                 awayTeam.currentPitcher = awayTeam.bullpen[awayTeam.nextReliefPitcher]
                 awayTeam.pitchersUsed << awayTeam.currentPitcher
+                awayTeam.currentPitcher.simPitcher.games += 1
                 awayTeam.nextReliefPitcher++
                 return awayTeam.currentPitcher
             } else if (awayTeam.nextReliefPitcher-5 < awayTeam.reservePitchers.size()) {
@@ -117,6 +150,7 @@ class BallGame {
                 auditLog.info("New pitcher for away team ($awayTeam.nextReliefPitcher). Bullpen size = $awayTeam.bullpen.size() ")
                 awayTeam.currentPitcher = awayTeam.reservePitchers[awayTeam.nextReliefPitcher-5]
                 awayTeam.pitchersUsed << awayTeam.currentPitcher
+                awayTeam.currentPitcher.simPitcher.games += 1
                 awayTeam.nextReliefPitcher++
                 return awayTeam.currentPitcher
             } else {

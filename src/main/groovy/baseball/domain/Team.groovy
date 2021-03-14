@@ -59,7 +59,8 @@ class Team extends Comparable {
         if (! compareString("year", year, target.year)) { result = false }
         if (! compareString("scheduleLookupKey", scheduleLookupKey, target.scheduleLookupKey)) { result = false }
         if (result) {
-            log.debug("$m Teams match?  OK")
+            if (! hideOK)
+                log.debug("$m Teams match?  OK")
         } else {
             log.debug("$m Teams match?  NO MATCH")
         }

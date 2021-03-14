@@ -4,6 +4,7 @@ class League extends Comparable {
     def C = "League"
     String abbreviation = "AL"
     String leagueKey = null
+    String simulationID = null
     // Map of Division objects, for easy lookup access.
     //Map divisions = [:]
     // List of Division objects, to preserve order.
@@ -15,9 +16,21 @@ class League extends Comparable {
     // Letters to use for divisionKey.
     List<String> keyTokens = ["A","B","C","D","E","F","G","H","I","J","K","L"]
 
-    League(String abbreviation, String leagueKey) {
+    League(String abbreviation, String leagueKey, String simulationID) {
         this.leagueKey = leagueKey
         this.abbreviation = abbreviation
+        this.simulationID = simulationID
+    }
+
+    // NEED TO FINISH!!!!
+    Map toMap() {
+        Map result = [:]
+        result["abbreviation"] = abbreviation
+        result["simulationID"] = simulationID
+        result["leagueKey"] = leagueKey
+        result["leagueName"] = leagueName
+        result["divisionsList"] = divisionsList
+        result
     }
 
     //League(Map map, Map teamMap, String leagueKey, Map scheduleTeamLookup) {
@@ -41,6 +54,10 @@ class League extends Comparable {
         //teams = map.teams
     }
 
+    String getLeagueName() {
+        return "$simulationID-$leagueKey"
+    }
+
     // Is the specified object equal to this one?
     boolean equals(League target) {
         boolean result = true
@@ -56,6 +73,12 @@ class League extends Comparable {
             log.debug("$m Leagues match?  OK")
         } else {
             log.debug("$m Leagues match?  NO MATCH")
+        }
+        if (divisions.size() > 5) {
+            throw new Exception("Error: League divisions (${divisions.size()}) should never be greater than 5.")
+        }
+        if (divisionsList.size() > 5) {
+            throw new Exception("Error: League divisions list (${divisionsList.size()}) should never be greater than 5.")
         }
         return result
     }
@@ -75,6 +98,12 @@ class League extends Comparable {
             builder << "$m Leagues match?  OK"
         } else {
             builder << "$m Leagues match?  NO MATCH"
+        }
+        if (divisions.size() > 5) {
+            throw new Exception("Error: League divisions (${divisions.size()}) should never be greater than 5.")
+        }
+        if (divisionsList.size() > 5) {
+            throw new Exception("Error: League divisions list (${divisionsList.size()}) should never be greater than 5.")
         }
         return result
     }
