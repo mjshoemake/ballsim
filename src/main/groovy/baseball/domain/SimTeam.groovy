@@ -4,7 +4,7 @@ import baseball.processing.HttpHistoricalDataManager
 import org.apache.log4j.Logger
 
 
-class SimTeam extends Comparable {
+class SimTeam extends SimTeamComparable {
     def C = "SimTeam"
     private auditLog = Logger.getLogger('Audit')
 
@@ -124,11 +124,14 @@ class SimTeam extends Comparable {
         }
     }
 
+    String toString() {
+        return teamName
+    }
+
     // Is the specified object equal to this one?
     boolean equals(SimTeam target) {
         boolean result = true
         def m = "${C}.equals() - "
-
         if (! compareString("teamName", teamName, target.teamName)) { result = false }
         if (! compareString("city", city, target.city)) { result = false }
         if (! compareString("year", year, target.year)) { result = false }
@@ -193,7 +196,6 @@ class SimTeam extends Comparable {
         } else {
             builder << "$m SimTeams match?  NO MATCH"
         }
-
         int playerCount = lineup.size() + bench.size() + rotation.size() + bullpen.size() + reservePitchers.size() + doneRelievers.size() + doneStarters.size()
         if (playerCount > 40) {
             throw new Exception("Player count ($playerCount) is greater than 40.")

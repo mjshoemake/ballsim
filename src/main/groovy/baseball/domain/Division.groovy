@@ -52,7 +52,7 @@ class Division extends Comparable {
         if (! compareString("abbreviation", abbreviation, target.abbreviation, builder)) { result = false }
         if (! compareString("name", name, target.name, builder)) { result = false }
         if (! compareString("divisionKey", divisionKey, target.divisionKey, builder)) { result = false }
-        if (! compareList("teams", teams, target.teams, builder)) { result = false }
+        if (! compareList("teams", teams.sort(), target.teams.sort(), builder)) { result = false }
         if (result) {
             builder << "$m Divisions match?  OK"
         } else {
@@ -67,5 +67,15 @@ class Division extends Comparable {
     void addTeam(SimTeam simTeam) {
         this.teams << simTeam
     }
+
+    boolean compareList(String fieldName, def source, def target, List builder) {
+        boolean result = super.compareList(fieldName, source, target, builder)
+        if (result) {
+            return result
+        } else {
+            return result
+        }
+    }
+
 
 }

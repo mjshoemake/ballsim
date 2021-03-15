@@ -245,8 +245,7 @@ abstract class Comparable {
                     Object targetItem = target.get(i)
                     try {
                         if (! sourceItem.equals(targetItem)) {
-                            builder << "$m $fieldName ${sourceItem.class.name} NOT equal to target (${targetItem.class.name})."
-
+                            builder << "$m $fieldName ${sourceItem.class.name} '${sourceItem.toString()}' NOT equal to target (${targetItem.class.name}) '${targetItem.toString()}'."
                             result = false
                         }
                     } catch (Exception e) {
