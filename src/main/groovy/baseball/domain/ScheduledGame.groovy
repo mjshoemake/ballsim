@@ -12,6 +12,7 @@ class ScheduledGame extends Comparable {
     //def highlightsLog = Logger.getLogger('highlights')
     //def seasonStatsLog = Logger.getLogger('seasonStats')
 
+    def C = "ScheduledGame"
     int roundNum = 1
     int gameNum = 1
     String homeTeam, awayTeam

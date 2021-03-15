@@ -4,7 +4,7 @@ import baseball.processing.HttpHistoricalDataManager
 import org.apache.log4j.Logger
 
 
-class SimTeam extends Comparable {
+class SimTeam extends SimTeamComparable {
     def C = "SimTeam"
     private auditLog = Logger.getLogger('Audit')
 
@@ -116,33 +116,43 @@ class SimTeam extends Comparable {
         }
     }
 
+    String toString() {
+        return teamName
+    }
+
     // Is the specified object equal to this one?
     boolean equals(SimTeam target) {
         boolean result = true
         def m = "${C}.equals() - "
         if (! compareString("teamName", teamName, target.teamName)) { result = false }
-        else if (! compareString("city", city, target.city)) { result = false }
-        else if (! compareString("year", year, target.year)) { result = false }
-        else if (! compareInt("nextBatter", nextBatter, target.nextBatter)) { result = false }
-        else if (! compareInt("nextReliefPitcher", nextReliefPitcher, target.nextReliefPitcher)) { result = false }
-        else if (! compareInt("nextStartingPitcher", nextStartingPitcher, target.nextStartingPitcher)) { result = false }
-        else if (! compareInt("pitchCount", pitchCount, target.pitchCount)) { result = false }
-        else if (! compareInt("wins", wins, target.wins)) { result = false }
-        else if (! compareInt("losses", losses, target.losses)) { result = false }
-        else if (! compareInt("winDiff", winDiff, target.winDiff)) { result = false }
-        else if (! compareObject("starter", starter, target.starter)) { result = false }
-        else if (! compareObject("currentPitcher", currentPitcher, target.currentPitcher)) { result = false }
-        else if (! compareObject("closer", closer, target.closer)) { result = false }
-        else if (! compareObject("team", team, target.team)) { result = false }
-        else if (! teamRoster.equals(target.teamRoster)) { result = false }
-        else if (! positions.equals(target.positions)) { result = false }
-        else if (! lineup.equals(target.lineup)) { result = false }
-        else if (! bench.equals(target.bench)) { result = false }
-        else if (! rotation.equals(target.rotation)) { result = false }
-        else if (! pitchersUsed.equals(target.pitchersUsed)) { result = false }
-        else if (! bullpen.equals(target.bullpen)) { result = false }
-        else if (! reservePitchers.equals(target.reservePitchers)) { result = false }
-
+        if (! compareString("city", city, target.city)) { result = false }
+        if (! compareString("year", year, target.year)) { result = false }
+        if (! compareInt("nextBatter", nextBatter, target.nextBatter)) { result = false }
+        if (! compareInt("nextReliefPitcher", nextReliefPitcher, target.nextReliefPitcher)) { result = false }
+        if (! compareInt("nextStartingPitcher", nextStartingPitcher, target.nextStartingPitcher)) { result = false }
+        if (! compareInt("pitchCount", pitchCount, target.pitchCount)) { result = false }
+        if (! compareInt("wins", wins, target.wins)) { result = false }
+        if (! compareInt("losses", losses, target.losses)) { result = false }
+        if (! compareInt("winDiff", winDiff, target.winDiff)) { result = false }
+        if (! compareObject("starter", starter, target.starter)) { result = false }
+        if (! compareObject("currentPitcher", currentPitcher, target.currentPitcher)) { result = false }
+        if (! compareObject("closer", closer, target.closer)) { result = false }
+        if (! compareObject("team", team, target.team)) { result = false }
+        if (! compareList("lineup", lineup, target.lineup)) { result = false }
+        if (! compareList("bench", bench, target.bench)) { result = false }
+        if (! compareList("rotation", rotation, target.rotation)) { result = false }
+        if (! compareList("bullpen", bullpen, target.bullpen)) { result = false }
+        if (! compareList("reservePitchers", reservePitchers, target.reservePitchers)) { result = false }
+        if (! compareList("pitchersUsed", pitchersUsed, target.pitchersUsed)) { result = false }
+        if (! compareList("teamRoster", teamRoster, target.teamRoster)) { result = false }
+        if (! compareMap("positions", positions, target.positions)) { result = false }
+        int playerCount = lineup.size() + bench.size() + rotation.size() + bullpen.size() + reservePitchers.size()// + doneRelievers.size() + doneStarters.size()
+        if (playerCount > 40) {
+            throw new Exception("Player count ($playerCount) is greater than 40.")
+        }
+        if (pitchersUsed.size() > 12) {
+            throw new Exception("Pitchers used ($pitchersUsed) should never be greater than 12.")
+        }
         return result
     }
 
@@ -176,6 +186,13 @@ class SimTeam extends Comparable {
             builder << "$m SimTeams match?  OK"
         } else {
             builder << "$m SimTeams match?  NO MATCH"
+        }
+        int playerCount = lineup.size() + bench.size() + rotation.size() + bullpen.size() + reservePitchers.size()// + doneRelievers.size() + doneStarters.size()
+        if (playerCount > 40) {
+            throw new Exception("Player count ($playerCount) is greater than 40.")
+        }
+        if (pitchersUsed.size() > 12) {
+            throw new Exception("Pitchers used ($pitchersUsed) should never be greater than 12.")
         }
 
         return result
