@@ -22,10 +22,10 @@ class Simulation extends Comparable {
     String simulationName = "Test Sim"
     String year
     String name
-    Map leagues = [:]
+    //Map leagues = [:]
     List leagueKeys = []
     // List of League objects, to preserve order.
-    //List leagueList = []
+    List leagueList = []
     // Letters to use for divisionKey.
     List<String> keyTokens = ["A","B","C","D","E","F","G","H","I","J","K","L"]
 
@@ -40,10 +40,13 @@ class Simulation extends Comparable {
         this.simulationName = map.simulationName
         this.year = map.year
         this.name = map.name
+        map.leagueList.each() {
+            this.leagueList << new League(it)
+        }
         map.leagueKeys.each { key ->
             this.leagueKeys << key
         }
-        map.leagueKeys = map.leagueKeys.sort()
+        this.leagueKeys = this.leagueKeys.sort()
         this.schedule = new ScheduledSeason(map.schedule)
         this.schedule.simulationID = this.simulationID
     }
@@ -61,9 +64,10 @@ class Simulation extends Comparable {
         } catch (Exception e) {
             println "ERROR!!!! ${e.getMessage()}"
         }
-        if (! compareMap("teamMap", teamMap, target.teamMap)) { result = false }
-        if (! compareMap("scheduleTeamLookup", scheduleTeamLookup, target.scheduleTeamLookup)) { result = false }
-        if (! compareMap("leagues", leagues, target.leagues)) { result = false }
+        if (! compareList("leagueList", leagueList.sort(), target.leagueList.sort())) { result = false }
+//        if (! compareMap("teamMap", teamMap, target.teamMap)) { result = false }
+//        if (! compareMap("scheduleTeamLookup", scheduleTeamLookup, target.scheduleTeamLookup)) { result = false }
+//        if (! compareMap("leagues", leagues, target.leagues)) { result = false }
         if (! compareObject("schedule", schedule, target.schedule)) { result = false }
         //if (! compareList("leagueList", leagueList, target.leagueList)) { result = false }
         if (schedule.rounds.size() > 170) {
@@ -84,21 +88,21 @@ class Simulation extends Comparable {
         result["simulationName"] = simulationName
         result["year"] = year
         result["name"] = name
-        //result["leagues"] = leagues
+        result["leagueList"] = leagueList.sort()
         result["leagueKeys"] = leagueKeys.sort()
-        //result["leagueList"] = leagueList
+        schedule.simulationID = simulationID
         result["schedule"] = schedule
         //result["teamMap"] = teamMap
         //result["scheduleTeamLookup"] = scheduleTeamLookup
         result
     }
 
-    List getLeagueList() {
-        List result = []
-        leagues.keySet().each {
-            result << leagues[it]
+    Map getLeagues() {
+        Map result = [:]
+        leagueList.each() { League nextLeague ->
+            result[nextLeague.abbreviation] = nextLeague
         }
-        result
+        return result
     }
 
     List<SimTeam> getTeams() {
@@ -215,9 +219,8 @@ class Simulation extends Comparable {
         if (! leagues.containsKey(team.league)) {
             String leagueKey = keyTokens[leagues.size()]
             league = new League(team.league, leagueKey, simulationID)
-            leagues[team.league] = league
-            leagueKeys << team.league
             leagueList << league
+            leagueKeys << team.league
         } else {
             league = leagues[team.league]
         }

@@ -5,7 +5,7 @@ class SimTeamComparable extends baseball.domain.Comparable implements java.lang.
     SimTeamComparable() {
     }
 
-    String sortBy = "winDiff"
+    static String sortBy = "winDiff"
 
     int compareTo(Object arg) {
         switch(sortBy) {

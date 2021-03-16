@@ -292,6 +292,8 @@ abstract class Comparable {
         def m = "${C}.compareMap() - "
         try {
             boolean result = true
+            if (fieldName == "leagues")
+                println "Leagues!!"
             if (source == null && target == null) {
                 //builder << "$m    $fieldName null == null.  OK"
                 return true
@@ -305,6 +307,10 @@ abstract class Comparable {
                 source.keySet().each { key ->
                     Object sourceItem = source[key]
                     Object targetItem = target[key]
+                    if (fieldName == "leagues") {
+                        builder << "$m    Source $fieldName [$key] = $sourceItem"
+                        builder << "$m    Target $fieldName [$key] = $targetItem"
+                    }
                     try {
                         if (! sourceItem.equals(targetItem, builder)) {
                             result = false

@@ -1,6 +1,6 @@
 package baseball.domain
 
-class League extends Comparable {
+class League extends LeagueComparable {
     def C = "League"
     String abbreviation = "AL"
     String leagueKey = null
@@ -54,6 +54,9 @@ class League extends Comparable {
         //teams = map.teams
     }
 
+    String toString() {
+        "$abbreviation (${divisionsList.size()}/${teams.size()})"
+    }
     String getLeagueName() {
         return "$simulationID-$leagueKey"
     }
@@ -65,14 +68,15 @@ class League extends Comparable {
 
         if (! compareString("abbreviation", abbreviation, target.abbreviation)) { result = false }
         if (! compareString("leagueKey", leagueKey, target.leagueKey)) { result = false }
-        if (! compareMap("divisions", divisions, target.divisions)) { result = false }
+        //if (! compareMap("divisions", divisions, target.divisions)) { result = false }
         if (! compareList("divisionsList", divisionsList, target.divisionsList)) { result = false }
         //if (! compareMap("teamMap", teamMap, target.teamMap)) { result = false }
         //if (! compareList("teams", teams, target.teams)) { result = false }
         if (result) {
             log.debug("$m Leagues match?  OK")
         } else {
-            log.debug("$m Leagues match?  NO MATCH")
+            log.debug("$m Leagues match?  NO MATCH   ${abbreviation} != ${target.abbreviation}")
+            new Exception("Leagues don't match!!!").printStackTrace()
         }
         if (divisions.size() > 5) {
             throw new Exception("Error: League divisions (${divisions.size()}) should never be greater than 5.")
@@ -90,14 +94,15 @@ class League extends Comparable {
 
         if (! compareString("abbreviation", abbreviation, target.abbreviation, builder)) { result = false }
         if (! compareString("leagueKey", leagueKey, target.leagueKey, builder)) { result = false }
-        if (! compareMap("divisions", divisions, target.divisions, builder)) { result = false }
+        //if (! compareMap("divisions", divisions, target.divisions, builder)) { result = false }
         if (! compareList("divisionsList", divisionsList, target.divisionsList, builder)) { result = false }
         //if (! compareMap("teamMap", teamMap, target.teamMap, builder)) { result = false }
         //if (! compareList("teams", teams, target.teams, builder)) { result = false }
         if (result) {
             builder << "$m Leagues match?  OK"
         } else {
-            builder << "$m Leagues match?  NO MATCH"
+            builder << "$m Leagues match?  NO MATCH   ${abbreviation} != ${target.abbreviation}"
+            new Exception("Leagues don't match!!!").printStackTrace()
         }
         if (divisions.size() > 5) {
             throw new Exception("Error: League divisions (${divisions.size()}) should never be greater than 5.")

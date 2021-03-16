@@ -64,6 +64,10 @@ class Division extends Comparable {
         return result
     }
 
+    String toString() {
+        return "$name (${teams.size()})"
+    }
+
     void addTeam(SimTeam simTeam) {
         this.teams << simTeam
     }

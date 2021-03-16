@@ -58,6 +58,7 @@ class SimulationManager {
         if (result.size() > 0) {
             sim = new Simulation(result[0])
         }
+/*
         // Reload schedule
         def scheduleMap = mongoManager.find(collectionSchedules, ["simulationID": simulationID])
         // Populate Schedule from JSON data.
@@ -72,6 +73,7 @@ class SimulationManager {
                 sim.leagues[nextKey] = new League(leagueMap[0])
             }
         }
+ */
         sim
     }
 
