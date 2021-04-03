@@ -23,7 +23,8 @@ import mjs.common.utils.LogUtils
  */
 class MongoManager {
 
-    def payloadLog = Logger.getLogger('Payload')
+    protected Logger log = Logger.getLogger("Debug");
+    protected Logger payloadLog = Logger.getLogger('Payload')
     MongoClient client = null
     MongoDatabase db = null
 
@@ -56,6 +57,7 @@ class MongoManager {
         LogUtils.debug(payloadLog, obj, "   ", true)
         //String json = new JsonBuilder(obj).toPrettyString()
         String json = new JsonBuilder(obj).toString()
+        log.debug("Adding object ${obj.getClass().name} to collection $collection... (size: ${json.size()})")
         //println "addToCollection [$collection]  $json"
         privateAddToCollection(collection, json)
         return obj["_id"]

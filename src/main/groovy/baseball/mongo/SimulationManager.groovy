@@ -58,14 +58,14 @@ class SimulationManager {
         if (result.size() > 0) {
             sim = new Simulation(result[0])
         }
-/*
         // Reload schedule
         def scheduleMap = mongoManager.find(collectionSchedules, ["simulationID": simulationID])
         // Populate Schedule from JSON data.
         if (scheduleMap.size() > 0) {
             schedule = new ScheduledSeason(scheduleMap[0])
+            sim.schedule = schedule
         }
-        sim.schedule = schedule
+/*
         // Reload Leagues
         sim.leagueKeys.each { nextKey ->
             def leagueMap = mongoManager.find(collectionLeagues, ["leagueName": "$simulationID-$nextKey"])
@@ -101,6 +101,7 @@ class SimulationManager {
         String scheduleName = sim.getScheduleName()
         log.debug "$m Loading schedule from file..."
         sim.schedule = scheduleLoader.loadScheduleFromFile(scheduleName, sim.getTeamCount())
+        sim.schedule.simulationID = sim.simulationID
         log.debug "$m Loading schedule from file... Done."
 
         // Save simulation
@@ -117,6 +118,7 @@ class SimulationManager {
         Map jsonMap = sim.toMap()
         mongoManager.addToCollection(collectionSimulations, jsonMap)
         log.debug "$m Saving schedule to datastore..."
+        sim.schedule.simulationID = sim.simulationID
         jsonMap = sim.schedule.toMap()
         mongoManager.addToCollection(collectionSchedules, jsonMap)
         log.debug "$m Saving leagues to datastore..."

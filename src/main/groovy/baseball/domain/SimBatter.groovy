@@ -108,6 +108,10 @@ class SimBatter extends Comparable {
         this.batter = batter
     }
 
+    String getPlayerID() {
+        batter?.playerID
+    }
+
     String getNameFirst() {
         batter?.nameFirst
     }

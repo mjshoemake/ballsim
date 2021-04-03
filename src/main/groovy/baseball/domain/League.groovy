@@ -22,14 +22,13 @@ class League extends LeagueComparable {
         this.simulationID = simulationID
     }
 
-    // NEED TO FINISH!!!!
     Map toMap() {
         Map result = [:]
         result["abbreviation"] = abbreviation
         result["simulationID"] = simulationID
         result["leagueKey"] = leagueKey
         result["leagueName"] = leagueName
-        result["divisionsList"] = divisionsList
+        result["divisionsList"] = toListOfMaps(divisionsList)
         result
     }
 

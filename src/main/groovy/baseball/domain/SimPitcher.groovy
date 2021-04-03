@@ -131,6 +131,10 @@ class SimPitcher extends Comparable {
         return result
     }
 
+    String getPlayerID() {
+        pitcher?.playerID
+    }
+
     String getNameFirst() {
         pitcher?.nameFirst
     }

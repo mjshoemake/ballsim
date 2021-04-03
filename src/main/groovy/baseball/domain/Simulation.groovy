@@ -47,8 +47,8 @@ class Simulation extends Comparable {
             this.leagueKeys << key
         }
         this.leagueKeys = this.leagueKeys.sort()
-        this.schedule = new ScheduledSeason(map.schedule)
-        this.schedule.simulationID = this.simulationID
+        //this.schedule = new ScheduledSeason(map.schedule)
+        //this.schedule.simulationID = this.simulationID
     }
 
     // Is the specified object equal to this one?
@@ -69,7 +69,7 @@ class Simulation extends Comparable {
 //        if (! compareMap("scheduleTeamLookup", scheduleTeamLookup, target.scheduleTeamLookup)) { result = false }
 //        if (! compareMap("leagues", leagues, target.leagues)) { result = false }
         if (! compareObject("schedule", schedule, target.schedule)) { result = false }
-        //if (! compareList("leagueList", leagueList, target.leagueList)) { result = false }
+//        if (! compareList("leagueList", leagueList, target.leagueList)) { result = false }
         if (schedule.rounds.size() > 170) {
             throw new Exception("Error: Schedule rounds (${schedule.rounds.size()}) should never be greater than 170.")
         }
@@ -88,10 +88,14 @@ class Simulation extends Comparable {
         result["simulationName"] = simulationName
         result["year"] = year
         result["name"] = name
-        result["leagueList"] = leagueList.sort()
-        result["leagueKeys"] = leagueKeys.sort()
-        schedule.simulationID = simulationID
-        result["schedule"] = schedule
+        result["leagueList"] = toListOfMaps(leagueList.sort())
+        result["leagueKeys"] = toListOfMaps(leagueKeys.sort())
+
+        logSizeOfObject(1, "Simulation", result)
+        logSizeOfObject(2, "Simulation.leagueList", result["leagueList"])
+        logSizeOfObject(2, "Simulation.leagueKeys", result["leagueKeys"])
+        //schedule.simulationID = simulationID
+        //result["schedule"] = schedule
         //result["teamMap"] = teamMap
         //result["scheduleTeamLookup"] = scheduleTeamLookup
         result
@@ -537,7 +541,9 @@ class Simulation extends Comparable {
         teams.each() { SimTeam next ->
             pTeamWins = 0
             numPlayers = 0
-            next.rotation.each() { GamePitcher nextPitcher ->
+            auditLog.debug "${next.teamName} Rotation: (${next.rotation.size()})"
+            next.rotation.each() { String playerID ->
+                GamePitcher nextPitcher = next.getPitcher(playerID)
                 SimPitcher simPitcher = nextPitcher.simPitcher
                 def winPercent = 0
                 def lossPercent = 0

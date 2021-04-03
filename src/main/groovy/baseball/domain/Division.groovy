@@ -24,6 +24,15 @@ class Division extends Comparable {
         }
     }
 
+    Map toMap() {
+        Map result = [:]
+        result["abbreviation"] = abbreviation
+        result["divisionKey"] = divisionKey
+        result["name"] = name
+        result["teams"] = toListOfMaps(teams)
+        result
+    }
+
     // Is the specified object equal to this one?
     boolean equals(Division target) {
         boolean result = true

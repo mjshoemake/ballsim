@@ -1,9 +1,11 @@
 package baseball.domain
 
+import groovy.json.JsonBuilder
 import org.apache.log4j.Logger
 
 abstract class Comparable {
     protected Logger log = Logger.getLogger("Debug");
+    protected Logger logObjectSize = Logger.getLogger("ObjectSize");
     boolean hideOK = true
 
     boolean compareString(String fieldName, String source, String target) {
@@ -292,9 +294,7 @@ abstract class Comparable {
         def m = "${C}.compareMap() - "
         try {
             boolean result = true
-            if (fieldName == "leagues")
-                println "Leagues!!"
-            if (source == null && target == null) {
+           if (source == null && target == null) {
                 //builder << "$m    $fieldName null == null.  OK"
                 return true
             } else if (source == null) {
@@ -337,6 +337,35 @@ abstract class Comparable {
             e.printStackTrace()
             return false
         }
+    }
+
+    int getSizeOfObject(Object obj) {
+        String json = new JsonBuilder(obj).toString()
+        return json.length()
+    }
+
+    void logSizeOfObject(int level, String name, def obj) {
+        String json = new JsonBuilder(obj).toString()
+        StringBuilder builder = new StringBuilder()
+        int size = json.length()
+        for (int i=1; i <= level; i++) {
+            builder << "   "
+        }
+        logObjectSize.debug("size: ${builder.toString()} $name:  $size")
+    }
+
+    List toListOfMaps(List list) {
+        List result = []
+        list.each { next ->
+            def itemToInsert
+            try {
+                itemToInsert = next.toMap()
+            } catch (Exception e) {
+                itemToInsert = next
+            }
+            result << itemToInsert
+        }
+        result
     }
 
 }

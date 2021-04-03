@@ -87,6 +87,21 @@ class GamePitcher extends GamePitcherComparable
         return result
     }
 
+    PitcherStats getPitcherStats() {
+        this.simPitcher?.pitcher.pitcherStats
+    }
+
+    String getHistoricalEra() {
+        this.simPitcher?.pitcher.pitcherStats.pitchingEra
+    }
+
+    String getPlayerID() {
+        this.simPitcher?.playerID
+    }
+
+    String getName() {
+        this.simPitcher?.pitcher.name
+    }
     String getNameFirst() {
         this.simPitcher?.nameFirst
     }

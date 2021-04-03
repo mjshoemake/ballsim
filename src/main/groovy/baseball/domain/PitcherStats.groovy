@@ -145,12 +145,18 @@ class PitcherStats extends Comparable {
     }
 
     public def getAvgBattersRetiredPerGame() {
-        def avgOuts = BigDecimal.valueOf(pitchingBattersRetired / pitchingGames).intValue()
+        def avgOuts = new BigDecimal(0)
+        if (pitchingGames > 0) {
+            avgOuts = BigDecimal.valueOf(pitchingBattersRetired / pitchingGames).intValue()
+        }
         avgOuts
     }
 
     public def getRate(int num, int divisor) {
-        def rate = BigDecimal.valueOf(num / divisor)
+        def rate = new BigDecimal(0)
+        if (divisor > 0) {
+            rate = BigDecimal.valueOf(num / divisor)
+        }
         rate
     }
 

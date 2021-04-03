@@ -95,6 +95,14 @@ class GameBatter extends GameBatterComparable {
         return result
     }
 
+    String getPlayerID() {
+        this.simBatter?.playerID
+    }
+
+    String getName() {
+        this.simBatter?.batter.name
+    }
+
     String getNameFirst() {
         this.simBatter?.nameFirst
     }
@@ -107,15 +115,15 @@ class GameBatter extends GameBatterComparable {
         this.simBatter?.primaryPosition
     }
 
+    void setPosition(String primaryPosition) {
+        this.simBatter?.primaryPosition = primaryPosition
+    }
+
     void setNameFirst(String value) {
         // Do nothing. This field references the Player object.
     }
 
     void setNameLast(String value) {
-        // Do nothing. This field references the Player object.
-    }
-
-    void setPosition(String value) {
         // Do nothing. This field references the Player object.
     }
 
@@ -129,7 +137,11 @@ class GameBatter extends GameBatterComparable {
     }
 
     def getBattingAvg() {
-        BigDecimal.valueOf(hits / atBats)
+        if (atBats != 0) {
+            BigDecimal.valueOf(hits / atBats)
+        } else {
+            0
+        }
     }
 
     void setPlateAppearances(int value) {
