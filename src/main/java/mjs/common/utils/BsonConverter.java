@@ -32,7 +32,7 @@ public class BsonConverter {
     /**
      * The log4j logger.
      */
-    //private static final Logger log = Logger.getLogger("Core");
+    private static final Logger log = Logger.getLogger("Core");
 
     /**
      * Convert a bean to an array of String objects that contain the properties of the bean. This is
@@ -69,7 +69,7 @@ public class BsonConverter {
         }
 
         if (bean == null) {
-            System.out.println(prefix.toString() + "null");
+            log.debug(prefix.toString() + "null");
             return null;
         }
         String methodName = "";
@@ -81,40 +81,40 @@ public class BsonConverter {
             PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(bean.getClass());
 
             if (bean == null) {
-                System.out.println(prefix.toString() + "null");
+                log.debug(prefix.toString() + "null");
                 return null;
             } else if (bean instanceof Integer) {
-                System.out.println(prefix.toString() + ((Integer)bean).intValue() + " (Integer).");
+                log.debug(prefix.toString() + ((Integer)bean).intValue() + " (Integer).");
                 return new BsonInt32(((Integer)bean).intValue());
             } else if (bean instanceof Long) {
-                System.out.println(prefix.toString() + ((Long)bean).longValue() + " (Long).");
+                log.debug(prefix.toString() + ((Long)bean).longValue() + " (Long).");
                 return new BsonInt64(((Long)bean).longValue());
             } else if (bean instanceof Float) {
-                System.out.println(prefix.toString() + ((Float)bean).toString() + " (Float).");
+                log.debug(prefix.toString() + ((Float)bean).toString() + " (Float).");
                 return new BsonDouble(((Float)bean).doubleValue());
             } else if (bean instanceof Double) {
-                System.out.println(prefix.toString() + ((Double)bean).toString() + " (Float).");
+                log.debug(prefix.toString() + ((Double)bean).toString() + " (Float).");
                 return new BsonDouble(((Double)bean).doubleValue());
             } else if (bean instanceof Boolean) {
-                System.out.println(prefix.toString() + ((Boolean)bean).toString() + " (Boolean).");
+                log.debug(prefix.toString() + ((Boolean)bean).toString() + " (Boolean).");
                 return new BsonBoolean(((Boolean)bean).booleanValue());
             } else if (bean instanceof ObjectId) {
-                System.out.println(prefix.toString() + "ObjectId.");
+                log.debug(prefix.toString() + "ObjectId.");
                 return new BsonObjectId((ObjectId)bean);
             } else if (bean instanceof Date) {
-                System.out.println(prefix.toString() + ((Date)bean).toString() + " (Date).");
+                log.debug(prefix.toString() + ((Date)bean).toString() + " (Date).");
                 return new BsonInt64(((Date)bean).getTime());
             } else if (bean instanceof String) {
-                System.out.println(prefix.toString() + ((String)bean).toString() + " (String).");
+                log.debug(prefix.toString() + ((String)bean).toString() + " (String).");
                 return new BsonString(bean.toString());
             } else if (bean instanceof BigDecimal) {
-                System.out.println(prefix.toString() + ((BigDecimal)bean).toString() + " (BigDecimal).");
+                log.debug(prefix.toString() + ((BigDecimal)bean).toString() + " (BigDecimal).");
                 return new BsonDouble(((BigDecimal)bean).doubleValue());
             } else if (bean instanceof BigInteger) {
-                System.out.println(prefix.toString() + ((BigInteger)bean).toString() + " (BigInteger).");
+                log.debug(prefix.toString() + ((BigInteger)bean).toString() + " (BigInteger).");
                 return new BsonInt64(((BigInteger)bean).longValue());
             } else if (bean instanceof Map) {
-                System.out.println(prefix.toString() + "Map...");
+                log.debug(prefix.toString() + "Map...");
                 BsonDocument result = new BsonDocument();
                 Map map = (Map)bean;
                 Iterator keys = map.keySet().iterator();
@@ -164,7 +164,7 @@ public class BsonConverter {
                 return result;
             } else {
                 // Loop through the properties of the bean.
-                System.out.println(prefix.toString() + "Processing " + bean.getClass().getName() + "...");
+                log.debug(prefix.toString() + "Processing " + bean.getClass().getName() + "...");
                 //log.debug(indent(level) + "Extracting bean properties...   count=" + pds.length);
                 BsonDocument result = new BsonDocument();
                 if (pds == null || pds.length == 0) {
@@ -205,11 +205,11 @@ public class BsonConverter {
                                 } else if (val == null) {
                                     // Skip.  Bson can't handle null values.
                                 } else if (val instanceof ObjectId) {
-                                    System.out.println(prefix.toString() + "ObjectId[b].");
+                                    log.debug(prefix.toString() + "ObjectId[b].");
                                     BsonValue value = processBean(((ObjectId)val).toHexString(), key,level + 1);
                                     result.put(key, value);
                                 } else {
-                                    System.out.println(prefix.toString() + "Unrecognized data type (" + val.getClass().getName() + ").");
+                                    log.debug(prefix.toString() + "Unrecognized data type (" + val.getClass().getName() + ").");
                                     throw new CoreException("Unrecognized data type: " + val.getClass().getName());
                                 }
                             }
@@ -218,7 +218,7 @@ public class BsonConverter {
                         }
                     }
                 }
-                System.out.println(prefix.toString() + "Converting " + bean.getClass().getName() + "... DONE!");
+                log.debug(prefix.toString() + "Converting " + bean.getClass().getName() + "... DONE!");
                 return result;
             }
         } catch (Exception e) {
@@ -287,14 +287,14 @@ public class BsonConverter {
                                                         Short.parseShort(objId.get("processIdentifier").toString()),
                                                         Integer.parseInt(objId.get("counter").toString()));
                                             } else {
-                                                System.out.println("Setting writeArgs to null.");
+                                                log.debug("Setting writeArgs to null.");
                                                 writeArgs[0] = null;
                                             }
                                         }
                                         if (map.get(fieldName) != null) {
-                                            System.out.println("Calling setter: " + fieldName + " value: " + map.get(fieldName) + " type: " + map.get(fieldName).getClass().getName());
+                                            log.debug("Calling setter: " + fieldName + " value: " + map.get(fieldName) + " type: " + map.get(fieldName).getClass().getName());
                                         } else {
-                                            System.out.println("Calling setter: " + fieldName + " value: null");
+                                            log.debug("Calling setter: " + fieldName + " value: null");
                                         }
                                         method.invoke(result, writeArgs);
                                     } catch (Exception e) {

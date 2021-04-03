@@ -171,12 +171,38 @@ class GamePitcher extends GamePitcherComparable
         pitches = 0
     }
 
-    public boolean pitcherExhausted() {
-        battersRetired > avgBattersRetiredPerGame
+    public boolean pitcherExhausted(String teamName) {
+        boolean exhausted = (battersRetired >= avgBattersRetiredPerGame)
+        if (exhausted) {
+            println "Is pitcher exhausted: $exhausted   Batters retired ($battersRetired) > Avg batters retired /game ($avgBattersRetiredPerGame);  Games: ${simPitcher.pitcher.pitcherStats.pitchingGames}  Games Started: ${simPitcher.pitcher.pitcherStats.pitchingGamesStarted} "
+            println "   Pitcher: $name ($teamName)"
+            println "   Avg batters retired per game: ${avgBattersRetiredPerGame}"
+            println "TEMP"
+        }
+        exhausted
     }
 
     public def getAvgBattersRetiredPerGame() {
-        simPitcher.avgBattersRetiredPerGame
+        PitcherStats pitcherStats = simPitcher.pitcher.pitcherStats
+        int games = pitcherStats.pitchingGames
+        int gamesStarted = pitcherStats.pitchingGamesStarted
+        if (pitcherStats.pitchingGames != gamesStarted) {
+            if (simPitcher.gamesStarted < gamesStarted) {
+                return 18
+            } else {
+                // Could calculate avg batters retired per game in relief, based on the
+                // 6 times the number of
+                int battersRetired = pitcherStats.pitchingBattersRetired
+                int battersRetiredInRelief = battersRetired - (pitcherStats.pitchingGamesStarted * 18)
+                if (games - gamesStarted > 0) {
+                    return BigDecimal.valueOf(battersRetiredInRelief / (games - gamesStarted)).intValue()
+                } else {
+                    return 1
+                }
+            }
+        } else {
+            simPitcher.avgBattersRetiredPerGame
+        }
     }
 
 }

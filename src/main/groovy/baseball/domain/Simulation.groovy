@@ -88,12 +88,19 @@ class Simulation extends Comparable {
         result["simulationName"] = simulationName
         result["year"] = year
         result["name"] = name
+        log.debug "Converting leagueList to Maps..."
         result["leagueList"] = toListOfMaps(leagueList.sort())
+        log.debug "Converting leagueKeys to Maps..."
         result["leagueKeys"] = toListOfMaps(leagueKeys.sort())
+        log.debug "Conversions DONE."
 
+        log.debug "logSizeOfObject 'Simulation'..."
         logSizeOfObject(1, "Simulation", result)
-        logSizeOfObject(2, "Simulation.leagueList", result["leagueList"])
-        logSizeOfObject(2, "Simulation.leagueKeys", result["leagueKeys"])
+        //log.debug "logSizeOfObject 'Simulation.leagueKeys'..."
+        //logSizeOfObject(2, "Simulation.leagueKeys", result["leagueKeys"])
+        //log.debug "logSizeOfObject 'Simulation.leagueList'..."
+        //logSizeOfObject(2, "Simulation.leagueList", result["leagueList"])
+        log.debug "logSizeOfObject DONE."
         //schedule.simulationID = simulationID
         //result["schedule"] = schedule
         //result["teamMap"] = teamMap

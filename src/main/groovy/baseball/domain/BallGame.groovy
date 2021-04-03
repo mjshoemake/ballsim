@@ -156,7 +156,7 @@ class BallGame {
                 return getPitcher(homeTeam.currentPitcher)
             } else if (homeTeam.nextReliefPitcher-5 < homeTeam.reservePitchers.size()) {
                 // Bullpen empty. Use reserve pitchers.
-                auditLog.info "New pitcher for home team ($homeTeam.nextReliefPitcher). Bullpen size = $homeTeam.bullpen.size() "
+                auditLog.info "New pitcher for home team ($homeTeam.nextReliefPitcher). Bullpen size = $homeTeam.bullpen.size() ${homePitcher.simPitcher.pitcher.name}"
                 homeTeam.currentPitcher = homeTeam.reservePitchers[homeTeam.nextReliefPitcher-5]
                 def homePitcher = getPitcher(homeTeam.currentPitcher)
                 homeTeam.pitchersUsed << homeTeam.currentPitcher
@@ -171,19 +171,19 @@ class BallGame {
             }
         } else {
             // New away pitcher.
-            auditLog.info("New pitcher for away team ($awayTeam.nextReliefPitcher). Bullpen size = $awayTeam.bullpen.size() ")
             if (awayTeam.bullpen.size() >= awayTeam.nextReliefPitcher+1) {
                 awayTeam.currentPitcher = awayTeam.bullpen[awayTeam.nextReliefPitcher]
                 def awayPitcher = getPitcher(awayTeam.currentPitcher)
+                auditLog.info "New pitcher for home team ($awayTeam.nextReliefPitcher). Bullpen size = $awayTeam.bullpen.size() ${awayPitcher.simPitcher.pitcher.name}"
                 awayTeam.pitchersUsed << awayTeam.currentPitcher
                 awayPitcher.simPitcher.games += 1
                 awayTeam.nextReliefPitcher++
                 return getPitcher(awayTeam.currentPitcher)
             } else if (awayTeam.nextReliefPitcher-5 < awayTeam.reservePitchers.size()) {
                 // Bullpen empty. Use reserve pitchers.
-                auditLog.info("New pitcher for away team ($awayTeam.nextReliefPitcher). Bullpen size = $awayTeam.bullpen.size() ")
                 awayTeam.currentPitcher = awayTeam.reservePitchers[awayTeam.nextReliefPitcher-5]
                 def awayPitcher = getPitcher(awayTeam.currentPitcher)
+                auditLog.info "New pitcher for home team ($awayTeam.nextReliefPitcher). Bullpen size = $awayTeam.bullpen.size() ${awayPitcher.simPitcher.pitcher.name}"
                 awayTeam.pitchersUsed << awayTeam.currentPitcher
                 awayPitcher.simPitcher.games += 1
                 awayTeam.nextReliefPitcher++
@@ -219,10 +219,13 @@ class BallGame {
         boolean readyToStart = isReadyToStart()
         int pitcherCount
         def pitcher
+        String teamName
         if (side == HalfInning.TOP) {
             pitcher = getPitcher(homeTeam.currentPitcher)
+            teamName = homeTeam.teamName
         } else {
             pitcher = getPitcher(awayTeam.currentPitcher)
+            teamName = awayTeam.teamName
         }
         outs = 0
         bases = Bases.EMPTY
@@ -230,7 +233,7 @@ class BallGame {
         runnerSecond = null
         runnerThird = null
         while (outs < 3) {
-            if (pitcher.pitcherExhausted()) {
+            if (pitcher.pitcherExhausted(teamName)) {
                 pitcher = getNewPitcher()
             }
 
