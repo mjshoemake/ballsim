@@ -120,6 +120,10 @@ class SimBatter extends Comparable {
         batter?.nameLast
     }
 
+    String getName() {
+        batter?.name
+    }
+
     String getPrimaryPosition() {
         batter?.primaryPosition
     }

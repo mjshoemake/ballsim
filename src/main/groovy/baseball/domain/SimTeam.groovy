@@ -17,6 +17,11 @@ class SimTeam extends SimTeamComparable {
     def reservePitchers = []
     def doneStarters = []
     def doneRelievers = []
+    def originalLineup = []
+    def originalBench = []
+    def originalRotation = []
+    def originalBullpen = []
+    def additionalStarters = []
 
     // Need to modify other lists so that they contain IDs, not actual objects.
     // The actual objects should only be found in the roster map.
@@ -125,6 +130,21 @@ class SimTeam extends SimTeamComparable {
         map.doneRelievers.each() { String s -> // playerID
             this.doneRelievers << s
         }
+        map.originalRotation.each() { String s -> // playerID
+            this.originalRotation << s
+        }
+        map.originalBullpen.each() { String s -> // playerID
+            this.originalBullpen << s
+        }
+        map.originalLineup.each() { String s -> // playerID
+            this.originalLineup << s
+        }
+        map.originalBench.each() { String s -> // playerID
+            this.originalBench << s
+        }
+        //map.originalReservedPitchers.each() { String s -> // playerID
+        //    this.originalReservedPitchers << s
+        //}
     }
 
     String toString() {
@@ -473,20 +493,35 @@ class SimTeam extends SimTeamComparable {
         auditLog.debug "Remaining: speedAndContact: ${speedAndContact.size()} speed: ${speed.size()} power: ${power.size()} contact: ${contact.size()}"
 
         // Migrate player groupings to permanent lists of playerIDs.
+        this.rotation.clear()
         rotationPlayers.each { GamePitcher next ->
             this.rotation << next.playerID
+            this.originalRotation << next.playerID
         }
+        this.bullpen.clear()
         bullpenPlayers.each { GamePitcher next ->
             this.bullpen << next.playerID
+            this.originalBullpen << next.playerID
+            if (next.pitcherStats.pitchingGamesStarted > 0) {
+                this.additionalStarters << next.playerID
+            }
         }
+        this.lineup.clear()
         lineupPlayers.each { GameBatter next ->
             this.lineup << next.playerID
+            this.originalLineup << next.playerID
         }
+        this.bench.clear()
         benchPlayers.each { GameBatter next ->
             this.bench << next.playerID
+            this.originalBench << next.playerID
         }
+        this.reservePitchers.clear()
         reservePitchersPlayers.each { GamePitcher next ->
             this.reservePitchers << next.playerID
+            if (next.pitcherStats.pitchingGamesStarted > 0) {
+                this.additionalStarters << next.playerID
+            }
         }
     }
 

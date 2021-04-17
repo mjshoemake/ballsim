@@ -99,9 +99,14 @@ class GamePitcher extends GamePitcherComparable
         this.simPitcher?.playerID
     }
 
+    String toString() {
+        "${getName()}  Starts: ${simPitcher.gamesStarted}/${simPitcher.pitcher.pitcherStats.pitchingGamesStarted} Games: ${simPitcher.games}/${simPitcher.pitcher.pitcherStats.pitchingGames}"
+    }
+
     String getName() {
         this.simPitcher?.pitcher.name
     }
+
     String getNameFirst() {
         this.simPitcher?.nameFirst
     }
@@ -173,12 +178,12 @@ class GamePitcher extends GamePitcherComparable
 
     public boolean pitcherExhausted(String teamName) {
         boolean exhausted = (battersRetired >= avgBattersRetiredPerGame)
-        if (exhausted) {
-            println "Is pitcher exhausted: $exhausted   Batters retired ($battersRetired) > Avg batters retired /game ($avgBattersRetiredPerGame);  Games: ${simPitcher.pitcher.pitcherStats.pitchingGames}  Games Started: ${simPitcher.pitcher.pitcherStats.pitchingGamesStarted} "
-            println "   Pitcher: $name ($teamName)"
-            println "   Avg batters retired per game: ${avgBattersRetiredPerGame}"
-            println "TEMP"
-        }
+        //if (exhausted) {
+            //println "Is pitcher exhausted: $exhausted   Batters retired ($battersRetired) > Avg batters retired /game ($avgBattersRetiredPerGame);  Games: ${simPitcher.pitcher.pitcherStats.pitchingGames}  Games Started: ${simPitcher.pitcher.pitcherStats.pitchingGamesStarted} "
+            //println "   Pitcher: $name ($teamName)"
+            //println "   Avg batters retired per game: ${avgBattersRetiredPerGame}"
+            //println "TEMP"
+        //}
         exhausted
     }
 

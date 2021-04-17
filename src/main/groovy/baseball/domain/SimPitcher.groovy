@@ -143,6 +143,10 @@ class SimPitcher extends Comparable {
         pitcher?.nameLast
     }
 
+    String getName() {
+        pitcher?.name
+    }
+
     void setNameFirst(String value) {
         // Do nothing. This field references the Player object.
     }
