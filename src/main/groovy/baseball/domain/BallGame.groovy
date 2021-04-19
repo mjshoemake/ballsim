@@ -46,6 +46,8 @@ class BallGame {
         awayTeam.pitchersUsed << awayTeam.starter
         homeTeam.nextReliefPitcher = 0
         awayTeam.nextReliefPitcher = 0
+        homeTeam.pitcherOfRecord = null
+        awayTeam.pitcherOfRecord = null
         if (homeTeam.starter == null) {
             throw new Exception("${homeTeam.teamName} has a null starter (next starting pitcher: ${homeTeam.nextStartingPitcher}).")
         }
@@ -355,8 +357,35 @@ class BallGame {
         getBatter(batter)
     }
 
+    private void updatePitchersOfRecord() {
+        if (homeScore == awayScore) {
+            homeTeam.pitcherOfRecord = null
+            awayTeam.pitcherOfRecord = null
+        } else if (homeScore > awayScore) {
+            awayTeam.pitcherOfRecord = awayTeam.currentPitcher
+            if (inning == 5 && side == HalfInning.BOTTOM) {
+                homeTeam.pitcherOfRecord = homeTeam.currentPitcher
+            } else if (inning > 5 && homeTeam.pitcherOfRecord == null) {
+                homeTeam.pitcherOfRecord = homeTeam.currentPitcher
+            }
+            if (awayTeam.pitcherOfRecord == null) {
+                awayTeam.pitcherOfRecord = awayTeam.currentPitcher
+            }
+        } else {
+            if (inning == 6 && side == HalfInning.TOP) {
+                awayTeam.pitcherOfRecord = awayTeam.currentPitcher
+            } else if (inning > 5 && awayTeam.pitcherOfRecord == null) {
+                awayTeam.pitcherOfRecord = awayTeam.currentPitcher
+            }
+            if (homeTeam.pitcherOfRecord == null) {
+                homeTeam.pitcherOfRecord = homeTeam.currentPitcher
+            }
+        }
+    }
+
     private def inningOver() {
         if (side == HalfInning.TOP) {
+            updatePitchersOfRecord()
             if (inning == 9 && homeScore > awayScore) {
                 isGameOver = true
             } else {
@@ -368,6 +397,7 @@ class BallGame {
                 printTeamHittingStats(awayTeam.lineup)
             }
         } else {
+            updatePitchersOfRecord()
             if (inning >= 9 && awayScore != homeScore) {
                 isGameOver = true
             } else {
@@ -391,15 +421,31 @@ class BallGame {
                 awayTeam.losses++
                 homeTeam.winDiff = homeTeam.wins - homeTeam.losses
                 awayTeam.winDiff = awayTeam.wins - awayTeam.losses
-                homeStarter.simPitcher.wins += 1
-                awayStarter.simPitcher.losses += 1
+                if (homeTeam.pitcherOfRecord != null) {
+                    getPitcher(homeTeam.pitcherOfRecord).simPitcher.wins += 1
+                } else {
+                    homeStarter.simPitcher.wins += 1
+                }
+                if (awayTeam.pitcherOfRecord != null) {
+                    getPitcher(awayTeam.pitcherOfRecord).simPitcher.losses += 1
+                } else {
+                    awayStarter.simPitcher.losses += 1
+                }
             } else {
                 awayTeam.wins++
                 homeTeam.losses++
                 homeTeam.winDiff = homeTeam.wins - homeTeam.losses
                 awayTeam.winDiff = awayTeam.wins - awayTeam.losses
-                awayStarter.simPitcher.wins += 1
-                homeStarter.simPitcher.losses += 1
+                if (homeTeam.pitcherOfRecord != null) {
+                    getPitcher(homeTeam.pitcherOfRecord).simPitcher.losses += 1
+                } else {
+                    homeStarter.simPitcher.losses += 1
+                }
+                if (awayTeam.pitcherOfRecord != null) {
+                    getPitcher(awayTeam.pitcherOfRecord).simPitcher.wins += 1
+                } else {
+                    awayStarter.simPitcher.wins += 1
+                }
             }
         }
 

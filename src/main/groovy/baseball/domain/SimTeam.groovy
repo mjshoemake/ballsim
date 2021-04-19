@@ -36,6 +36,7 @@ class SimTeam extends SimTeamComparable {
     String starter
     String currentPitcher
     String closer
+    String pitcherOfRecord
     int pitchCount = 0
     def positions = [:]
     int wins = 0
