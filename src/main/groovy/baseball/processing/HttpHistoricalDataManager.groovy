@@ -18,6 +18,13 @@ class HttpHistoricalDataManager {
 
     HttpHistoricalDataManager() {
         mongoManager.open("ballsim")
+        //deleteAllSavedData()
+    }
+
+    void deleteAllSavedData() {
+        mongoManager.deleteAll(TABLE_TEAM_MAP_FOR_SEASON)
+        mongoManager.deleteAll(TABLE_TEAM_ROSTER_FOR_SEASON)
+        mongoManager.deleteAll(TABLE_TEAMS_FOR_SEASON)
     }
 
     void close() {
@@ -139,7 +146,7 @@ class HttpHistoricalDataManager {
                     // Player is a pitcher. Load pitching stats.
                     perf.startEvent("LoadHistoricalData.get40ManRoster", "loadPitcherProperties[Map]")
                     pitchingStats = getPlayerPitchingStats(person.player_id, team_id, year)
-                    if (pitchingStats)
+                    //if (pitchingStats)
                     perf.endEvent("LoadHistoricalData.get40ManRoster", "loadPitcherProperties[Map]")
                 }
 

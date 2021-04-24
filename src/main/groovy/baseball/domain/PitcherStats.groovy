@@ -32,6 +32,7 @@ class PitcherStats extends Comparable {
     int pitchingBalks
     int pitchingWins
     int pitchingLosses
+    int pitchingSaves
     double pitchingWhip
     String pitchingEra
     SimPitcher simPitcher
@@ -59,6 +60,7 @@ class PitcherStats extends Comparable {
         this.pitchingWhip = source.pitchingWhip
         this.pitchingWins = source.pitchingWins
         this.pitchingLosses = source.pitchingLosses
+        this.pitchingSaves = source.pitchingSaves
         if (source.simPitcher) {
             this.simPitcher = new SimPitcher(source.simPitcher)
         }
@@ -87,6 +89,7 @@ class PitcherStats extends Comparable {
         else if (! compareInt("pitchingWildPitch", pitchingWildPitch, target.pitchingWildPitch)) { result = false }
         else if (! compareInt("pitchingWins", pitchingWins, target.pitchingWins)) { result = false }
         else if (! compareInt("pitchingLosses", pitchingLosses, target.pitchingLosses)) { result = false }
+        else if (! compareInt("pitchingSaves", pitchingSaves, target.pitchingSaves)) { result = false }
         else if (! compareObject("simPitcher", simPitcher, target.simPitcher)) { result = false }
         else if (! compareDouble("pitchingWhip", pitchingWhip, target.pitchingWhip)) { result = false }
         return result
@@ -113,6 +116,7 @@ class PitcherStats extends Comparable {
         if (! compareInt("pitchingBalks", pitchingBalks, target.pitchingBalks, builder)) { result = false }
         if (! compareInt("pitchingWins", pitchingWins, target.pitchingWins, builder)) { result = false }
         if (! compareInt("pitchingLosses", pitchingLosses, target.pitchingLosses, builder)) { result = false }
+        if (! compareInt("pitchingSaves", pitchingSaves, target.pitchingSaves, builder)) { result = false }
         if (! compareDouble("pitchingWhip", pitchingWhip, target.pitchingWhip, builder)) { result = false }
         if (! compareObject("simPitcher", simPitcher, target.simPitcher, builder)) { result = false }
 

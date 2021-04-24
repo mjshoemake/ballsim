@@ -5,7 +5,7 @@ import java.math.RoundingMode
 class GamePitcher extends GamePitcherComparable
 {
     def C = "GamePitcher"
-    def simPitcher
+    SimPitcher simPitcher
     int battersRetired = 0
     int order = 0
     int walks = 0
@@ -193,7 +193,7 @@ class GamePitcher extends GamePitcherComparable
         int gamesStarted = pitcherStats.pitchingGamesStarted
         if (pitcherStats.pitchingGames != gamesStarted) {
             if (simPitcher.gamesStarted < gamesStarted) {
-                return 18
+                return 21
             } else {
                 // Could calculate avg batters retired per game in relief, based on the
                 // 6 times the number of
@@ -202,7 +202,7 @@ class GamePitcher extends GamePitcherComparable
                 if (games - gamesStarted > 0) {
                     return BigDecimal.valueOf(battersRetiredInRelief / (games - gamesStarted)).intValue()
                 } else {
-                    return 1
+                    return 3
                 }
             }
         } else {

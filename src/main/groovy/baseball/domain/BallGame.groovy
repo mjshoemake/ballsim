@@ -48,6 +48,8 @@ class BallGame {
         awayTeam.nextReliefPitcher = 0
         homeTeam.pitcherOfRecord = null
         awayTeam.pitcherOfRecord = null
+        homeTeam.allPitchersProcessed = false
+        awayTeam.allPitchersProcessed = false
         if (homeTeam.starter == null) {
             throw new Exception("${homeTeam.teamName} has a null starter (next starting pitcher: ${homeTeam.nextStartingPitcher}).")
         }
@@ -213,55 +215,87 @@ class BallGame {
     }
 
     private def getNewPitcher() {
+        GamePitcher nextPitcher = null
+        boolean saveSituation = false
         if (side == HalfInning.TOP) {
-            // New home pitcher.
-            if (homeTeam.bullpen.size() >= homeTeam.nextReliefPitcher+1) {
-                homeTeam.currentPitcher = homeTeam.bullpen[homeTeam.nextReliefPitcher]
-                def homePitcher = getPitcher(homeTeam.currentPitcher)
-                gameLog.info "New pitcher for home team (${homePitcher.simPitcher.pitcher.name})."
-                homeTeam.pitchersUsed << homeTeam.currentPitcher
-                homePitcher.simPitcher.games += 1
-                homeTeam.nextReliefPitcher++
-                return getPitcher(homeTeam.currentPitcher)
-            } else if (homeTeam.nextReliefPitcher-5 < homeTeam.reservePitchers.size()) {
+            if (inning >= 9 && homeScore > awayScore && ((homeScore - awayScore) <= 3) && ! (homeTeam.closer in homeTeam.pitchersUsed)) {
+                saveSituation = true
+            }
+            nextPitcher = getNewPitcher(homeTeam, saveSituation)
+        } else {
+            if (inning >= 9 && awayScore > homeScore && ((awayScore - homeScore) <= 3) && ! (awayTeam.closer in awayTeam.pitchersUsed)) {
+                saveSituation = true
+            }
+            nextPitcher = getNewPitcher(awayTeam, saveSituation)
+        }
+        return nextPitcher
+    }
+
+    private def getNewPitcher(SimTeam team, boolean saveSituation) {
+        // New home pitcher.
+        boolean stop = false
+        // Is it time for the closer to come in?
+        if (saveSituation && team.closer != null) {
+            GamePitcher nextPitcher = getPitcher(team.closer)
+            team.currentPitcher = team.closer
+            gameLog.info "New pitcher for ${team.teamName} (${nextPitcher.simPitcher.pitcher.name})."
+            team.pitchersUsed << team.currentPitcher
+            nextPitcher.simPitcher.games += 1
+            return nextPitcher
+        }
+        // If not closer, keep looking.
+        while (! stop && team.bullpen.size() >= team.nextReliefPitcher+1) {
+            String playerID = team.bullpen[team.nextReliefPitcher]
+            GamePitcher gamePitcher = getPitcher(playerID)
+            if ((gamePitcher.simPitcher.games < gamePitcher.simPitcher.pitcher.pitcherStats.pitchingGames || team.allPitchersProcessed) && ! team.pitchersUsed.contains(playerID)) {
+                stop = true
+            } else {
+                team.nextReliefPitcher++
+            }
+        }
+        if (team.bullpen.size() >= team.nextReliefPitcher+1) {
+            team.currentPitcher = team.bullpen[team.nextReliefPitcher]
+            def newPitcher = getPitcher(team.currentPitcher)
+            gameLog.info "New pitcher for ${team.teamName} (${newPitcher.simPitcher.pitcher.name})."
+            team.pitchersUsed << team.currentPitcher
+            newPitcher.simPitcher.games += 1
+            team.nextReliefPitcher++
+            return getPitcher(team.currentPitcher)
+        } else {
+            stop = false
+            while (! stop && team.reservePitchers.size() >= team.nextReliefPitcher-5) {
+                String playerID
+                if (team.reservePitchers.size() == team.nextReliefPitcher-5) {
+                    // All relievers processed. Start over.
+                    playerID = team.reservePitchers[team.reservePitchers.size()-1]
+                    team.allPitchersProcessed = true
+                } else {
+                    playerID = team.reservePitchers[team.nextReliefPitcher-5]
+                }
+                if (playerID == null) {
+                    auditLog.error("PlayerID is null. team=${team.teamName} reservePitchersSize=${team.reservePitchers.size()} index=${team.nextReliefPitcher-5}")
+                }
+                GamePitcher gamePitcher = getPitcher(playerID)
+                if ((gamePitcher.simPitcher.games < gamePitcher.simPitcher.pitcher.pitcherStats.pitchingGames || team.allPitchersProcessed) && ! team.pitchersUsed.contains(playerID)) {
+                    stop = true
+                } else {
+                    team.nextReliefPitcher++
+                }
+            }
+            if (team.nextReliefPitcher-5 < team.reservePitchers.size()) {
                 // Bullpen empty. Use reserve pitchers.
-                homeTeam.currentPitcher = homeTeam.reservePitchers[homeTeam.nextReliefPitcher-5]
-                def homePitcher = getPitcher(homeTeam.currentPitcher)
+                team.currentPitcher = team.reservePitchers[team.nextReliefPitcher-5]
+                def homePitcher = getPitcher(team.currentPitcher)
                 gameLog.info "New pitcher for home team (${homePitcher.simPitcher.pitcher.name})."
-                homeTeam.pitchersUsed << homeTeam.currentPitcher
+                team.pitchersUsed << team.currentPitcher
                 homePitcher.simPitcher.games += 1
-                homeTeam.nextReliefPitcher++
-                return getPitcher(homeTeam.currentPitcher)
+                team.nextReliefPitcher++
+                return getPitcher(team.currentPitcher)
             } else {
                 // Keep the current pitcher. Out of pitchers.
                 auditLog.info "Out of pitchers. Going back to the starter."
-                homeTeam.currentPitcher = homeTeam.starter
-                return getPitcher(homeTeam.currentPitcher)
-            }
-        } else {
-            // New away pitcher.
-            if (awayTeam.bullpen.size() >= awayTeam.nextReliefPitcher+1) {
-                awayTeam.currentPitcher = awayTeam.bullpen[awayTeam.nextReliefPitcher]
-                def awayPitcher = getPitcher(awayTeam.currentPitcher)
-                gameLog.info "New pitcher for away team (${awayPitcher.simPitcher.pitcher.name})."
-                awayTeam.pitchersUsed << awayTeam.currentPitcher
-                awayPitcher.simPitcher.games += 1
-                awayTeam.nextReliefPitcher++
-                return getPitcher(awayTeam.currentPitcher)
-            } else if (awayTeam.nextReliefPitcher-5 < awayTeam.reservePitchers.size()) {
-                // Bullpen empty. Use reserve pitchers.
-                awayTeam.currentPitcher = awayTeam.reservePitchers[awayTeam.nextReliefPitcher-5]
-                def awayPitcher = getPitcher(awayTeam.currentPitcher)
-                gameLog.info "New pitcher for away team (${awayPitcher.simPitcher.pitcher.name})."
-                awayTeam.pitchersUsed << awayTeam.currentPitcher
-                awayPitcher.simPitcher.games += 1
-                awayTeam.nextReliefPitcher++
-                return getPitcher(awayTeam.currentPitcher)
-            } else {
-                // Keep the current pitcher. Out of pitchers.
-                gameLog.info "Out of pitchers. Going back to the starter."
-                awayTeam.currentPitcher = awayTeam.starter
-                return getPitcher(awayTeam.currentPitcher)
+                team.currentPitcher = team.starter
+                return getPitcher(team.currentPitcher)
             }
         }
     }
@@ -276,10 +310,16 @@ class BallGame {
     }
 
     GamePitcher getPitcher(String playerID) {
+        if (playerID == null) {
+            throw new Exception("getPitcher(ID=null)")
+        }
         GamePitcher result = homeTeam.roster[playerID]
         if (! result) {
-            return awayTeam.roster[playerID]
+            result = awayTeam.roster[playerID]
+            //auditLog.debug("getPitcher(ID=$playerID) = ${result.toString()}")
+            return result
         } else {
+            //auditLog.debug("getPitcher(ID=$playerID) = ${result.toString()}")
             return result
         }
     }
@@ -509,6 +549,9 @@ class BallGame {
             boxscoreLog.debug "${format("Pitcher", 20)}  ${format("W", 3)}  ${format("L", 3)}  ${format("IP", 5)}  ${format("R", 3)}  ${format("ERA", 5)}  ${format("H", 3)}  ${format("HR", 3)}  ${format("BB", 3)}  ${format("SO", 3)}"
             homeTeam.pitchersUsed.each() { next ->
                 def gamePitcher = getPitcher(next)
+                if (gamePitcher == null) {
+                    auditLog.debug("FAILURE: Writing pitcher for team ${homeTeam.teamName}: ID=${next}")
+                }
                 boxscoreLog.debug "${format(gamePitcher.simPitcher.pitcher.name, 20)}  ${format(gamePitcher.simPitcher.wins, 3)}  ${format(gamePitcher.simPitcher.losses, 3)}  ${format(gamePitcher.battersRetired/3, 5)}  ${format(gamePitcher.runs, 3)}  ${gamePitcher.simPitcher.era}  ${format(gamePitcher.hits, 3)}  ${format(gamePitcher.homers, 3)}  ${format(gamePitcher.walks, 3)}  ${format(gamePitcher.strikeouts, 3)}"
             }
         }

@@ -90,8 +90,15 @@ class SimulationManager {
         sim.simulationName = simulationName
         Map teamMap = dataMgr.getTeamMapForSeason(year)
         teamMap.remove("year")
-        teamMap.each() { next ->
-            sim.addTeamToSeason(next.value)
+        Object nextTeam
+        try {
+            teamMap.each() { next ->
+                nextTeam = next.value
+                sim.addTeamToSeason(next.value)
+            }
+        } catch (Exception e) {
+            log.error("Failed to add team ${nextTeam} to season.", e)
+            e.printStackTrace()
         }
         log.debug "$m scheduleTeamLookup:"
         LogUtils.debug(log, sim.scheduleTeamLookup, "   ", true)

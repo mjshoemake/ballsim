@@ -539,11 +539,12 @@ class Simulation extends Comparable {
         auditLog.debug("")
 
         int numPitchers = 0
-        int simWins, simLosses, simGamesStarted = 0
-        int wins, losses, gamesStarted = 0
+        int simSaves, simWins, simLosses, simGamesStarted, simGames = 0
+        int saves, wins, losses, gamesStarted, games = 0
         def ttlWinPercent = 0
         def ttlLossPercent = 0
         def ttlGamesStartedPercent = 0
+        def ttlGamesPercent = 0
 
         teams.each() { SimTeam next ->
             pTeamWins = 0
@@ -608,7 +609,7 @@ class Simulation extends Comparable {
                 auditLog.debug builder.toString()
             }
 
-            auditLog.debug format("${next.teamName} Final Rotation: (${next.rotation.size()})", 50) + "  " +
+            auditLog.debug format("${next.teamName} Current Rotation: (${next.rotation.size()})", 50) + "  " +
                     format("Wins",20) + "  " +
                     format("Losses",20) + "  " +
                     format("Games Started",20)
@@ -714,7 +715,159 @@ class Simulation extends Comparable {
                     auditLog.debug builder.toString()
                 }
             }
+
+            auditLog.debug format("${next.teamName} Original Bullpen: (${next.originalBullpen.size()})", 50) + "  " +
+                    format("Wins",20) + "  " +
+                    format("Losses",20) + "  " +
+                    format("Saves",20) + "  " +
+                    format("Games",20) + "  " +
+                    format("Games Started",20)
+            next.originalBullpen.each() { String playerID ->
+                GamePitcher nextPitcher = next.getPitcher(playerID)
+                SimPitcher simPitcher = nextPitcher.simPitcher
+                def winPercent = 0
+                def lossPercent = 0
+                def savePercent = 0
+                def gsPercent = 0
+                def gPercent = 0
+                numPitchers++
+                wins += simPitcher.pitcher.pitcherStats.pitchingWins
+                simWins += simPitcher.wins
+                losses += simPitcher.pitcher.pitcherStats.pitchingLosses
+                simLosses += simPitcher.losses
+                simSaves += simPitcher.saves
+                saves += simPitcher.pitcher.pitcherStats.pitchingSaves
+                gamesStarted += simPitcher.pitcher.pitcherStats.pitchingGamesStarted
+                simGamesStarted += simPitcher.gamesStarted
+                games += simPitcher.pitcher.pitcherStats.pitchingGames
+                simGames += simPitcher.games
+                if (simPitcher.pitcher.pitcherStats.pitchingWins != 0) {
+                    winPercent = ((simPitcher.wins - simPitcher.pitcher.pitcherStats.pitchingWins) / simPitcher.pitcher.pitcherStats.pitchingWins) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingLosses != 0) {
+                    lossPercent = ((simPitcher.losses - simPitcher.pitcher.pitcherStats.pitchingLosses) / simPitcher.pitcher.pitcherStats.pitchingLosses) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingSaves != 0) {
+                    savePercent = ((simPitcher.saves - simPitcher.pitcher.pitcherStats.pitchingSaves) / simPitcher.pitcher.pitcherStats.pitchingSaves) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingGamesStarted != 0) {
+                    gsPercent = ((simPitcher.gamesStarted - simPitcher.pitcher.pitcherStats.pitchingGamesStarted) / simPitcher.pitcher.pitcherStats.pitchingGamesStarted) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingGames != 0) {
+                    gPercent = ((simPitcher.games - simPitcher.pitcher.pitcherStats.pitchingGames) / simPitcher.pitcher.pitcherStats.pitchingGames) * 100
+                }
+                StringBuilder builder = new StringBuilder("   ${format(next.teamName, 15)} ")
+                builder << " ${format(simPitcher.nameFirst + " " + simPitcher.nameLast, 30)}"
+                builder << "  ${format(winPercent.toInteger() + "%  -> " + simPitcher.wins + " / " + simPitcher.pitcher.pitcherStats.pitchingWins, 20)}"
+                builder << "  ${format(lossPercent.toInteger() + "%  -> " + simPitcher.losses + " / " + simPitcher.pitcher.pitcherStats.pitchingLosses, 20)}"
+                builder << "  ${format(savePercent.toInteger() + "%  -> " + simPitcher.saves + " / " + simPitcher.pitcher.pitcherStats.pitchingSaves, 20)}"
+                builder << "  ${format(gPercent.toInteger() + "%  -> " + simPitcher.games + " / " + simPitcher.pitcher.pitcherStats.pitchingGames, 20)}"
+                builder << "  ${format(gsPercent.toInteger() + "%  -> " + simPitcher.gamesStarted + " / " + simPitcher.pitcher.pitcherStats.pitchingGamesStarted, 20)}"
+                auditLog.debug builder.toString()
+            }
+
+            auditLog.debug format("${next.teamName} Reserve Pitchers: (${next.reservePitchers.size()})", 50) + "  " +
+                    format("Wins",20) + "  " +
+                    format("Losses",20) + "  " +
+                    format("Saves",20) + "  " +
+                    format("Games",20) + "  " +
+                    format("Games Started",20)
+            next.reservePitchers.each() { String playerID ->
+                GamePitcher nextPitcher = next.getPitcher(playerID)
+                SimPitcher simPitcher = nextPitcher.simPitcher
+                def winPercent = 0
+                def lossPercent = 0
+                def savePercent = 0
+                def gsPercent = 0
+                def gPercent = 0
+                numPitchers++
+                wins += simPitcher.pitcher.pitcherStats.pitchingWins
+                simWins += simPitcher.wins
+                losses += simPitcher.pitcher.pitcherStats.pitchingLosses
+                simLosses += simPitcher.losses
+                simSaves += simPitcher.saves
+                saves += simPitcher.pitcher.pitcherStats.pitchingSaves
+                gamesStarted += simPitcher.pitcher.pitcherStats.pitchingGamesStarted
+                simGamesStarted += simPitcher.gamesStarted
+                games += simPitcher.pitcher.pitcherStats.pitchingGames
+                simGames += simPitcher.games
+                if (simPitcher.pitcher.pitcherStats.pitchingWins != 0) {
+                    winPercent = ((simPitcher.wins - simPitcher.pitcher.pitcherStats.pitchingWins) / simPitcher.pitcher.pitcherStats.pitchingWins) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingLosses != 0) {
+                    lossPercent = ((simPitcher.losses - simPitcher.pitcher.pitcherStats.pitchingLosses) / simPitcher.pitcher.pitcherStats.pitchingLosses) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingSaves != 0) {
+                    savePercent = ((simPitcher.saves - simPitcher.pitcher.pitcherStats.pitchingSaves) / simPitcher.pitcher.pitcherStats.pitchingSaves) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingGamesStarted != 0) {
+                    gsPercent = ((simPitcher.gamesStarted - simPitcher.pitcher.pitcherStats.pitchingGamesStarted) / simPitcher.pitcher.pitcherStats.pitchingGamesStarted) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingGames != 0) {
+                    gPercent = ((simPitcher.games - simPitcher.pitcher.pitcherStats.pitchingGames) / simPitcher.pitcher.pitcherStats.pitchingGames) * 100
+                }
+                StringBuilder builder = new StringBuilder("   ${format(next.teamName, 15)} ")
+                builder << " ${format(simPitcher.nameFirst + " " + simPitcher.nameLast, 30)}"
+                builder << "  ${format(winPercent.toInteger() + "%  -> " + simPitcher.wins + " / " + simPitcher.pitcher.pitcherStats.pitchingWins, 20)}"
+                builder << "  ${format(lossPercent.toInteger() + "%  -> " + simPitcher.losses + " / " + simPitcher.pitcher.pitcherStats.pitchingLosses, 20)}"
+                builder << "  ${format(savePercent.toInteger() + "%  -> " + simPitcher.saves + " / " + simPitcher.pitcher.pitcherStats.pitchingSaves, 20)}"
+                builder << "  ${format(gPercent.toInteger() + "%  -> " + simPitcher.games + " / " + simPitcher.pitcher.pitcherStats.pitchingGames, 20)}"
+                builder << "  ${format(gsPercent.toInteger() + "%  -> " + simPitcher.gamesStarted + " / " + simPitcher.pitcher.pitcherStats.pitchingGamesStarted, 20)}"
+                auditLog.debug builder.toString()
+            }
+
+            // Closer
+            if (next.closer != null) {
+                auditLog.debug format("${next.teamName} Closer: (${next.originalBullpen.size()})", 50) + "  " +
+                        format("Wins",20) + "  " +
+                        format("Losses",20) + "  " +
+                        format("Saves",20) + "  " +
+                        format("Games",20) + "  " +
+                        format("Games Started",20)
+                GamePitcher nextPitcher = next.getPitcher(next.closer)
+                SimPitcher simPitcher = nextPitcher.simPitcher
+                def winPercent = 0
+                def lossPercent = 0
+                def savePercent = 0
+                def gsPercent = 0
+                def gPercent = 0
+                numPitchers++
+                wins += simPitcher.pitcher.pitcherStats.pitchingWins
+                simWins += simPitcher.wins
+                losses += simPitcher.pitcher.pitcherStats.pitchingLosses
+                simSaves += simPitcher.saves
+                saves += simPitcher.pitcher.pitcherStats.pitchingSaves
+                simLosses += simPitcher.losses
+                gamesStarted += simPitcher.pitcher.pitcherStats.pitchingGamesStarted
+                simGamesStarted += simPitcher.gamesStarted
+                games += simPitcher.pitcher.pitcherStats.pitchingGames
+                simGames += simPitcher.games
+                if (simPitcher.pitcher.pitcherStats.pitchingWins != 0) {
+                    winPercent = ((simPitcher.wins - simPitcher.pitcher.pitcherStats.pitchingWins) / simPitcher.pitcher.pitcherStats.pitchingWins) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingLosses != 0) {
+                    lossPercent = ((simPitcher.losses - simPitcher.pitcher.pitcherStats.pitchingLosses) / simPitcher.pitcher.pitcherStats.pitchingLosses) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingSaves != 0) {
+                    savePercent = ((simPitcher.saves - simPitcher.pitcher.pitcherStats.pitchingSaves) / simPitcher.pitcher.pitcherStats.pitchingSaves) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingGamesStarted != 0) {
+                    gsPercent = ((simPitcher.gamesStarted - simPitcher.pitcher.pitcherStats.pitchingGamesStarted) / simPitcher.pitcher.pitcherStats.pitchingGamesStarted) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingGames != 0) {
+                    gPercent = ((simPitcher.games - simPitcher.pitcher.pitcherStats.pitchingGames) / simPitcher.pitcher.pitcherStats.pitchingGames) * 100
+                }
+                StringBuilder builder = new StringBuilder("   ${format(next.teamName, 15)} ")
+                builder << " ${format(simPitcher.nameFirst + " " + simPitcher.nameLast, 30)}"
+                builder << "  ${format(winPercent.toInteger() + "%  -> " + simPitcher.wins + " / " + simPitcher.pitcher.pitcherStats.pitchingWins, 20)}"
+                builder << "  ${format(lossPercent.toInteger() + "%  -> " + simPitcher.losses + " / " + simPitcher.pitcher.pitcherStats.pitchingLosses, 20)}"
+                builder << "  ${format(savePercent.toInteger() + "%  -> " + simPitcher.saves + " / " + simPitcher.pitcher.pitcherStats.pitchingSaves, 20)}"
+                builder << "  ${format(gPercent.toInteger() + "%  -> " + simPitcher.games + " / " + simPitcher.pitcher.pitcherStats.pitchingGames, 20)}"
+                builder << "  ${format(gsPercent.toInteger() + "%  -> " + simPitcher.gamesStarted + " / " + simPitcher.pitcher.pitcherStats.pitchingGamesStarted, 20)}"
+                auditLog.debug builder.toString()
+            }
         }
+
         if (wins != 0) {
             ttlWinPercent = ((simWins - wins) / wins) * 100
         }

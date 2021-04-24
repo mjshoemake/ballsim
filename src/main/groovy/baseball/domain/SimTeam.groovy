@@ -45,6 +45,7 @@ class SimTeam extends SimTeamComparable {
     String gamesBack = ""
     boolean lineupSet = false
     Team team = null
+    boolean allPitchersProcessed = false
 
     SimTeam() {
     }
@@ -353,6 +354,10 @@ class SimTeam extends SimTeamComparable {
         // Trim down bullpen
         bullpenPlayers.sort { a, b -> a.pitcherStats.era?.toString() <=> b.pitcherStats.era?.toString() }
         if (bullpenPlayers.size() > 5) {
+            // Take top reliever and make him the closer.
+            this.closer = bullpenPlayers[0].playerID
+            bullpenPlayers.remove(0)
+
             // Remove pitchers to get down to 5.
             while (bullpenPlayers.size() > 5) {
                 reservePitchersPlayers << bullpenPlayers.get(bullpenPlayers.size() - 1)
