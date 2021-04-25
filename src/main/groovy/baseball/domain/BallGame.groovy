@@ -387,14 +387,33 @@ class BallGame {
         }
     }
 
-    private def getNextBatter() {
-        def batter
+    private GameBatter getNextBatter() {
+        GameBatter batter
         if (side == HalfInning.TOP) {
-            batter = awayTeam.lineup[awayTeam.nextBatter]
+            batter = getNextBatter(awayTeam)
         } else {
-            batter = homeTeam.lineup[homeTeam.nextBatter]
+            batter = getNextBatter(homeTeam)
         }
-        getBatter(batter)
+        batter
+    }
+
+    private GameBatter getNextBatter(SimTeam team) {
+        String playerID = team.lineup[team.nextBatter]
+        GameBatter batter = getBatter(playerID)
+        SimBatter simBatter = batter.simBatter
+        Map positions = team.positions
+        if (simBatter.atBats >= simBatter.batter.atBats) {
+            // Find a replacement batter for this batter on the bench.
+            team.bench.each() { nextHitter ->
+                positions.find {}
+            }
+        }
+        batter
+    }
+
+    // Returns the key for the specified value in the map.
+    private Object findMapKeyByValue(Object value) {
+
     }
 
     private void updatePitchersOfRecord() {

@@ -194,7 +194,7 @@ class Player extends Comparable {
         if (hits == 0 || atBats == 0) {
             BigDecimal.valueOf(0.0)
         } else {
-            BigDecimal.valueOf(hits / atBats)
+            BigDecimal.valueOf(hits).divide(BigDecimal.valueOf(atBats), 3,3)
         }
     }
 
@@ -340,6 +340,7 @@ class Player extends Comparable {
                     it.pitchingHomers = Integer.parseInt(pitchingStats.hr)
                     it.pitchingWins = Integer.parseInt(pitchingStats.w)
                     it.pitchingLosses = Integer.parseInt(pitchingStats.l)
+                    it.pitchingSaves = Integer.parseInt(pitchingStats.sv)
                     if (pitchingStats.wp.equals("")) {
                         it.pitchingWildPitch = 0
                     } else {

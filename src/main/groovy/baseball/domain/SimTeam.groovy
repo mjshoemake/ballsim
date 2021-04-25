@@ -383,10 +383,15 @@ class SimTeam extends SimTeamComparable {
             auditLog.info "   ${next.name} GS: ${next.pitcherStats.pitchingGamesStarted} GS: ${next.pitcherStats.pitchingGames} ERA: ${next.pitcherStats.era} Batters Retired: ${next.pitcherStats.pitchingBattersRetired} BB: ${next.pitcherStats.pitchingWalks} R: ${next.pitcherStats.pitchingRuns} ER: ${next.pitcherStats.pitchingEarnedRuns} SO: ${next.pitcherStats.pitchingStrikeouts} H: ${next.pitcherStats.pitchingHits} HR: ${next.pitcherStats.pitchingHomers} WP: ${next.pitcherStats.pitchingWildPitch} HBP: ${next.pitcherStats.pitchingHitBatter} Balk: ${next.pitcherStats.pitchingBalks} WHIP: ${next.pitcherStats.pitchingWhip}"
         }
 
+        if (teamName.contains("Braves")) {
+            auditLog.debug("BRAVES FOUND!!!")
+        }
+
         // Create lineup.
         // POWER: Who hits the most home runs?
         auditLog.debug ""
-        battersPlayers.sort { a, b -> a.homers <=> b.homers }
+        battersPlayers.sort { a, b -> a.simBatter.batter.homers <=> b.simBatter.batter.homers }
+        auditLog.debug "${battersPlayers[0].toString()}"
         int i = battersPlayers.size() - 1
         // Found cleanup hitter.
         auditLog.debug "#4 hitter: ${battersPlayers[i].name} Pos: ${battersPlayers[i].position} HR: ${battersPlayers[i].homers} SB: ${battersPlayers[i].stolenBases} Avg: ${battersPlayers[i].battingAvg} AB: ${battersPlayers[i].atBats}"
@@ -406,12 +411,12 @@ class SimTeam extends SimTeamComparable {
         i--
 
         // SPEED: Who steals the most bases?
-        battersPlayers.sort { a, b -> a.stolenBases <=> b.stolenBases }
+        battersPlayers.sort { a, b -> a.simBatter.batter.stolenBases <=> b.simBatter.batter.stolenBases }
         i = battersPlayers.size() - 1
         while (i >= 0 && speed.size() < 2) {
-            if (battersPlayers[i].battingAvg > new BigDecimal(".290") && batters[i].stolenBases > 25) {
+            if (battersPlayers[i].simBatter.batter.battingAvg > new BigDecimal(".290") && battersPlayers[i].simBatter.batter.stolenBases > 25) {
                 // Speed And Contact
-                auditLog.debug "SpeedAndContact Found: ${battersPlayers[i].name} Pos: ${battersPlayers[i].position} SB: ${battersPlayers[i].stolenBases} Avg: ${battersPlayers[i].battingAvg} AB: ${battersPlayers[i].atBats}"
+                auditLog.debug "SpeedAndContact Found: ${battersPlayers[i].name} Pos: ${battersPlayers[i].position} SB: ${battersPlayers[i].simBatter.batter.stolenBases} Avg: ${battersPlayers[i].simBatter.batter.battingAvg} AB: ${battersPlayers[i].simBatter.batter.atBats}"
                 speedAndContact << battersPlayers[i]
                 battersPlayers.remove(i)
                 i--
@@ -427,12 +432,12 @@ class SimTeam extends SimTeamComparable {
         }
 
         // CONTACT: Who has the best batting avg?
-        battersPlayers.sort { a, b -> a.battingAvg <=> b.battingAvg }
+        battersPlayers.sort { a, b -> a.simBatter.batter.battingAvg <=> b.simBatter.batter.battingAvg }
         i = battersPlayers.size() - 1
         while (i >= 0) {
-            if (battersPlayers[i].atBats > 200) {
+            if (battersPlayers[i].simBatter.batter.battingAvg > new BigDecimal(".275") && battersPlayers[i].simBatter.batter.atBats > 200) {
                 // Contact
-                auditLog.debug "Contact Found: ${battersPlayers[i].name} Pos: ${battersPlayers[i].position} SB: ${battersPlayers[i].stolenBases} Avg: ${battersPlayers[i].battingAvg} AB: ${battersPlayers[i].atBats}"
+                auditLog.debug "Contact Found: ${battersPlayers[i].name} Pos: ${battersPlayers[i].position} SB: ${battersPlayers[i].simBatter.batter.stolenBases} Avg: ${battersPlayers[i].simBatter.batter.battingAvg} AB: ${battersPlayers[i].simBatter.batter.atBats}"
                 contact << battersPlayers[i]
                 battersPlayers.remove(i)
                 i--
@@ -443,7 +448,7 @@ class SimTeam extends SimTeamComparable {
         i = battersPlayers.size() - 1
         while (i >= 0) {
             // Remainder
-            auditLog.debug "Remainder Found: ${battersPlayers[i].name} Pos: ${battersPlayers[i].position} SB: ${battersPlayers[i].stolenBases} Avg: ${battersPlayers[i].battingAvg} AB: ${battersPlayers[i].atBats}"
+            auditLog.debug "Remainder Found: ${battersPlayers[i].name} Pos: ${battersPlayers[i].position} SB: ${battersPlayers[i].simBatter.batter.stolenBases} Avg: ${battersPlayers[i].simBatter.batter.battingAvg} AB: ${battersPlayers[i].simBatter.batter.atBats}"
             remainder << battersPlayers[i]
             battersPlayers.remove(i)
             i--
@@ -479,20 +484,37 @@ class SimTeam extends SimTeamComparable {
         }
 
         // Out of players? Fill up rest of line up using remainder players.
-        while (lineup.size() < 9 && remainder.size() > 0) {
+        auditLog.debug("Iterating through remainder players...")
+        int iterations = 0
+        while (lineup.size() < 9 && remainder.size() > 0 && iterations < 40) {
             primaryPosition = remainder[0].position
             addIfPositionAvailable(primaryPosition, remainder, "Remainder", roster, lineup, bench, middleInfielders, outerInfielders, benchPlayers, lineupPlayers)
+            iterations++
         }
+
+        auditLog.debug("All players processed. Checking infielders.")
         if (! positions["SS"]) {
+            if (middleInfielders.size() == 0) {
+                throw new Exception("No middle-infielders identified and SS position still not filled.")
+            }
             addIfPositionAvailable("SS", middleInfielders, "MiddleInfielders", roster, lineup, bench, middleInfielders, outerInfielders, benchPlayers, lineupPlayers)
         }
         if (! positions["2B"]) {
+            if (middleInfielders.size() == 0) {
+                throw new Exception("No middle-infielders identified and 2B position still not filled.")
+            }
             addIfPositionAvailable("2B", middleInfielders, "MiddleInfielders", roster, lineup, bench, middleInfielders, outerInfielders, benchPlayers, lineupPlayers)
         }
         if (! positions["3B"]) {
+            if (outerInfielders.size() == 0) {
+                throw new Exception("No outer-infielders identified and 3B position still not filled.")
+            }
             addIfPositionAvailable("3B", outerInfielders, "OuterInfielders", roster, lineup, bench, middleInfielders, outerInfielders, benchPlayers, lineupPlayers)
         }
         if (! positions["1B"]) {
+            if (outerInfielders.size() == 0) {
+                throw new Exception("No outer-infielders identified and 1B position still not filled.")
+            }
             addIfPositionAvailable("1B", outerInfielders, "OuterInfielders", roster, lineup, bench, middleInfielders, outerInfielders, benchPlayers, lineupPlayers)
         }
 
@@ -533,7 +555,8 @@ class SimTeam extends SimTeamComparable {
 
     void addIfPositionAvailable(def primaryPosition, def sourceList, def category, Map roster, List lineup, List bench, List middleInfielders, List outerInfielders, List benchPlayers, List lineupPlayers) {
         // Get the playerID and then get the player from the roster.
-        def player = sourceList[0]
+        GameBatter player = sourceList[0]
+        StringBuilder builder = new StringBuilder("Processing ${player.nameFirst} ${player.nameLast}... ")
         if (primaryPosition == "OF") {
             if (! positions["LF"]) {
                 primaryPosition = "LF"
@@ -544,6 +567,8 @@ class SimTeam extends SimTeamComparable {
             } else {
                 primaryPosition = "LF"
             }
+        } else if (primaryPosition == "PR") {
+            primaryPosition = "DH"
         }
         // Assign a fielding position and make sure that position is not taken.
 
@@ -553,7 +578,7 @@ class SimTeam extends SimTeamComparable {
                 sourceList[0].position = "DH"
                 positions["DH"] = player?.playerID
                 player.position = "DH"
-                auditLog.info "   ${lineupPlayers.size() + 1}: ${player.name} Primary Pos: ${primaryPosition} Pos: ${player.position} SB: ${player.stolenBases} HR: ${player.homers} Avg: ${player.battingAvg} AB: ${player.atBats}   ${category}"
+                auditLog.info "   ${lineupPlayers.size() + 1}: ${player.name} Primary Pos: ${primaryPosition} Pos: ${player.position} SB: ${player.simBatter.batter.stolenBases} HR: ${player.simBatter.batter.homers} Avg: ${player.simBatter.batter.battingAvg} AB: ${player.simBatter.batter.atBats}   ${category}"
                 lineupPlayers << player
                 if (lineupPlayers.size() > 9) {
                     throw new Exception("Integrity Check failed. Lineup must no more than 9 players.")
@@ -566,9 +591,11 @@ class SimTeam extends SimTeamComparable {
             if (positions["DH"]) {
                 // Already taken. Skip this person.
                 if (primaryPosition in ["2B","SS"]) {
-                   middleInfielders << player
+                    builder << "Middle-Infielder. "
+                    middleInfielders << player
                 }
                 if (primaryPosition in ["1B","3B"]) {
+                    builder << "Outer-Infielder. "
                     outerInfielders << player
                 }
                 benchPlayers << player
@@ -578,7 +605,7 @@ class SimTeam extends SimTeamComparable {
                 sourceList[0].position = "DH"
                 positions["DH"] = player?.playerID
                 player.position = "DH"
-                auditLog.info "   ${lineupPlayers.size() + 1}: ${player.name} Primary Pos: ${primaryPosition} Pos: ${player.position} SB: ${player.stolenBases} HR: ${player.homers} Avg: ${player.battingAvg} AB: ${player.atBats}   ${category}"
+                auditLog.info "   ${lineupPlayers.size() + 1}: ${player.name} Primary Pos: ${primaryPosition} Pos: ${player.position} SB: ${player.simBatter.batter.stolenBases} HR: ${player.simBatter.batter.homers} Avg: ${player.simBatter.batter.battingAvg} AB: ${player.simBatter.batter.atBats}   ${category}"
                 lineupPlayers << player
                 if (lineupPlayers.size() > 9) {
                     throw new Exception("Integrity Check failed. Lineup must no more than 9 players.")
@@ -592,7 +619,7 @@ class SimTeam extends SimTeamComparable {
             }
             positions[primaryPosition] = player?.playerID
             player?.position = primaryPosition
-            auditLog.info "   ${lineupPlayers.size() + 1}: ${player.name} Primary Pos: ${primaryPosition} Pos: ${player.position} SB: ${player.stolenBases} HR: ${player.homers} Avg: ${player.battingAvg} AB: ${player.atBats}   ${category}"
+            auditLog.info "   ${lineupPlayers.size() + 1}: ${player.name} Primary Pos: ${primaryPosition} Pos: ${player.position} SB: ${player.simBatter.batter.stolenBases} HR: ${player.simBatter.batter.homers} Avg: ${player.simBatter.batter.battingAvg} AB: ${player.simBatter.batter.atBats}   ${category}"
             lineupPlayers << player
             if (lineupPlayers.size() > 9) {
                 throw new Exception("Integrity Check failed. Lineup must no more than 9 players.")
@@ -600,6 +627,7 @@ class SimTeam extends SimTeamComparable {
             benchPlayers.remove(player)
             sourceList.remove(0)
         }
+        auditLog.debug(builder.toString())
     }
 
     GameBatter getBatter(String playerID) {

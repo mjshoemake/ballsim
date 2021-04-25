@@ -95,6 +95,10 @@ class GameBatter extends GameBatterComparable {
         return result
     }
 
+    String toString() {
+        "${getName()}  Games: ${simBatter?.games}/${simBatter?.batter.games} HR: ${simBatter?.batter?.homers} Avg: ${simBatter?.batter?.battingAvg} SB: ${simBatter?.batter?.stolenBases}"
+    }
+
     String getPlayerID() {
         this.simBatter?.playerID
     }

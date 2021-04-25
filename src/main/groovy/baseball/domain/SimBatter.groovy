@@ -5,6 +5,7 @@ import baseball.processing.HttpHistoricalDataManager
 class SimBatter extends Comparable {
 
     def C = "SimBatter"
+    int games = 0
     int battingPos = 0
     int atBats = 0
     int walks = 0
@@ -26,6 +27,7 @@ class SimBatter extends Comparable {
     }
 
     SimBatter(Map map) {
+        this.games = map.games
         this.battingPos = map.battingPos
         this.atBats = map.atBats
         this.walks = map.walks
@@ -54,6 +56,7 @@ class SimBatter extends Comparable {
         if (! compareString("nameFirst", nameFirst, target.nameFirst)) { result = false }
         else if (! compareString("nameLast", nameLast, target.nameLast)) { result = false }
         else if (! compareInt("battingPos", battingPos, target.battingPos)) { result = false }
+        else if (! compareInt("games", games, target.games)) { result = false }
         else if (! compareInt("atBats", atBats, target.atBats)) { result = false }
         else if (! compareInt("walks", walks, target.walks)) { result = false }
         else if (! compareInt("strikeouts", strikeouts, target.strikeouts)) { result = false }
@@ -80,6 +83,7 @@ class SimBatter extends Comparable {
         if (! compareString("nameLast", nameLast, target.nameLast, builder)) { result = false }
         if (! compareString("primaryPosition", primaryPosition, target.primaryPosition, builder)) { result = false }
         if (! compareInt("battingPos", battingPos, target.battingPos, builder)) { result = false }
+        if (! compareInt("games", games, target.games, builder)) { result = false }
         if (! compareInt("atBats", atBats, target.atBats, builder)) { result = false }
         if (! compareInt("walks", walks, target.walks, builder)) { result = false }
         if (! compareInt("strikeouts", strikeouts, target.strikeouts, builder)) { result = false }
