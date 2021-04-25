@@ -230,9 +230,15 @@ class SimulationManager {
         sim
     }
 
-    Simulation logStatsAccuracy(Simulation sim) {
-        def m = "${C}.logStasAccuracy() - "
-        sim.logStatsAccuracy()
+    Simulation logPitchingStatsAccuracy(Simulation sim) {
+        def m = "${C}.logPitchingStasAccuracy() - "
+        sim.logPitchingStatsAccuracy()
+        sim
+    }
+
+    Simulation logBattingStatsAccuracy(Simulation sim) {
+        def m = "${C}.logBattingStasAccuracy() - "
+        sim.logBattingStatsAccuracy()
         sim
     }
 

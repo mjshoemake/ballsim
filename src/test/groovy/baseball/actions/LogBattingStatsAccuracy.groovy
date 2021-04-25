@@ -11,9 +11,9 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-class LogStatsAccuracy {
+class LogBattingStatsAccuracy {
 
-    def C = "LogStatsAccuracy"
+    def C = "LogBattingStatsAccuracy"
     def ballGame = null
     def loader = null
     def log = Logger.getLogger("Debug");
@@ -47,26 +47,26 @@ class LogStatsAccuracy {
     void run() {
         def m = "${C}.run() - "
         PerformanceMetrics perf = new PerformanceMetrics()
-        perf.resetMetrics("LogStatsAccuracy.run")
-        perf.startEvent("LogStatsAccuracy.run", "Main")
+        perf.resetMetrics("LogBattingStatsAccuracy.run")
+        perf.startEvent("LogBattingStatsAccuracy.run", "Main")
 
         // Reload the simulation
         println "$m calling SimulationManager.findSimulation($simulationID)..."
-        perf.startEvent("LogStatsAccuracy.run", "LoadSim")
+        perf.startEvent("LogBattingStatsAccuracy.run", "LoadSim")
         Simulation sim = simMgr.findSimulation(simulationID)
-        perf.endEvent("LogStatsAccuracy.run", "LoadSim")
+        perf.endEvent("LogBattingStatsAccuracy.run", "LoadSim")
         println "$m calling SimulationManager.findSimulation($simulationID)... Done"
 
         // Play Simulation Game
         println "$m calling SimulationManager.logStatsAccuracy()... SimID: $simulationID"
-        perf.startEvent("LogStatsAccuracy.run", "LogSchedule")
-        simMgr.logStatsAccuracy(sim)
-        perf.endEvent("LogStatsAccuracy.run", "LogSchedule")
+        perf.startEvent("LogBattingStatsAccuracy.run", "LogSchedule")
+        simMgr.logBattingStatsAccuracy(sim)
+        perf.endEvent("LogBattingStatsAccuracy.run", "LogSchedule")
         println "$m calling SimulationManager.logStatsAccuracy()... Done"
 
         println "$m Log Stats Accuracy Completed Successfully!"
 
-        perf.endEvent("LogStatsAccuracy.run", "Main")
+        perf.endEvent("LogBattingStatsAccuracy.run", "Main")
         perf.writeMetricsToLog()
 
     }
