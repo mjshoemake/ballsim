@@ -3,7 +3,7 @@ package baseball.domain
 class GameBatter extends GameBatterComparable {
 
     def C = "GameBatter"
-    def simBatter
+    SimBatter simBatter
     int battingPos = 0
     int atBats = 0
     int walks = 0
@@ -96,7 +96,7 @@ class GameBatter extends GameBatterComparable {
     }
 
     String toString() {
-        "${getName()}  Games: ${simBatter?.games}/${simBatter?.batter.games} HR: ${simBatter?.batter?.homers} Avg: ${simBatter?.batter?.battingAvg} SB: ${simBatter?.batter?.stolenBases}"
+        "${getName()} (${position}/${simBatter.batter.primaryPosition}) Games: ${simBatter?.games}/${simBatter?.batter.games} HR: ${simBatter?.batter?.homers} Avg: ${simBatter?.batter?.battingAvg} SB: ${simBatter?.batter?.stolenBases} AB: ${simBatter?.atBats}/${simBatter?.batter?.atBats}"
     }
 
     String getPlayerID() {

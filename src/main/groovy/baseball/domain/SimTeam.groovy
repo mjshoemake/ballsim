@@ -38,7 +38,7 @@ class SimTeam extends SimTeamComparable {
     String closer
     String pitcherOfRecord
     int pitchCount = 0
-    def positions = [:]
+    BidirectionalHashMap positions = new BidirectionalHashMap()
     int wins = 0
     int losses = 0
     int winDiff = 0
@@ -540,6 +540,9 @@ class SimTeam extends SimTeamComparable {
             this.originalLineup << next.playerID
         }
         this.bench.clear()
+        benchPlayers.sort { a, b -> a.simBatter.batter.battingAvg <=> b.simBatter.batter.battingAvg }
+        // Sort descending
+        benchPlayers.reverse(true)
         benchPlayers.each { GameBatter next ->
             this.bench << next.playerID
             this.originalBench << next.playerID

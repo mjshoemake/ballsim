@@ -398,23 +398,120 @@ class BallGame {
     }
 
     private GameBatter getNextBatter(SimTeam team) {
-        String playerID = team.lineup[team.nextBatter]
+        int nextBatterNum = team.nextBatter
+        String playerID = team.lineup[nextBatterNum]
         GameBatter batter = getBatter(playerID)
+        GameBatter replacement = null
         SimBatter simBatter = batter.simBatter
         Map positions = team.positions
+        String[] positionOptions = []
         if (simBatter.atBats >= simBatter.batter.atBats) {
+            if (batter.name == "Javy Lopez") {
+                auditLog.debug("Javy Lopez found!!!!")
+            }
+
+            // What position was this batter fielding?
+            String position = positions.getKeyForValue(playerID)
+            if (position == null) {
+                auditPositionsMap(team)
+                throw new Exception("Position is not set for the specified player ($playerID).")
+            }
+            auditLog.debug("Replacing ${batter.nameFirst} ${batter.nameLast} ID=${batter.playerID} (${position}) At Bats: ${batter.simBatter.atBats}/${batter.simBatter.batter.atBats}.")
+            if (position.equals("SS")) {
+                positionOptions = ["SS", "2B", "IF"]
+            } else if (position.equals("2B")) {
+                positionOptions = ["2B", "SS", "IF"]
+            } else if (position.equals("1B")) {
+                positionOptions = ["1B", "3B", "IF"]
+            } else if (position.equals("3B")) {
+                positionOptions = ["3B", "1B", "IF"]
+            } else if (position.equals("LF")) {
+                positionOptions = ["LF", "OF", "RF", "CF"]
+            } else if (position.equals("RF")) {
+                positionOptions = ["RF", "OF", "LF", "CF"]
+            } else if (position.equals("CF")) {
+                positionOptions = ["CF", "OF", "LF", "RF"]
+            } else if (position.equals("OF")) {
+                positionOptions = ["OF", "LF", "CF", "RF"]
+            } else if (position.equals("C")) {
+                positionOptions = ["C"]
+            } else if (position.equals("DH")) {
+                positionOptions = ["DH", "LF", "CF", "RF", "OF", "1B", "2B", "3B", "SS", "C", "IF"]
+            }
+
+            if (! positionOptions || positionOptions?.size() == 0) {
+                throw new Exception("PositionOptions not set (length must be at least 1).")
+            }
+
             // Find a replacement batter for this batter on the bench.
-            team.bench.each() { nextHitter ->
-                positions.find {}
+            GameBatter reserveOption = null
+            team.bench.find() { String nextBatter ->
+                GameBatter candidate = getBatter(nextBatter)
+                if (candidate.simBatter.batter.primaryPosition == positionOptions[0] && candidate.simBatter.atBats < candidate.simBatter.batter.atBats && replacement == null && team.positions.getKeyForValue(candidate.playerID) == null) {
+                    team.lineup[nextBatterNum] = candidate.playerID
+                    team.positions[position] = nextBatter
+                    auditLog.debug("   Replacement: ${candidate.nameFirst} ${candidate.nameLast} ID=${candidate.playerID} ($position/${candidate.simBatter.batter.primaryPosition}) Avg: ${candidate.simBatter.batter.battingAvg} At Bats: ${candidate.simBatter.atBats}/${candidate.simBatter.batter.atBats}")
+                    if (! auditPositionsMap(team)) {
+                        auditLog.debug("Positions don't match!!")
+                    }
+                    replacement = candidate
+                    return true
+                } else if (positionOptions.contains(candidate.simBatter.batter.primaryPosition) && candidate.simBatter.atBats < candidate.simBatter.batter.atBats && reserveOption == null && team.positions.getKeyForValue(candidate.playerID) == null) {
+                    auditLog.debug("   Backup: ${candidate.nameFirst} ${candidate.nameLast} ID=${candidate.playerID} ($position/${candidate.simBatter.batter.primaryPosition}) Avg: ${candidate.simBatter.batter.battingAvg} At Bats: ${candidate.simBatter.atBats}/${candidate.simBatter.batter.atBats}")
+                    reserveOption = candidate
+                } else {
+                    auditLog.debug("   Skipping: ${candidate.nameFirst} ${candidate.nameLast} ID=${candidate.playerID} ($position/${candidate.simBatter.batter.primaryPosition}) Avg: ${candidate.simBatter.batter.battingAvg} At Bats: ${candidate.simBatter.atBats}/${candidate.simBatter.batter.atBats}")
+                }
+                return false
+            }
+            if (reserveOption != null && replacement == null && team.positions.getKeyForValue(reserveOption.playerID) == null) {
+                team.lineup[nextBatterNum] = reserveOption.playerID
+                team.positions[position] = reserveOption.playerID
+                auditLog.debug("   Replacement: ${reserveOption.nameFirst} ${reserveOption.nameLast} ID=${reserveOption.playerID} ($position)")
+                if (! auditPositionsMap(team)) {
+                    auditLog.debug("Positions don't match!!")
+                }
+                replacement = reserveOption
+            } else if (replacement == null && team.positions.getKeyForValue(team.originalLineup[nextBatterNum]) == null) {
+                // Unable to find a replacement. Pull from original lineup.
+                GameBatter fromLineup = getBatter(team.originalLineup[nextBatterNum])
+                team.lineup[nextBatterNum] = fromLineup.playerID
+                team.positions[position] = fromLineup.playerID
+                auditLog.debug("   Replacement from Original Lineup: ${fromLineup.nameFirst} ${fromLineup.nameLast} ID=${fromLineup.playerID} ($position)")
+                if (! auditPositionsMap(team)) {
+                    auditLog.debug("Positions don't match!!")
+                }
+                replacement = fromLineup
             }
         }
-        batter
+
+        if (replacement == null) {
+            batter
+        } else {
+            replacement
+        }
     }
 
-    // Returns the key for the specified value in the map.
-    private Object findMapKeyByValue(Object value) {
-
+    private boolean auditPositionsMap(SimTeam team) {
+        boolean matches = true
+        team.positions.keySet().each { nextKey ->
+            String actualPos = nextKey
+            String lookupPos = team.positions.getKeyForValue(team.positions[nextKey])
+            if (actualPos != lookupPos) {
+                matches = false
+            }
+        }
+        if (! matches) {
+            auditLog.error("Position dump:")
+            team.positions.keySet().each { nextKey ->
+                String actualPos = nextKey
+                String lookupPos = team.positions.getKeyForValue(team.positions[nextKey])
+                auditLog.error("   $nextKey: ${team.positions[nextKey]} -> ${lookupPos}")
+            }
+        }
+        return matches
     }
+
 
     private void updatePitchersOfRecord() {
         if (homeScore == awayScore) {

@@ -930,7 +930,7 @@ class Simulation extends Comparable {
                     format("Triples", 20) + "  " +
                     format("Stolen Bases", 20)
 
-            next.lineup.each() { String playerID ->
+            next.originalLineup.each() { String playerID ->
                 GameBatter nextBatter = next.getBatter(playerID)
                 SimBatter simBatter = nextBatter.simBatter
                 def atBatsPercent = 0
