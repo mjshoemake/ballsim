@@ -106,7 +106,7 @@ class SimulationManager {
         // Schedule
         def scheduleLoader = new ScheduleLoader()
         String scheduleName = sim.getScheduleName()
-        log.debug "$m Loading schedule from file..."
+        log.debug "$m Loading schedule from file... $scheduleName"
         sim.schedule = scheduleLoader.loadScheduleFromFile(scheduleName, sim.getTeamCount())
         sim.schedule.simulationID = sim.simulationID
         log.debug "$m Loading schedule from file... Done."

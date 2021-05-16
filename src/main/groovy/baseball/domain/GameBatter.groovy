@@ -103,6 +103,10 @@ class GameBatter extends GameBatterComparable {
         this.simBatter?.playerID
     }
 
+    boolean isLocked() {
+        this.simBatter?.locked
+    }
+
     String getName() {
         this.simBatter?.batter.name
     }

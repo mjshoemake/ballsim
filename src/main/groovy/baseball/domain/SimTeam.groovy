@@ -22,6 +22,7 @@ class SimTeam extends SimTeamComparable {
     def originalRotation = []
     def originalBullpen = []
     def additionalStarters = []
+    def defaultHitterForPos = new BidirectionalHashMap()
 
     // Need to modify other lists so that they contain IDs, not actual objects.
     // The actual objects should only be found in the roster map.
@@ -387,12 +388,56 @@ class SimTeam extends SimTeamComparable {
             auditLog.debug("BRAVES FOUND!!!")
         }
 
+        // Cleanup batter data.
+        battersPlayers = cleanupBatters(battersPlayers)
+
+        // Sort by atbats and save hitter with most atbats for each position.
+        battersPlayers.sort { a, b -> a.simBatter.batter.atBats <=> b.simBatter.batter.atBats }
+        String lf, cf, rf
+        List of = []
+        int positionsFilled = 0
+        int i = battersPlayers.size() - 1
+        while (i >= 0 && positionsFilled < 8) {
+            GameBatter next = battersPlayers[i]
+            if (next.position == "LF" && lf == null) {
+                lf = next.playerID
+            } else if (next.position == "RF" && rf == null) {
+                rf = next.playerID
+            } else if (next.position == "CF" && cf == null) {
+                cf = next.playerID
+            } else if (next.position == "OF" && of.size() < 3) {
+                of << next.playerID
+            } else if (next.position in ["C","1B","2B","3B","SS"] && ! defaultHitterForPos.containsKey(next.position)) {
+                // Infielders
+                defaultHitterForPos[next.position] = next.playerID
+            }
+            i--
+        }
+        if (lf != null) {
+            defaultHitterForPos["LF"] = lf
+        } else {
+            defaultHitterForPos["LF"] = of[0]
+            of.remove(0)
+        }
+        if (rf != null) {
+            defaultHitterForPos["RF"] = rf
+        } else {
+            defaultHitterForPos["RF"] = of[0]
+            of.remove(0)
+        }
+        if (cf != null) {
+            defaultHitterForPos["CF"] = cf
+        } else {
+            defaultHitterForPos["CF"] = of[0]
+            of.remove(0)
+        }
+
         // Create lineup.
         // POWER: Who hits the most home runs?
         auditLog.debug ""
         battersPlayers.sort { a, b -> a.simBatter.batter.homers <=> b.simBatter.batter.homers }
         auditLog.debug "${battersPlayers[0].toString()}"
-        int i = battersPlayers.size() - 1
+        i = battersPlayers.size() - 1
         // Found cleanup hitter.
         auditLog.debug "#4 hitter: ${battersPlayers[i].name} Pos: ${battersPlayers[i].position} HR: ${battersPlayers[i].homers} SB: ${battersPlayers[i].stolenBases} Avg: ${battersPlayers[i].battingAvg} AB: ${battersPlayers[i].atBats}"
         power << battersPlayers[i]
@@ -457,7 +502,7 @@ class SimTeam extends SimTeamComparable {
         // Players organized. Set lineup and defensive positions.
         auditLog.info ""
         auditLog.info "Batting Order:  $year $teamName"
-        int positionsFilled = 0
+        positionsFilled = 0
         def primaryPosition
         // Speed And Contact
         while (speedAndContact.size() > 0) {
@@ -552,6 +597,25 @@ class SimTeam extends SimTeamComparable {
             this.reservePitchers << next.playerID
             if (next.pitcherStats.pitchingGamesStarted > 0) {
                 this.additionalStarters << next.playerID
+            }
+        }
+
+        positions.keySet().each() { key ->
+            String playerID = positions[key]
+            if (! defaultHitterForPos.containsKey(key) && ! defaultHitterForPos.containsValue(playerID)) {
+                defaultHitterForPos[key] = playerID
+            }
+        }
+
+        if (defaultHitterForPos.size() < 8) {
+            throw new Exception("Default Hitter For Position map should have at least 8 entries. Actual: ${defaultHitterForPos.size()}")
+        }
+    }
+
+    List cleanupBatters(List batters) {
+        batters.each() { next ->
+            if (next.name == "Bobby Bonilla" && year == "1990") {
+                next.simBatter.batter.primaryPosition = "RF"
             }
         }
     }

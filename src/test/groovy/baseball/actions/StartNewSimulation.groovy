@@ -53,7 +53,7 @@ class StartNewSimulation {
 
     void createNewSimulation() {
         def m = "${C}.createNewSimulation() - "
-        def year = "1992"
+        def year = "1990"
 
         // Delete the simulation, just in case a sim with this ID exists.
         println "$m calling SimulationManager.deleteSimulation()... SimID: $simulationID"

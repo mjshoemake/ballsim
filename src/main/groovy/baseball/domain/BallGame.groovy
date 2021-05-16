@@ -405,7 +405,7 @@ class BallGame {
         SimBatter simBatter = batter.simBatter
         Map positions = team.positions
         String[] positionOptions = []
-        if (simBatter.atBats >= simBatter.batter.atBats) {
+        if (simBatter.atBats >= simBatter.batter.atBats && ! simBatter.locked) {
             if (batter.name == "Javy Lopez") {
                 auditLog.debug("Javy Lopez found!!!!")
             }
@@ -418,13 +418,13 @@ class BallGame {
             }
             auditLog.debug("Replacing ${batter.nameFirst} ${batter.nameLast} ID=${batter.playerID} (${position}) At Bats: ${batter.simBatter.atBats}/${batter.simBatter.batter.atBats}.")
             if (position.equals("SS")) {
-                positionOptions = ["SS", "2B", "IF"]
+                positionOptions = ["SS", "2B", "IF", "3B", "1B"]
             } else if (position.equals("2B")) {
-                positionOptions = ["2B", "SS", "IF"]
+                positionOptions = ["2B", "SS", "IF", "3B", "1B"]
             } else if (position.equals("1B")) {
-                positionOptions = ["1B", "3B", "IF"]
+                positionOptions = ["1B", "3B", "IF", "2B"]
             } else if (position.equals("3B")) {
-                positionOptions = ["3B", "1B", "IF"]
+                positionOptions = ["3B", "1B", "IF", "SS"]
             } else if (position.equals("LF")) {
                 positionOptions = ["LF", "OF", "RF", "CF"]
             } else if (position.equals("RF")) {
@@ -474,12 +474,17 @@ class BallGame {
                 replacement = reserveOption
             } else if (replacement == null && team.positions.getKeyForValue(team.originalLineup[nextBatterNum]) == null) {
                 // Unable to find a replacement. Pull from original lineup.
-                GameBatter fromLineup = getBatter(team.originalLineup[nextBatterNum])
+                GameBatter fromLineup = getBatter(team.defaultHitterForPos[position])
+                if (fromLineup == null) {
+                    fromLineup = getBatter(team.originalLineup[nextBatterNum])
+                }
+                fromLineup.simBatter.locked = true
                 team.lineup[nextBatterNum] = fromLineup.playerID
                 team.positions[position] = fromLineup.playerID
-                auditLog.debug("   Replacement from Original Lineup: ${fromLineup.nameFirst} ${fromLineup.nameLast} ID=${fromLineup.playerID} ($position)")
+                auditLog.debug("   Replacement -> Default $position: ${fromLineup.nameFirst} ${fromLineup.nameLast} ID=${fromLineup.playerID} ($position)")
                 if (! auditPositionsMap(team)) {
                     auditLog.debug("Positions don't match!!")
+                    throw new Exception("Positions don't match.")
                 }
                 replacement = fromLineup
             }

@@ -21,6 +21,7 @@ class SimBatter extends Comparable {
     int rbi = 0
     Player batter
     boolean maxedOut = false
+    boolean locked = false
 
     SimBatter(Player batter) {
         this.batter = batter
