@@ -3032,3 +3032,7 @@ out/test/ballsim/baseball/ReplaySeasonTests.class
 out/test/ballsim/baseball/ScheduleLoaderTest.class
 out/production/ballsim/main/resources/schedules/AA7-AB7_BA6-BB6-team-schedule.txt
 out/production/ballsim/schedules/AA7-AB7_BA6-BB6-team-schedule.txt
+out/production/ballsim/main/resources/schedules/AA5-AB5-AC5_BA5-BB5-BC5-team-schedule.txt
+out/production/ballsim/main/resources/schedules/AA7-AB7_BA7-BB7-team-schedule.txt
+out/production/ballsim/schedules/AA5-AB5-AC5_BA5-BB5-BC5-team-schedule.txt
+out/production/ballsim/schedules/AA7-AB7_BA7-BB7-team-schedule.txt

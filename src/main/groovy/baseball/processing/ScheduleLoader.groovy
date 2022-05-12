@@ -74,41 +74,43 @@ class ScheduleLoader {
         ScheduledRound currentRound = new ScheduledRound(1)
 
         scheduleText.eachLine() {
-            def columns = it.split("\t")
+            if (! it.startsWith("--")) {
+                def columns = it.split("\t")
 
-            if ((! (columns[0] == "Round" && columns[1] == "Game #" && columns[2] == "Home Team")) && (columns[0] != "")) {
-                roundNum = Integer.parseInt(columns[0])
-                gameNum = Integer.parseInt(columns[1])
-                //println("$roundNum - $gameNum")
-                def homeTeam
-                def awayTeam
-                if (trimTeamName) {
-                    homeTeam = (Integer.parseInt(columns[2].substring(5)) - 1)
-                    awayTeam = (Integer.parseInt(columns[3].substring(5)) - 1)
-                } else {
-                    homeTeam = columns[2]
-                    awayTeam = columns[3]
-                }
-                if (roundNum != lastRoundNum) {
-                    //println "Adding round: ${currentRound.roundNum}  home: ${currentRound.games[0].homeTeam}  away: ${currentRound.games[0].awayTeam}"
-                    scheduledSeason.addRound(currentRound)
-                    for (int i=1; i <= roundNum - lastRoundNum - 1; i++) {
-                        // Complete existing round.
-                        currentRound = currentRound.copy()
-                        scheduledSeason.addRound(currentRound)
-                        //println "Adding round: ${currentRound.roundNum} Size: ${scheduledSeason.rounds.size()}  home: ${currentRound.games[0].homeTeam}  away: ${currentRound.games[0].awayTeam}"
+                if ((! (columns[0] == "Round" && columns[1] == "Game #" && columns[2] == "Home Team")) && (columns[0] != "")) {
+                    roundNum = Integer.parseInt(columns[0])
+                    gameNum = Integer.parseInt(columns[1])
+                    //println("$roundNum - $gameNum")
+                    def homeTeam
+                    def awayTeam
+                    if (trimTeamName) {
+                        homeTeam = (Integer.parseInt(columns[2].substring(5)) - 1)
+                        awayTeam = (Integer.parseInt(columns[3].substring(5)) - 1)
+                    } else {
+                        homeTeam = columns[2]
+                        awayTeam = columns[3]
                     }
-                    lastRoundNum = roundNum
-                    currentRound = new ScheduledRound(roundNum)
-                } else {
+                    if (roundNum != lastRoundNum) {
+                        //println "Adding round: ${currentRound.roundNum}  home: ${currentRound.games[0].homeTeam}  away: ${currentRound.games[0].awayTeam}"
+                        scheduledSeason.addRound(currentRound)
+                        for (int i=1; i <= roundNum - lastRoundNum - 1; i++) {
+                            // Complete existing round.
+                            currentRound = currentRound.copy()
+                            scheduledSeason.addRound(currentRound)
+                            //println "Adding round: ${currentRound.roundNum} Size: ${scheduledSeason.rounds.size()}  home: ${currentRound.games[0].homeTeam}  away: ${currentRound.games[0].awayTeam}"
+                        }
+                        lastRoundNum = roundNum
+                        currentRound = new ScheduledRound(roundNum)
+                    } else {
 
+                    }
+                    def game = new ScheduledGame()
+                    game.roundNum = roundNum
+                    game.gameNum = gameNum++
+                    game.homeTeam = homeTeam
+                    game.awayTeam = awayTeam
+                    currentRound.addGame(game)
                 }
-                def game = new ScheduledGame()
-                game.roundNum = roundNum
-                game.gameNum = gameNum++
-                game.homeTeam = homeTeam
-                game.awayTeam = awayTeam
-                currentRound.addGame(game)
             }
         }
 

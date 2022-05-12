@@ -45,9 +45,13 @@ class HttpHistoricalDataManager {
         }
     }
 
-    def getTeamMapForSeason(String year) {
+    def getTeamMapForSeason(String year, boolean forceLoadFromWeb) {
         boolean loadedFromAPI = false
-        def teamMapForSeason = mongoManager.find(TABLE_TEAM_MAP_FOR_SEASON, ["year": year])
+        def teamMapForSeason = null
+
+        // Force load from web?  If so, skip load from Mongo.
+        if (! forceLoadFromWeb)
+            teamMapForSeason = mongoManager.find(TABLE_TEAM_MAP_FOR_SEASON, ["year": year])
         def teams = []
         if (! teamMapForSeason) {
             String json = HttpClient.requestGet("$baseUrl/json/named.team_all_season.bam?season=${year}&active_sw='Y'&all_star_sw='N'&sport_code='mlb'")

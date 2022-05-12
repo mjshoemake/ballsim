@@ -5,6 +5,7 @@ import groovy.json.JsonOutput
 import mjs.common.utils.TransactionIdGen
 import org.apache.log4j.Logger
 import org.bson.types.ObjectId
+import mjs.common.utils.FileWriter
 
 class Simulation extends Comparable {
 
@@ -236,6 +237,8 @@ class Simulation extends Comparable {
             league = leagues[team.league]
         }
         league.addTeam(team)
+        log.info("Adding team: ${team.name_display_full}.")
+
         leagueKeys = leagueKeys.sort()
     }
 
@@ -537,6 +540,11 @@ class Simulation extends Comparable {
         auditLog.debug("")
         auditLog.debug("Pitching Stats Accuracy:")
         auditLog.debug("")
+        Date date = new Date()
+        FileWriter fileWriter = new FileWriter(System.getProperty("user.home") + File.separator +
+                                               "mjs" + File.separator + "ballsim" + File.separator + "Pitching Stats " +
+                                               date.format("dd-MM-yyyy HHmmss") + ".txt")
+        fileWriter.println("Pitching Status Accuracy")
 
         int numPitchers = 0
         int simSaves, simWins, simLosses, simGamesStarted, simGames = 0
@@ -552,6 +560,8 @@ class Simulation extends Comparable {
 
             auditLog.debug("")
             auditLog.debug("${next.teamName} Potential Starters:")
+            fileWriter.println("")
+            fileWriter.println("${next.teamName} Potential Starters:")
             // How many potential starters?
             int possibleStarters = 0
             next.originalBullpen.each() { String playerID ->
@@ -559,6 +569,7 @@ class Simulation extends Comparable {
                 if (pitcher.pitcherStats.pitchingGamesStarted > 0) {
                     possibleStarters++
                     auditLog.debug("   ${pitcher.name}")
+                    fileWriter.println("\t${pitcher.name}")
                 }
             }
             next.reservePitchers.each() { String playerID ->
@@ -566,19 +577,28 @@ class Simulation extends Comparable {
                 if (pitcher.pitcherStats.pitchingGamesStarted > 0) {
                     possibleStarters++
                     auditLog.debug("   ${pitcher.name}")
+                    fileWriter.println("\t${pitcher.name}")
                 }
             }
 
             auditLog.debug("${next.teamName} Done Starters:")
+            fileWriter.println("${next.teamName} Done Starters:")
             next.doneStarters.each() {
                 GamePitcher pitcher = next.getPitcher(it)
                 auditLog.debug("   ${pitcher.name}")
+                fileWriter.println("\t${pitcher.name}")
             }
             auditLog.debug format("${next.teamName} Rotation: (${next.originalRotation.size()})", 50) + "  " +
                                    format("Wins",20) + "  " +
                                    format("Losses",20) + "  " +
                                    format("Games Started",20) + "  " +
-                                   format("ERA",20)
+                                   format("ERA",20) + "  " +
+                                   format("Opp Avg",20) + "  " +
+                                   format("Strikeouts",20) + "  " +
+                                   format("Walks",20) + "  " +
+                                   format("Hit-by-Pitch",20) + "  " +
+                                   format("Hits",20)
+            fileWriter.println("${next.teamName} Rotation: (${next.originalRotation.size()})\tPlayer Name\tWins %\tSim Wins\tWins\tLosses %\tSim Losses\tLosses\tGames Started\tERA\tOpp Avg\tStrikeouts\tWalks\tHit-by-Pitch\tHits")
 
             next.originalRotation.each() { String playerID ->
                 GamePitcher nextPitcher = next.getPitcher(playerID)
@@ -586,6 +606,10 @@ class Simulation extends Comparable {
                 def winPercent = 0
                 def lossPercent = 0
                 def gsPercent = 0
+                def bbPercent = 0
+                def kPercent = 0
+                def hbpPercent = 0
+                def hPercent = 0
                 numPitchers++
                 wins += simPitcher.pitcher.pitcherStats.pitchingWins
                 simWins += simPitcher.wins
@@ -602,20 +626,56 @@ class Simulation extends Comparable {
                 if (simPitcher.pitcher.pitcherStats.pitchingGamesStarted != 0) {
                     gsPercent = ((simPitcher.gamesStarted - simPitcher.pitcher.pitcherStats.pitchingGamesStarted) / simPitcher.pitcher.pitcherStats.pitchingGamesStarted) * 100
                 }
+                if (simPitcher.pitcher.pitcherStats.pitchingStrikeouts != 0) {
+                    kPercent = ((simPitcher.strikeouts - simPitcher.pitcher.pitcherStats.pitchingStrikeouts) / simPitcher.pitcher.pitcherStats.pitchingStrikeouts) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingWalks != 0) {
+                    bbPercent = ((simPitcher.walks - simPitcher.pitcher.pitcherStats.pitchingWalks) / simPitcher.pitcher.pitcherStats.pitchingWalks) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingHitBatter != 0) {
+                    hbpPercent = ((simPitcher.hitByPitch - simPitcher.pitcher.pitcherStats.pitchingHitBatter) / simPitcher.pitcher.pitcherStats.pitchingHitBatter) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingHits != 0) {
+                    hPercent = ((simPitcher.hits - simPitcher.pitcher.pitcherStats.pitchingHits) / simPitcher.pitcher.pitcherStats.pitchingHits) * 100
+                }
                 StringBuilder builder = new StringBuilder("   ${format(next.teamName, 15)} ")
                 builder << " ${format(simPitcher.nameFirst + " " + simPitcher.nameLast, 30)}"
                 builder << "  ${format(winPercent.toInteger() + "%  -> " + simPitcher.wins + " / " + simPitcher.pitcher.pitcherStats.pitchingWins, 20)}"
                 builder << "  ${format(lossPercent.toInteger() + "%  -> " + simPitcher.losses + " / " + simPitcher.pitcher.pitcherStats.pitchingLosses, 20)}"
                 builder << "  ${format(gsPercent.toInteger() + "%  -> " + simPitcher.gamesStarted + " / " + simPitcher.pitcher.pitcherStats.pitchingGamesStarted, 20)}"
                 builder << "  ${format(simPitcher.era + " / " + simPitcher.pitcher.pitcherStats.pitchingEra, 20)}"
+                builder << "  ${format(simPitcher.oppBattingAvg + " / " + simPitcher.pitcher.pitcherStats.oppBattingAvg, 20)}"
+                builder << "  ${format(simPitcher.strikeoutsPerNineInnings + " / " + simPitcher.pitcher.pitcherStats.strikeoutsPerNineInnings, 20)}"
+                builder << "  ${format(simPitcher.walksPerNineInnings + " / " + simPitcher.pitcher.pitcherStats.walksPerNineInnings, 20)}"
+                builder << "  ${format(hbpPercent.toInteger() + "%  -> " + simPitcher.hitByPitch + " / " + simPitcher.pitcher.pitcherStats.pitchingHitBatter, 20)}"
+                builder << "  ${format(hPercent.toInteger() + "%  -> " + simPitcher.hits + " / " + simPitcher.pitcher.pitcherStats.pitchingHits, 20)}"
                 auditLog.debug builder.toString()
+
+                fileWriter.println("${next.teamName}\t${simPitcher.nameFirst + " " + simPitcher.nameLast}\t" +
+                                   "${winPercent.toInteger()}%\t" +
+                                   "${simPitcher.wins}\t${simPitcher.pitcher.pitcherStats.pitchingWins}\t" +
+                                   "${lossPercent.toInteger()}%\t" +
+                                   "${simPitcher.losses}\t${simPitcher.pitcher.pitcherStats.pitchingLosses}\t" +
+                                   "${gsPercent.toInteger()}%\t${simPitcher.gamesStarted}\t${simPitcher.pitcher.pitcherStats.pitchingGamesStarted}\t" +
+                                   "${simPitcher.era}\t${simPitcher.pitcher.pitcherStats.pitchingEra}\t" +
+                                   "${simPitcher.oppBattingAvg}\t${simPitcher.pitcher.pitcherStats.oppBattingAvg}\t" +
+                                   "${simPitcher.strikeoutsPerNineInnings}\t${simPitcher.pitcher.pitcherStats.strikeoutsPerNineInnings}\t" +
+                                   "${simPitcher.walksPerNineInnings}\t${simPitcher.pitcher.pitcherStats.walksPerNineInnings}\t" +
+                                   "${hbpPercent.toInteger()}%\t${simPitcher.hitByPitch}\t${simPitcher.pitcher.pitcherStats.pitchingHitBatter}\t" +
+                                   "${hPercent.toInteger()}%\t${simPitcher.hits}\t${simPitcher.pitcher.pitcherStats.pitchingHits}")
             }
 
             auditLog.debug format("${next.teamName} Current Rotation: (${next.rotation.size()})", 50) + "  " +
                            format("Wins",20) + "  " +
                            format("Losses",20) + "  " +
                            format("Games Started",20) + "  " +
-                           format("ERA",20)
+                           format("ERA",20) + "  " +
+                           format("Opp Avg",20) + "  " +
+                           format("Strikeouts",20) + "  " +
+                           format("Walks",20) + "  " +
+                           format("Hit-by-Pitch",20) + "  " +
+                           format("Hits",20)
+            fileWriter.println("${next.teamName} Current Rotation: (${next.rotation.size()})\tWins\tLosses\tGames Started\tERA\tOpp Avg\tStrikeouts\tWalks\tHit-by-Pitch\tHits")
 
             next.rotation.each() { String playerID ->
                 GamePitcher nextPitcher = next.getPitcher(playerID)
@@ -623,6 +683,10 @@ class Simulation extends Comparable {
                 def winPercent = 0
                 def lossPercent = 0
                 def gsPercent = 0
+                def bbPercent = 0
+                def kPercent = 0
+                def hbpPercent = 0
+                def hPercent = 0
                 numPitchers++
                 wins += simPitcher.pitcher.pitcherStats.pitchingWins
                 simWins += simPitcher.wins
@@ -639,13 +703,43 @@ class Simulation extends Comparable {
                 if (simPitcher.pitcher.pitcherStats.pitchingGamesStarted != 0) {
                     gsPercent = ((simPitcher.gamesStarted - simPitcher.pitcher.pitcherStats.pitchingGamesStarted) / simPitcher.pitcher.pitcherStats.pitchingGamesStarted) * 100
                 }
+                if (simPitcher.pitcher.pitcherStats.pitchingStrikeouts != 0) {
+                    kPercent = ((simPitcher.strikeouts - simPitcher.pitcher.pitcherStats.pitchingStrikeouts) / simPitcher.pitcher.pitcherStats.pitchingStrikeouts) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingWalks != 0) {
+                    bbPercent = ((simPitcher.walks - simPitcher.pitcher.pitcherStats.pitchingWalks) / simPitcher.pitcher.pitcherStats.pitchingWalks) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingHitBatter != 0) {
+                    hbpPercent = ((simPitcher.hitByPitch - simPitcher.pitcher.pitcherStats.pitchingHitBatter) / simPitcher.pitcher.pitcherStats.pitchingHitBatter) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingHits != 0) {
+                    hPercent = ((simPitcher.hits - simPitcher.pitcher.pitcherStats.pitchingHits) / simPitcher.pitcher.pitcherStats.pitchingHits) * 100
+                }
                 StringBuilder builder = new StringBuilder("   ${format(next.teamName, 15)} ")
                 builder << " ${format(simPitcher.nameFirst + " " + simPitcher.nameLast, 30)}"
                 builder << "  ${format(winPercent.toInteger() + "%  -> " + simPitcher.wins + " / " + simPitcher.pitcher.pitcherStats.pitchingWins, 20)}"
                 builder << "  ${format(lossPercent.toInteger() + "%  -> " + simPitcher.losses + " / " + simPitcher.pitcher.pitcherStats.pitchingLosses, 20)}"
                 builder << "  ${format(gsPercent.toInteger() + "%  -> " + simPitcher.gamesStarted + " / " + simPitcher.pitcher.pitcherStats.pitchingGamesStarted, 20)}"
                 builder << "  ${format(simPitcher.era + " / " + simPitcher.pitcher.pitcherStats.pitchingEra, 20)}"
+                builder << "  ${format(simPitcher.oppBattingAvg + " / " + simPitcher.pitcher.pitcherStats.oppBattingAvg, 20)}"
+                builder << "  ${format(simPitcher.strikeoutsPerNineInnings + " / " + simPitcher.pitcher.pitcherStats.strikeoutsPerNineInnings, 20)}"
+                builder << "  ${format(simPitcher.walksPerNineInnings + " / " + simPitcher.pitcher.pitcherStats.walksPerNineInnings, 20)}"
+                builder << "  ${format(hbpPercent.toInteger() + "%  -> " + simPitcher.hitByPitch + " / " + simPitcher.pitcher.pitcherStats.pitchingHitBatter, 20)}"
+                builder << "  ${format(hPercent.toInteger() + "%  -> " + simPitcher.hits + " / " + simPitcher.pitcher.pitcherStats.pitchingHits, 20)}"
                 auditLog.debug builder.toString()
+
+                fileWriter.println("${next.teamName}\t${simPitcher.nameFirst + " " + simPitcher.nameLast}\t" +
+                                   "${winPercent.toInteger()}%\t" +
+                                   "${simPitcher.wins}\t${simPitcher.pitcher.pitcherStats.pitchingWins}\t" +
+                                   "${lossPercent.toInteger()}%\t" +
+                                   "${simPitcher.losses}\t${simPitcher.pitcher.pitcherStats.pitchingLosses}\t" +
+                                   "${gsPercent.toInteger()}%\t${simPitcher.gamesStarted}\t${simPitcher.pitcher.pitcherStats.pitchingGamesStarted}\t" +
+                                   "${simPitcher.era}\t${simPitcher.pitcher.pitcherStats.pitchingEra}\t" +
+                                   "${simPitcher.oppBattingAvg}\t${simPitcher.pitcher.pitcherStats.oppBattingAvg}\t" +
+                                   "${simPitcher.strikeoutsPerNineInnings}\t${simPitcher.pitcher.pitcherStats.strikeoutsPerNineInnings}\t" +
+                                   "${simPitcher.walksPerNineInnings}\t${simPitcher.pitcher.pitcherStats.walksPerNineInnings}\t" +
+                                   "${hbpPercent.toInteger()}%\t${simPitcher.hitByPitch}\t${simPitcher.pitcher.pitcherStats.pitchingHitBatter}\t" +
+                                   "${hPercent.toInteger()}%\t${simPitcher.hits}\t${simPitcher.pitcher.pitcherStats.pitchingHits}")
             }
 
             List additionalStarters = []
@@ -657,13 +751,25 @@ class Simulation extends Comparable {
             auditLog.debug format("${next.teamName} Additional Starters: (${next.additionalStarters.size()})", 50) + "  " +
                     format("Wins",20) + "  " +
                     format("Losses",20) + "  " +
-                    format("Games Started",20)
+                    format("Games Started",20) + "  " +
+                    format("ERA",20) + "  " +
+                    format("Opp Avg",20) + "  " +
+                    format("Strikeouts",20) + "  " +
+                    format("Walks",20) + "  " +
+                    format("Hit-by-Pitch",20) + "  " +
+                    format("Hits",20)
+            fileWriter.println("${next.teamName} Additional Starters: (${next.additionalStarters.size()})\tWins\tLosses\tGames Started\tERA\tOpp Avg\tStrikeouts\tWalks\tHit-by-Pitch\tHits")
+
             next.additionalStarters.each() { String playerID ->
                 GamePitcher nextPitcher = next.getPitcher(playerID)
                 SimPitcher simPitcher = nextPitcher.simPitcher
                 def winPercent = 0
                 def lossPercent = 0
                 def gsPercent = 0
+                def bbPercent = 0
+                def kPercent = 0
+                def hbpPercent = 0
+                def hPercent = 0
                 numPitchers++
                 wins += simPitcher.pitcher.pitcherStats.pitchingWins
                 simWins += simPitcher.wins
@@ -680,13 +786,43 @@ class Simulation extends Comparable {
                 if (simPitcher.pitcher.pitcherStats.pitchingGamesStarted != 0) {
                     gsPercent = ((simPitcher.gamesStarted - simPitcher.pitcher.pitcherStats.pitchingGamesStarted) / simPitcher.pitcher.pitcherStats.pitchingGamesStarted) * 100
                 }
+                if (simPitcher.pitcher.pitcherStats.pitchingStrikeouts != 0) {
+                    kPercent = ((simPitcher.strikeouts - simPitcher.pitcher.pitcherStats.pitchingStrikeouts) / simPitcher.pitcher.pitcherStats.pitchingStrikeouts) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingWalks != 0) {
+                    bbPercent = ((simPitcher.walks - simPitcher.pitcher.pitcherStats.pitchingWalks) / simPitcher.pitcher.pitcherStats.pitchingWalks) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingHitBatter != 0) {
+                    hbpPercent = ((simPitcher.hitByPitch - simPitcher.pitcher.pitcherStats.pitchingHitBatter) / simPitcher.pitcher.pitcherStats.pitchingHitBatter) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingHits != 0) {
+                    hPercent = ((simPitcher.hits - simPitcher.pitcher.pitcherStats.pitchingHits) / simPitcher.pitcher.pitcherStats.pitchingHits) * 100
+                }
                 StringBuilder builder = new StringBuilder("   ${format(next.teamName, 15)} ")
                 builder << " ${format(simPitcher.nameFirst + " " + simPitcher.nameLast, 30)}"
                 builder << "  ${format(winPercent.toInteger() + "%  -> " + simPitcher.wins + " / " + simPitcher.pitcher.pitcherStats.pitchingWins, 20)}"
                 builder << "  ${format(lossPercent.toInteger() + "%  -> " + simPitcher.losses + " / " + simPitcher.pitcher.pitcherStats.pitchingLosses, 20)}"
                 builder << "  ${format(gsPercent.toInteger() + "%  -> " + simPitcher.gamesStarted + " / " + simPitcher.pitcher.pitcherStats.pitchingGamesStarted, 20)}"
                 builder << "  ${format(simPitcher.era + " / " + simPitcher.pitcher.pitcherStats.pitchingEra, 20)}"
+                builder << "  ${format(simPitcher.oppBattingAvg + " / " + simPitcher.pitcher.pitcherStats.oppBattingAvg, 20)}"
+                builder << "  ${format(simPitcher.strikeoutsPerNineInnings + " / " + simPitcher.pitcher.pitcherStats.strikeoutsPerNineInnings, 20)}"
+                builder << "  ${format(simPitcher.walksPerNineInnings + " / " + simPitcher.pitcher.pitcherStats.walksPerNineInnings, 20)}"
+                builder << "  ${format(hbpPercent.toInteger() + "%  -> " + simPitcher.hitByPitch + " / " + simPitcher.pitcher.pitcherStats.pitchingHitBatter, 20)}"
+                builder << "  ${format(hPercent.toInteger() + "%  -> " + simPitcher.hits + " / " + simPitcher.pitcher.pitcherStats.pitchingHits, 20)}"
                 auditLog.debug builder.toString()
+
+                fileWriter.println("${next.teamName}\t${simPitcher.nameFirst + " " + simPitcher.nameLast}\t" +
+                                   "${winPercent.toInteger()}%\t" +
+                                   "${simPitcher.wins}\t${simPitcher.pitcher.pitcherStats.pitchingWins}\t" +
+                                   "${lossPercent.toInteger()}%\t" +
+                                   "${simPitcher.losses}\t${simPitcher.pitcher.pitcherStats.pitchingLosses}\t" +
+                                   "${gsPercent.toInteger()}%\t${simPitcher.gamesStarted}\t${simPitcher.pitcher.pitcherStats.pitchingGamesStarted}\t" +
+                                   "${simPitcher.era}\t${simPitcher.pitcher.pitcherStats.pitchingEra}\t" +
+                                   "${simPitcher.oppBattingAvg}\t${simPitcher.pitcher.pitcherStats.oppBattingAvg}\t" +
+                                   "${simPitcher.strikeoutsPerNineInnings}\t${simPitcher.pitcher.pitcherStats.strikeoutsPerNineInnings}\t" +
+                                   "${simPitcher.walksPerNineInnings}\t${simPitcher.pitcher.pitcherStats.walksPerNineInnings}\t" +
+                                   "${hbpPercent.toInteger()}%\t${simPitcher.hitByPitch}\t${simPitcher.pitcher.pitcherStats.pitchingHitBatter}\t" +
+                                   "${hPercent.toInteger()}%\t${simPitcher.hits}\t${simPitcher.pitcher.pitcherStats.pitchingHits}")
             }
 
             next.doneStarters.each() { String playerID ->
@@ -696,6 +832,10 @@ class Simulation extends Comparable {
                     def winPercent = 0
                     def lossPercent = 0
                     def gsPercent = 0
+                    def bbPercent = 0
+                    def kPercent = 0
+                    def hbpPercent = 0
+                    def hPercent = 0
                     numPitchers++
                     wins += simPitcher.pitcher.pitcherStats.pitchingWins
                     simWins += simPitcher.wins
@@ -712,13 +852,43 @@ class Simulation extends Comparable {
                     if (simPitcher.pitcher.pitcherStats.pitchingGamesStarted != 0) {
                         gsPercent = ((simPitcher.gamesStarted - simPitcher.pitcher.pitcherStats.pitchingGamesStarted) / simPitcher.pitcher.pitcherStats.pitchingGamesStarted) * 100
                     }
+                    if (simPitcher.pitcher.pitcherStats.pitchingStrikeouts != 0) {
+                        kPercent = ((simPitcher.strikeouts - simPitcher.pitcher.pitcherStats.pitchingStrikeouts) / simPitcher.pitcher.pitcherStats.pitchingStrikeouts) * 100
+                    }
+                    if (simPitcher.pitcher.pitcherStats.pitchingWalks != 0) {
+                        bbPercent = ((simPitcher.walks - simPitcher.pitcher.pitcherStats.pitchingWalks) / simPitcher.pitcher.pitcherStats.pitchingWalks) * 100
+                    }
+                    if (simPitcher.pitcher.pitcherStats.pitchingHitBatter != 0) {
+                        hbpPercent = ((simPitcher.hitByPitch - simPitcher.pitcher.pitcherStats.pitchingHitBatter) / simPitcher.pitcher.pitcherStats.pitchingHitBatter) * 100
+                    }
+                    if (simPitcher.pitcher.pitcherStats.pitchingHits != 0) {
+                        hPercent = ((simPitcher.hits - simPitcher.pitcher.pitcherStats.pitchingHits) / simPitcher.pitcher.pitcherStats.pitchingHits) * 100
+                    }
                     StringBuilder builder = new StringBuilder("   ${format(next.teamName, 15)} ")
                     builder << " ${format(simPitcher.nameFirst + " " + simPitcher.nameLast, 30)}"
                     builder << "  ${format(winPercent.toInteger() + "%  -> " + simPitcher.wins + " / " + simPitcher.pitcher.pitcherStats.pitchingWins, 20)}"
                     builder << "  ${format(lossPercent.toInteger() + "%  -> " + simPitcher.losses + " / " + simPitcher.pitcher.pitcherStats.pitchingLosses, 20)}"
                     builder << "  ${format(gsPercent.toInteger() + "%  -> " + simPitcher.gamesStarted + " / " + simPitcher.pitcher.pitcherStats.pitchingGamesStarted, 20)}"
                     builder << "  ${format(simPitcher.era + " / " + simPitcher.pitcher.pitcherStats.pitchingEra, 20)}"
+                    builder << "  ${format(simPitcher.oppBattingAvg + " / " + simPitcher.pitcher.pitcherStats.oppBattingAvg, 20)}"
+                    builder << "  ${format(simPitcher.strikeoutsPerNineInnings + " / " + simPitcher.pitcher.pitcherStats.strikeoutsPerNineInnings, 20)}"
+                    builder << "  ${format(simPitcher.walksPerNineInnings + " / " + simPitcher.pitcher.pitcherStats.walksPerNineInnings, 20)}"
+                    builder << "  ${format(hbpPercent.toInteger() + "%  -> " + simPitcher.hitByPitch + " / " + simPitcher.pitcher.pitcherStats.pitchingHitBatter, 20)}"
+                    builder << "  ${format(hPercent.toInteger() + "%  -> " + simPitcher.hits + " / " + simPitcher.pitcher.pitcherStats.pitchingHits, 20)}"
                     auditLog.debug builder.toString()
+
+                    fileWriter.println("${next.teamName}\t${simPitcher.nameFirst + " " + simPitcher.nameLast}\t" +
+                                       "${winPercent.toInteger()}%\t" +
+                                       "${simPitcher.wins}\t${simPitcher.pitcher.pitcherStats.pitchingWins}\t" +
+                                       "${lossPercent.toInteger()}%\t" +
+                                       "${simPitcher.losses}\t${simPitcher.pitcher.pitcherStats.pitchingLosses}\t" +
+                                       "${gsPercent.toInteger()}%\t${simPitcher.gamesStarted}\t${simPitcher.pitcher.pitcherStats.pitchingGamesStarted}\t" +
+                                       "${simPitcher.era}\t${simPitcher.pitcher.pitcherStats.pitchingEra}\t" +
+                                       "${simPitcher.oppBattingAvg}\t${simPitcher.pitcher.pitcherStats.oppBattingAvg}\t" +
+                                       "${simPitcher.strikeoutsPerNineInnings}\t${simPitcher.pitcher.pitcherStats.strikeoutsPerNineInnings}\t" +
+                                       "${simPitcher.walksPerNineInnings}\t${simPitcher.pitcher.pitcherStats.walksPerNineInnings}\t" +
+                                       "${hbpPercent.toInteger()}%\t${simPitcher.hitByPitch}\t${simPitcher.pitcher.pitcherStats.pitchingHitBatter}\t" +
+                                       "${hPercent.toInteger()}%\t${simPitcher.hits}\t${simPitcher.pitcher.pitcherStats.pitchingHits}")
                 }
             }
 
@@ -727,7 +897,14 @@ class Simulation extends Comparable {
                     format("Losses",20) + "  " +
                     format("Saves",20) + "  " +
                     format("Games",20) + "  " +
-                    format("Games Started",20)
+                    format("Games Started",20) + "  " +
+                    format("ERA",20) + "  " +
+                    format("Opp Avg",20) + "  " +
+                    format("Strikeouts",20) + "  " +
+                    format("Walks",20) + "  " +
+                    format("Hit-by-Pitch",20) + "  " +
+                    format("Hits",20)
+            fileWriter.println("${next.teamName} Original Bullpen: (${next.additionalStarters.size()})\tWins\tLosses\tSaves\tGames\tGames Started\tERA\tOpp Avg\tStrikeouts\tWalks\tHit-by-Pitch\tHits")
             next.originalBullpen.each() { String playerID ->
                 GamePitcher nextPitcher = next.getPitcher(playerID)
                 SimPitcher simPitcher = nextPitcher.simPitcher
@@ -736,6 +913,10 @@ class Simulation extends Comparable {
                 def savePercent = 0
                 def gsPercent = 0
                 def gPercent = 0
+                def bbPercent = 0
+                def kPercent = 0
+                def hbpPercent = 0
+                def hPercent = 0
                 numPitchers++
                 wins += simPitcher.pitcher.pitcherStats.pitchingWins
                 simWins += simPitcher.wins
@@ -762,6 +943,18 @@ class Simulation extends Comparable {
                 if (simPitcher.pitcher.pitcherStats.pitchingGames != 0) {
                     gPercent = ((simPitcher.games - simPitcher.pitcher.pitcherStats.pitchingGames) / simPitcher.pitcher.pitcherStats.pitchingGames) * 100
                 }
+                if (simPitcher.pitcher.pitcherStats.pitchingStrikeouts != 0) {
+                    kPercent = ((simPitcher.strikeouts - simPitcher.pitcher.pitcherStats.pitchingStrikeouts) / simPitcher.pitcher.pitcherStats.pitchingStrikeouts) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingWalks != 0) {
+                    bbPercent = ((simPitcher.walks - simPitcher.pitcher.pitcherStats.pitchingWalks) / simPitcher.pitcher.pitcherStats.pitchingWalks) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingHitBatter != 0) {
+                    hbpPercent = ((simPitcher.hitByPitch - simPitcher.pitcher.pitcherStats.pitchingHitBatter) / simPitcher.pitcher.pitcherStats.pitchingHitBatter) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingHits != 0) {
+                    hPercent = ((simPitcher.hits - simPitcher.pitcher.pitcherStats.pitchingHits) / simPitcher.pitcher.pitcherStats.pitchingHits) * 100
+                }
                 StringBuilder builder = new StringBuilder("   ${format(next.teamName, 15)} ")
                 builder << " ${format(simPitcher.nameFirst + " " + simPitcher.nameLast, 30)}"
                 builder << "  ${format(winPercent.toInteger() + "%  -> " + simPitcher.wins + " / " + simPitcher.pitcher.pitcherStats.pitchingWins, 20)}"
@@ -770,7 +963,28 @@ class Simulation extends Comparable {
                 builder << "  ${format(gPercent.toInteger() + "%  -> " + simPitcher.games + " / " + simPitcher.pitcher.pitcherStats.pitchingGames, 20)}"
                 builder << "  ${format(gsPercent.toInteger() + "%  -> " + simPitcher.gamesStarted + " / " + simPitcher.pitcher.pitcherStats.pitchingGamesStarted, 20)}"
                 builder << "  ${format(simPitcher.era + " / " + simPitcher.pitcher.pitcherStats.pitchingEra, 20)}"
+                builder << "  ${format(simPitcher.oppBattingAvg + " / " + simPitcher.pitcher.pitcherStats.oppBattingAvg, 20)}"
+                builder << "  ${format(simPitcher.strikeoutsPerNineInnings + " / " + simPitcher.pitcher.pitcherStats.strikeoutsPerNineInnings, 20)}"
+                builder << "  ${format(simPitcher.walksPerNineInnings + " / " + simPitcher.pitcher.pitcherStats.walksPerNineInnings, 20)}"
+                builder << "  ${format(hbpPercent.toInteger() + "%  -> " + simPitcher.hitByPitch + " / " + simPitcher.pitcher.pitcherStats.pitchingHitBatter, 20)}"
+                builder << "  ${format(hPercent.toInteger() + "%  -> " + simPitcher.hits + " / " + simPitcher.pitcher.pitcherStats.pitchingHits, 20)}"
                 auditLog.debug builder.toString()
+
+                fileWriter.println("${next.teamName}\t${simPitcher.nameFirst + " " + simPitcher.nameLast}\t" +
+                                   "${winPercent.toInteger()}%\t" +
+                                   "${simPitcher.wins}\t${simPitcher.pitcher.pitcherStats.pitchingWins}\t" +
+                                   "${lossPercent.toInteger()}%\t" +
+                                   "${simPitcher.losses}\t${simPitcher.pitcher.pitcherStats.pitchingLosses}\t" +
+                                   "${savePercent.toInteger()}%\t" +
+                                   "${simPitcher.saves}\t${simPitcher.pitcher.pitcherStats.pitchingSaves}\t" +
+                                   "${gPercent.toInteger()}%\t${simPitcher.games}\t${simPitcher.pitcher.pitcherStats.pitchingGames}\t" +
+                                   "${gsPercent.toInteger()}%\t${simPitcher.gamesStarted}\t${simPitcher.pitcher.pitcherStats.pitchingGamesStarted}\t" +
+                                   "${simPitcher.era}\t${simPitcher.pitcher.pitcherStats.pitchingEra}\t" +
+                                   "${simPitcher.oppBattingAvg}\t${simPitcher.pitcher.pitcherStats.oppBattingAvg}\t" +
+                                   "${simPitcher.strikeoutsPerNineInnings}\t${simPitcher.pitcher.pitcherStats.strikeoutsPerNineInnings}\t" +
+                                   "${simPitcher.walksPerNineInnings}\t${simPitcher.pitcher.pitcherStats.walksPerNineInnings}\t" +
+                                   "${hbpPercent.toInteger()}%\t${simPitcher.hitByPitch}\t${simPitcher.pitcher.pitcherStats.pitchingHitBatter}\t" +
+                                   "${hPercent.toInteger()}%\t${simPitcher.hits}\t${simPitcher.pitcher.pitcherStats.pitchingHits}")
             }
 
             auditLog.debug format("${next.teamName} Reserve Pitchers: (${next.reservePitchers.size()})", 50) + "  " +
@@ -778,7 +992,14 @@ class Simulation extends Comparable {
                     format("Losses",20) + "  " +
                     format("Saves",20) + "  " +
                     format("Games",20) + "  " +
-                    format("Games Started",20)
+                    format("Games Started",20) + "  " +
+                    format("ERA",20) + "  " +
+                    format("Opp Avg",20) + "  " +
+                    format("Strikeouts",20) + "  " +
+                    format("Walks",20) + "  " +
+                    format("Hit-by-Pitch",20) + "  " +
+                    format("Hits",20)
+            fileWriter.println("${next.teamName} Reserve Pitchers: (${next.reservePitchers.size()})\tWins\tLosses\tSaves\tGames\tGames Started\tERA\tOpp Avg\tStrikeouts\tWalks\tHit-by-Pitch\tHits")
             next.reservePitchers.each() { String playerID ->
                 GamePitcher nextPitcher = next.getPitcher(playerID)
                 SimPitcher simPitcher = nextPitcher.simPitcher
@@ -787,6 +1008,10 @@ class Simulation extends Comparable {
                 def savePercent = 0
                 def gsPercent = 0
                 def gPercent = 0
+                def bbPercent = 0
+                def kPercent = 0
+                def hbpPercent = 0
+                def hPercent = 0
                 numPitchers++
                 wins += simPitcher.pitcher.pitcherStats.pitchingWins
                 simWins += simPitcher.wins
@@ -813,6 +1038,18 @@ class Simulation extends Comparable {
                 if (simPitcher.pitcher.pitcherStats.pitchingGames != 0) {
                     gPercent = ((simPitcher.games - simPitcher.pitcher.pitcherStats.pitchingGames) / simPitcher.pitcher.pitcherStats.pitchingGames) * 100
                 }
+                if (simPitcher.pitcher.pitcherStats.pitchingStrikeouts != 0) {
+                    kPercent = ((simPitcher.strikeouts - simPitcher.pitcher.pitcherStats.pitchingStrikeouts) / simPitcher.pitcher.pitcherStats.pitchingStrikeouts) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingWalks != 0) {
+                    bbPercent = ((simPitcher.walks - simPitcher.pitcher.pitcherStats.pitchingWalks) / simPitcher.pitcher.pitcherStats.pitchingWalks) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingHitBatter != 0) {
+                    hbpPercent = ((simPitcher.hitByPitch - simPitcher.pitcher.pitcherStats.pitchingHitBatter) / simPitcher.pitcher.pitcherStats.pitchingHitBatter) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingHits != 0) {
+                    hPercent = ((simPitcher.hits - simPitcher.pitcher.pitcherStats.pitchingHits) / simPitcher.pitcher.pitcherStats.pitchingHits) * 100
+                }
                 StringBuilder builder = new StringBuilder("   ${format(next.teamName, 15)} ")
                 builder << " ${format(simPitcher.nameFirst + " " + simPitcher.nameLast, 30)}"
                 builder << "  ${format(winPercent.toInteger() + "%  -> " + simPitcher.wins + " / " + simPitcher.pitcher.pitcherStats.pitchingWins, 20)}"
@@ -821,7 +1058,28 @@ class Simulation extends Comparable {
                 builder << "  ${format(gPercent.toInteger() + "%  -> " + simPitcher.games + " / " + simPitcher.pitcher.pitcherStats.pitchingGames, 20)}"
                 builder << "  ${format(gsPercent.toInteger() + "%  -> " + simPitcher.gamesStarted + " / " + simPitcher.pitcher.pitcherStats.pitchingGamesStarted, 20)}"
                 builder << "  ${format(simPitcher.era + " / " + simPitcher.pitcher.pitcherStats.pitchingEra, 20)}"
+                builder << "  ${format(simPitcher.oppBattingAvg + " / " + simPitcher.pitcher.pitcherStats.oppBattingAvg, 20)}"
+                builder << "  ${format(simPitcher.strikeoutsPerNineInnings + " / " + simPitcher.pitcher.pitcherStats.strikeoutsPerNineInnings, 20)}"
+                builder << "  ${format(simPitcher.walksPerNineInnings + " / " + simPitcher.pitcher.pitcherStats.walksPerNineInnings, 20)}"
+                builder << "  ${format(hbpPercent.toInteger() + "%  -> " + simPitcher.hitByPitch + " / " + simPitcher.pitcher.pitcherStats.pitchingHitBatter, 20)}"
+                builder << "  ${format(hPercent.toInteger() + "%  -> " + simPitcher.hits + " / " + simPitcher.pitcher.pitcherStats.pitchingHits, 20)}"
                 auditLog.debug builder.toString()
+
+                fileWriter.println("${next.teamName}\t${simPitcher.nameFirst + " " + simPitcher.nameLast}\t" +
+                                   "${winPercent.toInteger()}%\t" +
+                                   "${simPitcher.wins}\t${simPitcher.pitcher.pitcherStats.pitchingWins}\t" +
+                                   "${lossPercent.toInteger()}%\t" +
+                                   "${simPitcher.losses}\t${simPitcher.pitcher.pitcherStats.pitchingLosses}\t" +
+                                   "${savePercent.toInteger()}%\t" +
+                                   "${simPitcher.saves}\t${simPitcher.pitcher.pitcherStats.pitchingSaves}\t" +
+                                   "${gPercent.toInteger()}%\t${simPitcher.games}\t${simPitcher.pitcher.pitcherStats.pitchingGames}\t" +
+                                   "${gsPercent.toInteger()}%\t${simPitcher.gamesStarted}\t${simPitcher.pitcher.pitcherStats.pitchingGamesStarted}\t" +
+                                   "${simPitcher.era}\t${simPitcher.pitcher.pitcherStats.pitchingEra}\t" +
+                                   "${simPitcher.oppBattingAvg}\t${simPitcher.pitcher.pitcherStats.oppBattingAvg}\t" +
+                                   "${simPitcher.strikeoutsPerNineInnings}\t${simPitcher.pitcher.pitcherStats.strikeoutsPerNineInnings}\t" +
+                                   "${simPitcher.walksPerNineInnings}\t${simPitcher.pitcher.pitcherStats.walksPerNineInnings}\t" +
+                                   "${hbpPercent.toInteger()}%\t${simPitcher.hitByPitch}\t${simPitcher.pitcher.pitcherStats.pitchingHitBatter}\t" +
+                                   "${hPercent.toInteger()}%\t${simPitcher.hits}\t${simPitcher.pitcher.pitcherStats.pitchingHits}")
             }
 
             // Closer
@@ -831,7 +1089,15 @@ class Simulation extends Comparable {
                         format("Losses",20) + "  " +
                         format("Saves",20) + "  " +
                         format("Games",20) + "  " +
-                        format("Games Started",20)
+                        format("Games Started",20) + "  " +
+                        format("ERA",20) + "  " +
+                        format("Opp Avg",20) + "  " +
+                        format("Strikeouts",20) + "  " +
+                        format("Walks",20) + "  " +
+                        format("Hit-by-Pitch",20) + "  " +
+                        format("Hits",20)
+                fileWriter.println("${next.teamName} Original Bullpen: (${next.originalBullpen.size()})\tWins\tLosses\tSaves\tGames\tGames Started\tERA\tOpp Avg\tStrikeouts\tWalks\tHit-by-Pitch\tHits")
+
                 GamePitcher nextPitcher = next.getPitcher(next.closer)
                 SimPitcher simPitcher = nextPitcher.simPitcher
                 def winPercent = 0
@@ -839,6 +1105,10 @@ class Simulation extends Comparable {
                 def savePercent = 0
                 def gsPercent = 0
                 def gPercent = 0
+                def bbPercent = 0
+                def kPercent = 0
+                def hbpPercent = 0
+                def hPercent = 0
                 numPitchers++
                 wins += simPitcher.pitcher.pitcherStats.pitchingWins
                 simWins += simPitcher.wins
@@ -865,6 +1135,18 @@ class Simulation extends Comparable {
                 if (simPitcher.pitcher.pitcherStats.pitchingGames != 0) {
                     gPercent = ((simPitcher.games - simPitcher.pitcher.pitcherStats.pitchingGames) / simPitcher.pitcher.pitcherStats.pitchingGames) * 100
                 }
+                if (simPitcher.pitcher.pitcherStats.pitchingStrikeouts != 0) {
+                    kPercent = ((simPitcher.strikeouts - simPitcher.pitcher.pitcherStats.pitchingStrikeouts) / simPitcher.pitcher.pitcherStats.pitchingStrikeouts) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingWalks != 0) {
+                    bbPercent = ((simPitcher.walks - simPitcher.pitcher.pitcherStats.pitchingWalks) / simPitcher.pitcher.pitcherStats.pitchingWalks) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingHitBatter != 0) {
+                    hbpPercent = ((simPitcher.hitByPitch - simPitcher.pitcher.pitcherStats.pitchingHitBatter) / simPitcher.pitcher.pitcherStats.pitchingHitBatter) * 100
+                }
+                if (simPitcher.pitcher.pitcherStats.pitchingHits != 0) {
+                    hPercent = ((simPitcher.hits - simPitcher.pitcher.pitcherStats.pitchingHits) / simPitcher.pitcher.pitcherStats.pitchingHits) * 100
+                }
                 StringBuilder builder = new StringBuilder("   ${format(next.teamName, 15)} ")
                 builder << " ${format(simPitcher.nameFirst + " " + simPitcher.nameLast, 30)}"
                 builder << "  ${format(winPercent.toInteger() + "%  -> " + simPitcher.wins + " / " + simPitcher.pitcher.pitcherStats.pitchingWins, 20)}"
@@ -873,7 +1155,28 @@ class Simulation extends Comparable {
                 builder << "  ${format(gPercent.toInteger() + "%  -> " + simPitcher.games + " / " + simPitcher.pitcher.pitcherStats.pitchingGames, 20)}"
                 builder << "  ${format(gsPercent.toInteger() + "%  -> " + simPitcher.gamesStarted + " / " + simPitcher.pitcher.pitcherStats.pitchingGamesStarted, 20)}"
                 builder << "  ${format(simPitcher.era + " / " + simPitcher.pitcher.pitcherStats.pitchingEra, 20)}"
+                builder << "  ${format(simPitcher.oppBattingAvg + " / " + simPitcher.pitcher.pitcherStats.oppBattingAvg, 20)}"
+                builder << "  ${format(simPitcher.strikeoutsPerNineInnings + " / " + simPitcher.pitcher.pitcherStats.strikeoutsPerNineInnings, 20)}"
+                builder << "  ${format(simPitcher.walksPerNineInnings + " / " + simPitcher.pitcher.pitcherStats.walksPerNineInnings, 20)}"
+                builder << "  ${format(hbpPercent.toInteger() + "%  -> " + simPitcher.hitByPitch + " / " + simPitcher.pitcher.pitcherStats.pitchingHitBatter, 20)}"
+                builder << "  ${format(hPercent.toInteger() + "%  -> " + simPitcher.hits + " / " + simPitcher.pitcher.pitcherStats.pitchingHits, 20)}"
                 auditLog.debug builder.toString()
+
+                fileWriter.println("${next.teamName}\t${simPitcher.nameFirst + " " + simPitcher.nameLast}\t" +
+                        "${winPercent.toInteger()}%\t" +
+                        "${simPitcher.wins}\t${simPitcher.pitcher.pitcherStats.pitchingWins}\t" +
+                        "${lossPercent.toInteger()}%\t" +
+                        "${simPitcher.losses}\t${simPitcher.pitcher.pitcherStats.pitchingLosses}\t" +
+                        "${savePercent.toInteger()}%\t" +
+                        "${simPitcher.saves}\t${simPitcher.pitcher.pitcherStats.pitchingSaves}\t" +
+                        "${gPercent.toInteger()}%\t${simPitcher.games}\t${simPitcher.pitcher.pitcherStats.pitchingGames}\t" +
+                        "${gsPercent.toInteger()}%\t${simPitcher.gamesStarted}\t${simPitcher.pitcher.pitcherStats.pitchingGamesStarted}\t" +
+                        "${simPitcher.era}\t${simPitcher.pitcher.pitcherStats.pitchingEra}\t" +
+                        "${simPitcher.oppBattingAvg}\t${simPitcher.pitcher.pitcherStats.oppBattingAvg}\t" +
+                        "${simPitcher.strikeoutsPerNineInnings}\t${simPitcher.pitcher.pitcherStats.strikeoutsPerNineInnings}\t" +
+                        "${simPitcher.walksPerNineInnings}\t${simPitcher.pitcher.pitcherStats.walksPerNineInnings}\t" +
+                        "${hbpPercent.toInteger()}%\t${simPitcher.hitByPitch}\t${simPitcher.pitcher.pitcherStats.pitchingHitBatter}\t" +
+                        "${hPercent.toInteger()}%\t${simPitcher.hits}\t${simPitcher.pitcher.pitcherStats.pitchingHits}")
             }
         }
 
@@ -901,6 +1204,7 @@ class Simulation extends Comparable {
             nextRound++
         }
         auditLog.debug("Done!")
+        fileWriter.close()
     }
 
     void logBattingStatsAccuracy() {

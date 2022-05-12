@@ -82,22 +82,28 @@ class SimulationManager {
         return startNewSimulation(teamMap, idPrefix, simulationName, simulationID)
     }
 
-    Simulation startNewSimulation(String year, String idPrefix, String simulationName, String simulationID) {
+    Simulation startNewSimulation(String year, String idPrefix, String simulationName, String simulationID, boolean forceLoadFromWeb) {
         def m = "${C}.startNewSimulation() - "
         Simulation sim = new Simulation()
         sim.year = year
         sim.simulationID = simulationID
         sim.simulationName = simulationName
-        Map teamMap = dataMgr.getTeamMapForSeason(year)
+        Map teamMap = dataMgr.getTeamMapForSeason(year, forceLoadFromWeb)
         teamMap.remove("year")
+        log.info("Team map for season ${year} loaded. Size=${teamMap.size()}")
+
         Object nextTeam
+        String key
         try {
             teamMap.each() { next ->
+                key = next.key
                 nextTeam = next.value
-                sim.addTeamToSeason(next.value)
+                if (key != "_id") {
+                    sim.addTeamToSeason(next.value)
+                }
             }
         } catch (Exception e) {
-            log.error("Failed to add team ${nextTeam} to season.", e)
+            log.error("Failed to add team ${key} to season.", e)
             e.printStackTrace()
         }
         log.debug "$m scheduleTeamLookup:"

@@ -107,6 +107,14 @@ class GamePitcher extends GamePitcherComparable
         this.simPitcher?.pitcher.name
     }
 
+    void setLocked(boolean value) {
+        this.simPitcher?.locked = value
+    }
+
+    boolean isLocked() {
+        this.simPitcher?.locked
+    }
+
     String getNameFirst() {
         this.simPitcher?.nameFirst
     }

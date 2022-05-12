@@ -5,6 +5,7 @@ import java.math.RoundingMode
 class SimPitcher extends Comparable {
 
     def C = "SimPitcher"
+    boolean locked = false
     int wins = 0
     int losses = 0
     int saves = 0
@@ -173,11 +174,51 @@ class SimPitcher extends Comparable {
 
     def getOppBattingAvg() {
         int oppAtBats = battersRetired + hits
+        BigDecimal value
         if (oppAtBats == 0) {
-            BigDecimal.valueOf(0)
+            value = BigDecimal.valueOf(0)
         }  else {
-            BigDecimal.valueOf(hits / oppAtBats)
+            value = BigDecimal.valueOf(hits / oppAtBats)
         }
+        value
+    }
+
+    def getOppBattingAvgAsString() {
+        format(getOppBattingAvg().toString() + "000",5)
+    }
+
+    def getStrikeoutsPerNineInnings() {
+        BigDecimal games = new BigDecimal(battersRetired)
+        games = games.divide(27, 5, RoundingMode.HALF_UP)
+        if (games.intValue() == 0) {
+            return "0.00"
+        }
+        BigDecimal result = new BigDecimal(strikeouts)
+        result = result.divide(games, 3, RoundingMode.HALF_UP)
+        String padded = result.toString() + "000"
+        if (result.intValue() >= 10) {
+            padded = format(padded, 5)
+        } else {
+            padded = format(padded, 4) + ' '
+        }
+        padded
+    }
+
+    def getWalksPerNineInnings() {
+        BigDecimal games = new BigDecimal(battersRetired)
+        games = games.divide(27, 5, RoundingMode.HALF_UP)
+        if (games.intValue() == 0) {
+            return "0.00"
+        }
+        BigDecimal result = new BigDecimal(walks)
+        result = result.divide(games, 3, RoundingMode.HALF_UP)
+        String padded = result.toString() + "000"
+        if (result.intValue() >= 10) {
+            padded = format(padded, 5)
+        } else {
+            padded = format(padded, 4) + ' '
+        }
+        padded
     }
 
     def getEra() {

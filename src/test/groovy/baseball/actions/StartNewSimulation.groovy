@@ -53,7 +53,7 @@ class StartNewSimulation {
 
     void createNewSimulation() {
         def m = "${C}.createNewSimulation() - "
-        def year = "1990"
+        def year = "2021"
 
         // Delete the simulation, just in case a sim with this ID exists.
         println "$m calling SimulationManager.deleteSimulation()... SimID: $simulationID"
@@ -63,7 +63,8 @@ class StartNewSimulation {
         // Start simulation
         log.debug "$m No saved simulation found. Starting new simulation..."
         log.debug "$m calling SimulationManager.startNewSimulation()... SimID: $simulationID"
-        Simulation sim = simMgr.startNewSimulation(year, idPrefix, "Shoemake Sim 1", simulationID)
+        boolean forceLoadFromWeb = true
+        Simulation sim = simMgr.startNewSimulation(year, idPrefix, "Shoemake Sim 1", simulationID, forceLoadFromWeb)
         log.debug "$m calling SimulationManager.startNewSimulation()... Done"
 
         // Reload the simulation

@@ -143,6 +143,10 @@ class PitcherStats extends Comparable {
         }
     }
 
+    def getOppBattingAvgAsString() {
+        format(getOppBattingAvg().toString() + "000",5)
+    }
+
     public def getRate(int num) {
         def rate = BigDecimal.valueOf(num / battersFaced)
         rate
@@ -191,6 +195,40 @@ class PitcherStats extends Comparable {
         result
     }
 */
+
+    def getStrikeoutsPerNineInnings() {
+        BigDecimal games = new BigDecimal(pitchingBattersRetired)
+        games = games.divide(27, 5, RoundingMode.HALF_UP)
+        if (games.intValue() == 0) {
+            return "0.00"
+        }
+        BigDecimal result = new BigDecimal(pitchingStrikeouts)
+        result = result.divide(games, 3, RoundingMode.HALF_UP)
+        String padded = result.toString() + "000"
+        if (result.intValue() >= 10) {
+            padded = format(padded, 5)
+        } else {
+            padded = format(padded, 4) + ' '
+        }
+        padded
+    }
+
+    def getWalksPerNineInnings() {
+        BigDecimal games = new BigDecimal(pitchingBattersRetired)
+        games = games.divide(27, 5, RoundingMode.HALF_UP)
+        if (games.intValue() == 0) {
+            return "0.00"
+        }
+        BigDecimal result = new BigDecimal(pitchingWalks)
+        result = result.divide(games, 3, RoundingMode.HALF_UP)
+        String padded = result.toString() + "000"
+        if (result.intValue() >= 10) {
+            padded = format(padded, 5)
+        } else {
+            padded = format(padded, 4) + ' '
+        }
+        padded
+    }
 
     def getEra() {
         pitchingEra

@@ -171,6 +171,32 @@ class BallGame {
                 int index = team.rotation.indexOf(team.starter)
                 team.rotation[index] = nextPitcher.playerID
                 team.starter = nextPitcher.playerID
+                if (team.starter == null) {
+                    nextPitcher = popFirstDoneStarter(team)
+                    team.doneStarters << team.starter
+                    index = team.rotation.indexOf(team.starter)
+                    team.rotation[index] = nextPitcher.playerID
+                    team.starter = nextPitcher.playerID
+                    if (nextPitcher.simPitcher.pitcher.pitcherStats.pitchingGamesStarted > 28) {
+                        nextPitcher.locked = true
+                    }
+                    auditLog.debug("${simPitcherStarter.name} is maxed out (${simPitcherStarter.gamesStarted} starts). New pitcher: ${nextPitcher.name}  Games Started: ${nextPitcher.pitcherStats.pitchingGamesStarted}")
+                    if (team.starter == null) {
+                        throw new Exception("Home team replacement starter is null.")
+                    }
+                } else {
+                    auditLog.debug("${simPitcherStarter.name} is maxed out (${simPitcherStarter.gamesStarted} starts). New pitcher: ${nextPitcher.name}  Games Started: ${nextPitcher.pitcherStats.pitchingGamesStarted}")
+                }
+            } else {
+                // Can't find a starter to replace with.  Use done starter with the most games and lock in.
+                nextPitcher = popFirstDoneStarter(team)
+                team.doneStarters << team.starter
+                int index = team.rotation.indexOf(team.starter)
+                team.rotation[index] = nextPitcher.playerID
+                team.starter = nextPitcher.playerID
+                if (nextPitcher.simPitcher.pitcher.pitcherStats.pitchingGamesStarted > 28) {
+                    nextPitcher.locked = true
+                }
                 auditLog.debug("${simPitcherStarter.name} is maxed out (${simPitcherStarter.gamesStarted} starts). New pitcher: ${nextPitcher.name}  Games Started: ${nextPitcher.pitcherStats.pitchingGamesStarted}")
                 if (team.starter == null) {
                     throw new Exception("Home team replacement starter is null.")
@@ -179,6 +205,18 @@ class BallGame {
         }
     }
 
+    private GamePitcher popFirstDoneStarter(SimTeam team) {
+        List tempDoneStarters = []
+        team.doneStarters.each() { String playerID ->
+            tempDoneStarters << getPitcher(playerID)
+        }
+
+        tempDoneStarters.sort { a, b -> a.simPitcher.gamesStarted <=> b.simPitcher.gamesStarted }
+        int i = tempDoneStarters.size() - 1
+        GamePitcher result = tempDoneStarters[i]
+        team.doneStarters.remove(result.playerID)
+        result
+    }
 
     private SimPitcher getHomeSimPitcher(String playerID) {
         try {
@@ -478,7 +516,9 @@ class BallGame {
                 if (fromLineup == null) {
                     fromLineup = getBatter(team.originalLineup[nextBatterNum])
                 }
-                fromLineup.simBatter.locked = true
+                if (fromLineup.simBatter.batter.atBats > 490) {
+                    fromLineup.simBatter.locked = true
+                }
                 team.lineup[nextBatterNum] = fromLineup.playerID
                 team.positions[position] = fromLineup.playerID
                 auditLog.debug("   Replacement -> Default $position: ${fromLineup.nameFirst} ${fromLineup.nameLast} ID=${fromLineup.playerID} ($position)")
@@ -1376,7 +1416,8 @@ class BallGame {
             def batter = simBatter.batter
             def pitcher = simPitcher.pitcher.pitcherStats
             def batterHitRate = batter.getRate(batter.hits)
-            def batterWalkRate = batter.getRate(batter.walks + batter.hitByPitch, batter.walks + batter.hitByPitch + batter.atBats - batter.hits)
+            def batterWalkRate = batter.getRate(batter.walks,           batter.walks + batter.hitByPitch + batter.atBats - batter.hits)
+            def batterHitBatterRate = batter.getRate(batter.hitByPitch, batter.walks + batter.hitByPitch + batter.atBats - batter.hits)
             def batterStrikeoutRate = batter.getRate(batter.strikeouts, batter.walks + batter.hitByPitch + batter.atBats - batter.hits)
             def batterHomerRate = batter.getRate(batter.homers, batter.hits)
             def batterDoubleRate = batter.getRate(batter.doubles, batter.hits)
@@ -1385,33 +1426,38 @@ class BallGame {
             def adjustment = BigDecimal.ZERO
             // Pitcher Info
             def pitcherHitRate = pitcher.getRate(pitcher.pitchingHits) + adjustment
-            def pitcherWalkRate = pitcher.getRate(pitcher.pitchingWalks + pitcher.pitchingHitBatter, pitcher.pitchingWalks + pitcher.pitchingHitBatter + pitcher.pitchingBattersRetired) + adjustment
-            def pitcherBalkRate = pitcher.getRate(pitcher.pitchingBalks)
+            def pitcherWalkRate = pitcher.getRate(pitcher.pitchingWalks,           pitcher.pitchingWalks + pitcher.pitchingHitBatter + pitcher.pitchingBattersRetired) + adjustment
+            def pitcherHitBatterRate = pitcher.getRate(pitcher.pitchingHitBatter,  pitcher.pitchingWalks + pitcher.pitchingHitBatter + pitcher.pitchingBattersRetired) + adjustment
             def pitcherStrikeoutRate = pitcher.getRate(pitcher.pitchingStrikeouts, pitcher.pitchingWalks + pitcher.pitchingHitBatter + pitcher.pitchingBattersRetired)
+            def pitcherBalkRate = pitcher.getRate(pitcher.pitchingBalks)
             def pitcherHomerRate = pitcher.getRate(pitcher.pitchingHomers, pitcher.pitchingHits) + adjustment
 
-            def actualHitRate, actualWalkRate, actualStrikeoutRate, actualHomerRate
+            def actualHitRate, actualWalkRate, actualStrikeoutRate, actualHomerRate, actualHitBatterRate
             if (simStyle == SimStyle.PITCHER_FOCUSED) {
                 actualHitRate = pitcherHitRate
                 actualWalkRate = pitcherWalkRate
                 actualStrikeoutRate = pitcherStrikeoutRate
                 actualHomerRate = pitcherHomerRate
+                actualHitBatterRate = pitcherHitBatterRate
             } else if (simStyle == SimStyle.BATTER_FOCUSED) {
                 actualHitRate = batterHitRate
                 actualWalkRate = batterWalkRate
                 actualStrikeoutRate = batterStrikeoutRate
                 actualHomerRate = batterHomerRate
+                actualHitBatterRate = batterHitBatterRate
             } else if (simStyle == SimStyle.BATTER_HEAVY) {
                 actualHitRate = ((batterHitRate + batterHitRate + pitcherHitRate) / 3)
                 actualWalkRate = ((batterWalkRate + batterWalkRate + pitcherWalkRate) / 3)
                 actualStrikeoutRate = ((batterStrikeoutRate + batterStrikeoutRate + pitcherStrikeoutRate) / 3)
                 actualHomerRate = ((batterHomerRate + batterHomerRate + pitcherHomerRate) / 3)
+                actualHitBatterRate = ((batterHitBatterRate + batterHitBatterRate + pitcherHitBatterRate) / 3)
             } else {
                 // Combined Rates
                 actualHitRate = ((batterHitRate + pitcherHitRate) / 2)
                 actualWalkRate = ((batterWalkRate + pitcherWalkRate) / 2)
                 actualStrikeoutRate = ((batterStrikeoutRate + pitcherStrikeoutRate) / 2)
                 actualHomerRate = ((batterHomerRate + pitcherHomerRate) / 2)
+                actualHitBatterRate = ((batterHitBatterRate + pitcherHitBatterRate) / 2)
             }
 
             //boxscoreLog.debug ""
@@ -1477,7 +1523,7 @@ class BallGame {
                     simBatter.walks += 1
                     simPitcher.walks += 1
                     result = AtBatResult.WALK
-                } else if (walkOrOut <= actualWalkRate + pitcherStrikeoutRate) {
+                } else if (walkOrOut <= actualWalkRate + actualStrikeoutRate) {
                     // Strikeout
                     gameBatter.strikeouts += 1
                     gamePitcher.strikeouts += 1
@@ -1488,6 +1534,13 @@ class BallGame {
                     simBatter.atBats += 1
                     simPitcher.battersRetired += 1
                     result = AtBatResult.STRIKEOUT
+                } else if (walkOrOut <= actualWalkRate + actualStrikeoutRate + actualHitBatterRate) {
+                    // Strikeout
+                    gameBatter.hitByPitch += 1
+                    gamePitcher.hitByPitch += 1
+                    simBatter.hitByPitch += 1
+                    simPitcher.hitByPitch += 1
+                    result = AtBatResult.HIT_BY_PITCH
                 } else {
                     // Groundout
                     gameBatter.atBats += 1
